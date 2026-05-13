@@ -67,3 +67,72 @@ LLM-as-a-Judge Evaluation
      |
      v
 Improvement Case Generator
+```
+
+## Sprint 0
+
+Sprint 0 sets up the empty deployment path before adding RAG logic:
+
+- FastAPI service with public health check at `/health`.
+- Hello-world trace endpoint at `/hello`.
+- Minimal Google ADK `qa_agent` placeholder in `phoenix_reflex_agent/agent.py`.
+- Phoenix Cloud tracing through `phoenix.otel.register()`.
+- Google ADK OpenInference instrumentation.
+- Dockerfile with Python and Node, ready for Cloud Run and the later Phoenix MCP `npx` dependency.
+- Gemini CLI MCP config in `.gemini/settings.json` for Phoenix runtime introspection.
+
+## Local Run
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+copy .env.example .env
+uvicorn phoenix_reflex.main:app --reload --port 8080
+```
+
+Then open:
+
+- `http://localhost:8080/health`
+- `http://localhost:8080/hello`
+
+The `/hello` request emits a `hello_world` span when `PHOENIX_API_KEY` is set.
+
+Use Phoenix Cloud credentials, not Arize AX credentials:
+
+- `PHOENIX_API_KEY`: Phoenix key from `app.phoenix.arize.com`.
+- `PHOENIX_COLLECTOR_ENDPOINT`: Phoenix Cloud Hostname from Settings, including `/s/<space>`.
+- `PHOENIX_PROJECT_NAME`: `phoenix-reflex`.
+
+Example collector endpoint:
+
+```text
+https://app.phoenix.arize.com/s/your-space
+```
+
+## Cloud Run
+
+Create Secret Manager secrets named `PHOENIX_API_KEY` and `GOOGLE_API_KEY`, then deploy:
+
+```powershell
+.\scripts\deploy-cloud-run.ps1 `
+  -ProjectId your-gcp-project-id `
+  -PhoenixCollectorEndpoint https://app.phoenix.arize.com/s/your-space `
+  -Region europe-west1
+```
+
+The service should expose:
+
+- `/health` for Cloud Run readiness checks.
+- `/hello` for validating that a trace reaches Phoenix Cloud.
+
+## Phoenix MCP
+
+The Arize hackathon starter configures Phoenix MCP through Gemini CLI rather than inside the Python ADK service. This repo follows that pattern for sprint 0:
+
+- Edit `.gemini/settings.json`.
+- Replace `https://app.phoenix.arize.com/s/your-space` with the same Phoenix Cloud hostname used for tracing.
+- Put the API key in the Gemini CLI environment or fill the `--apiKey` value locally.
+- Start Gemini CLI from the repo root so it can load the MCP server config.
+
+Once traces exist, Gemini CLI can inspect Phoenix traces, prompts, datasets, experiments, and sessions through `@arizeai/phoenix-mcp`.
