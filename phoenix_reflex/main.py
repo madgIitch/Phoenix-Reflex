@@ -7,6 +7,7 @@ from datetime import datetime, UTC
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
+from phoenix_reflex.evaluator import evaluate_faithfulness
 from phoenix_reflex.observability import configure_tracing, get_tracer
 from phoenix_reflex.qa import ask_agent
 from phoenix_reflex.retriever import retrieve_documents
@@ -14,6 +15,11 @@ from phoenix_reflex.retriever import retrieve_documents
 
 class AskRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=1000)
+
+
+class FaithfulnessDemoRequest(BaseModel):
+    question: str = Field(..., min_length=1, max_length=1000)
+    answer: str = Field(..., min_length=1, max_length=4000)
 
 
 @asynccontextmanager
@@ -78,3 +84,12 @@ def retrieve(query: str, top_k: int = 4) -> dict[str, object]:
 @app.post("/ask")
 async def ask(request: AskRequest) -> dict[str, object]:
     return await ask_agent(request.question)
+
+
+@app.post("/eval/faithfulness")
+def eval_faithfulness(request: FaithfulnessDemoRequest) -> dict[str, object]:
+    return {
+        "question": request.question,
+        "answer": request.answer,
+        "faithfulness": evaluate_faithfulness(request.question, request.answer),
+    }

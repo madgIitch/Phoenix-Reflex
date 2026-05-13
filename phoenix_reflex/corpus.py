@@ -78,7 +78,8 @@ CORPUS: tuple[Document, ...] = (
         title="Sprint 1 answer policy",
         text=(
             "qa_agent must answer only from retrieved context, cite document ids, "
-            "and say it does not know when the context is missing or too weak. "
+            "and say it does not know when the context is missing, unrelated, or too weak. "
+            "When abstaining, it should briefly explain what information is missing. "
             "This abstention behavior is part of the demo design."
         ),
         tags=("sprint-1", "prompt", "abstention"),

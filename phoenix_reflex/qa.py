@@ -7,6 +7,7 @@ from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
 
+from phoenix_reflex.evaluator import evaluate_faithfulness
 from phoenix_reflex.observability import get_tracer
 from phoenix_reflex_agent.agent import root_agent
 
@@ -62,9 +63,14 @@ async def ask_agent(question: str) -> dict[str, object]:
         span.set_attribute("qa.event_count", event_count)
         span.set_attribute("qa.final_author", final_author or "")
         span.set_attribute("output.value", answer)
+        faithfulness = evaluate_faithfulness(question, answer)
+        span.set_attribute("eval.faithfulness.label", str(faithfulness["label"]))
+        span.set_attribute("eval.faithfulness.score", float(faithfulness["score"]))
+        span.set_attribute("eval.faithfulness.explanation", str(faithfulness["explanation"]))
         return {
             "question": question,
             "answer": answer,
+            "faithfulness": faithfulness,
             "session_id": session_id,
             "event_count": event_count,
         }

@@ -161,6 +161,56 @@ Invoke-RestMethod `
 
 The answer should cite corpus document ids such as `[s1-goal]` and `[s1-prompt]`. In Arize AX, the trace should show the top-level ask span, retrieval span, ADK invocation, tool call, and model generation activity.
 
+## Sprint 2
+
+Sprint 2 adds inline faithfulness evaluation:
+
+- LLM-as-a-judge evaluator in `phoenix_reflex/evaluator.py`.
+- Every `/ask` response is checked against retrieved documents.
+- The API response includes `faithfulness.label`, `faithfulness.score`, and `faithfulness.explanation`.
+- Arize AX traces include a `faithfulness_eval` span and `eval.faithfulness.*` attributes on `qa_agent.ask`.
+
+Example response shape:
+
+```json
+{
+  "question": "...",
+  "answer": "...",
+  "faithfulness": {
+    "label": "faithful",
+    "score": 1.0,
+    "explanation": "...",
+    "context_doc_ids": ["s1-goal", "s1-prompt"]
+  }
+}
+```
+
+Useful validation questions:
+
+```text
+Que agrega el sprint 1 y que debe hacer si no hay contexto?
+Cual es el presupuesto exacto del equipo y la biografia de cada miembro?
+```
+
+The first should be answered with citations and a high faithfulness score. The second should abstain and still receive a high score because the abstention is supported by the missing context.
+
+To demonstrate an intentionally unfaithful answer without weakening the normal agent behavior, use the manual eval endpoint:
+
+```powershell
+$body = @{
+  question = "Cual es el presupuesto exacto del equipo?"
+  answer = "El presupuesto exacto del equipo es 50000 euros."
+} | ConvertTo-Json -Compress
+
+Invoke-RestMethod `
+  -Uri "http://localhost:8080/eval/faithfulness" `
+  -Method Post `
+  -ContentType "application/json" `
+  -Body $body
+```
+
+This should return `unfaithful` because the corpus does not support the budget claim.
+
 ## Phoenix MCP
 
 The Arize hackathon starter configures Phoenix MCP through Gemini CLI rather than inside the Python ADK service. This repo follows that pattern for sprint 0:
