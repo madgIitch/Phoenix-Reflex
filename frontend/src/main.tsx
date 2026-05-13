@@ -45,6 +45,7 @@ type AskResponse = {
   answer: string;
   faithfulness?: { label: string; score: number; explanation: string; context_doc_ids: string[] };
   document_relevance?: { label: string; score: number; explanation: string; context_doc_ids: string[] };
+  answer_quality?: { label: string; reasons: string[]; explanation: string };
   failure_mode?: string;
 };
 
@@ -69,11 +70,13 @@ type TraceSummary = {
     answer: string;
     faithfulness?: AskResponse['faithfulness'];
     document_relevance?: AskResponse['document_relevance'];
+    answer_quality?: AskResponse['answer_quality'];
     failure_mode?: string;
   };
   retrieved_documents?: RetrievalResult[];
   faithfulness?: AskResponse['faithfulness'];
   document_relevance?: AskResponse['document_relevance'];
+  answer_quality?: AskResponse['answer_quality'];
   failure_mode?: string;
   event_count: number;
 };
@@ -409,8 +412,10 @@ function AskView({ question, response, onQuestion, onAsk }: {
           <>
             <Metric label="Faithfulness" value={`${response.faithfulness?.label ?? '-'} ${response.faithfulness?.score ?? ''}`} />
             <Metric label="Document relevance" value={`${response.document_relevance?.label ?? '-'} ${response.document_relevance?.score ?? ''}`} />
+            <Metric label="Answer quality" value={response.answer_quality?.label ?? '-'} />
             <Metric label="Failure mode" value={response.failure_mode ?? '-'} />
             <p>{response.faithfulness?.explanation}</p>
+            {response.answer_quality?.label === 'suspicious' && <p>{response.answer_quality.explanation}</p>}
           </>
         ) : <p>No answer yet.</p>}
       </aside>
@@ -461,6 +466,15 @@ function TracesView({
   onRefresh: () => void;
   onExport: () => void;
 }) {
+  const [copyStatus, setCopyStatus] = useState('');
+
+  async function copySelectedTrace() {
+    if (!selectedTrace) return;
+    await copyJsonToClipboard(selectedTrace);
+    setCopyStatus('Copied');
+    window.setTimeout(() => setCopyStatus(''), 1800);
+  }
+
   return (
     <div className="twoPane">
       <section>
@@ -476,7 +490,7 @@ function TracesView({
         </header>
         <table>
           <thead>
-            <tr><th>Time</th><th>Session</th><th>Input</th><th>Faithfulness</th><th>Failure</th></tr>
+            <tr><th>Time</th><th>Session</th><th>Input</th><th>Faithfulness</th><th>Quality</th><th>Failure</th></tr>
           </thead>
           <tbody>
             {traces.map((trace) => (
@@ -485,6 +499,7 @@ function TracesView({
                 <td>{trace.session_id.slice(0, 18)}...</td>
                 <td>{trace.question}</td>
                 <td>{trace.faithfulness?.label ?? '-'} {trace.faithfulness?.score ?? ''}</td>
+                <td>{trace.answer_quality?.label ?? '-'}</td>
                 <td>{trace.failure_mode ?? '-'}</td>
               </tr>
             ))}
@@ -521,10 +536,15 @@ function TracesView({
               <pre>{JSON.stringify({
                 faithfulness: selectedTrace.faithfulness,
                 document_relevance: selectedTrace.document_relevance,
+                answer_quality: selectedTrace.answer_quality,
                 failure_mode: selectedTrace.failure_mode,
               }, null, 2)}</pre>
             </section>
-            <button onClick={() => downloadJson(`trace-${selectedTrace.session_id}.json`, selectedTrace)}>Export selected</button>
+            <div className="actions">
+              <button onClick={copySelectedTrace}>Copy JSON</button>
+              <button onClick={() => downloadJson(`trace-${selectedTrace.session_id}.json`, selectedTrace)}>Export selected</button>
+              {copyStatus && <span className="actionStatus">{copyStatus}</span>}
+            </div>
           </>
         ) : <p>No traces captured yet. Ask a question first.</p>}
       </aside>
@@ -554,6 +574,24 @@ function downloadJson(filename: string, data: unknown) {
   anchor.download = filename;
   anchor.click();
   URL.revokeObjectURL(href);
+}
+
+async function copyJsonToClipboard(data: unknown) {
+  const text = JSON.stringify(data, null, 2);
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.left = '-9999px';
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
 }
 
 function formatTime(value: string) {

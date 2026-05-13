@@ -18,6 +18,7 @@ def record_trace_summary(
     answer: str,
     faithfulness: dict[str, Any],
     document_relevance: dict[str, Any] | None = None,
+    answer_quality: dict[str, Any] | None = None,
     failure_mode: str = "unknown",
     session_id: str,
     event_count: int,
@@ -37,11 +38,13 @@ def record_trace_summary(
             "answer": answer,
             "faithfulness": faithfulness,
             "document_relevance": document_relevance,
+            "answer_quality": answer_quality,
             "failure_mode": failure_mode,
         },
         "retrieved_documents": retrieved_documents,
         "faithfulness": faithfulness,
         "document_relevance": document_relevance,
+        "answer_quality": answer_quality,
         "failure_mode": failure_mode,
         "event_count": event_count,
     }
@@ -52,17 +55,25 @@ def record_trace_summary(
 
 def maybe_create_improvement_case(summary: dict[str, Any]) -> dict[str, Any] | None:
     faithfulness = summary["faithfulness"]
-    if float(faithfulness.get("score", 0.0)) >= 0.75:
+    answer_quality = summary.get("answer_quality") or {}
+    faithfulness_score = float(faithfulness.get("score", 0.0))
+    is_suspicious = answer_quality.get("label") == "suspicious"
+    if faithfulness_score >= 0.75 and not is_suspicious:
         return None
+    quality_only_failure = faithfulness_score >= 0.75 and is_suspicious
 
     return add_improvement_case(
         question=summary["question"],
         answer=summary["answer"],
         faithfulness_label=str(faithfulness.get("label", "unknown")),
-        faithfulness_score=float(faithfulness.get("score", 0.0)),
-        explanation=str(faithfulness.get("explanation", "")),
+        faithfulness_score=faithfulness_score,
+        explanation=(
+            str(answer_quality.get("explanation", ""))
+            if quality_only_failure
+            else str(faithfulness.get("explanation", ""))
+        ),
         source_session_id=summary["session_id"],
-        failure_mode=str(summary.get("failure_mode", "unknown")),
+        failure_mode="answer_quality" if quality_only_failure else str(summary.get("failure_mode", "unknown")),
     )
 
 
@@ -206,6 +217,8 @@ def _suggest_fix(failure_mode: str) -> str:
         return "Improve corpus coverage or retrieval ranking for this question."
     if failure_mode == "generation":
         return "Tighten the prompt so unsupported claims become explicit abstentions."
+    if failure_mode == "answer_quality":
+        return "Improve answer usefulness checks: preserve the user language, avoid intent drift, and do not over-abstain when relevant context exists."
     return "Improve retrieval coverage or tighten the prompt so unsupported claims become explicit abstentions."
 
 

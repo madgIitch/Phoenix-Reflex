@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from functools import lru_cache
 from uuid import uuid4
 
@@ -76,6 +77,21 @@ async def ask_agent(question: str) -> dict[str, object]:
 
         retrieved = retrieve_documents(question, top_k=5)
         retrieved_documents = retrieved.get("documents", [])
+        valid_ids = set(retrieved.get("valid_citation_ids", []))
+        phantom_citations = _find_phantom_citations(answer, valid_ids)
+        if phantom_citations:
+            span.set_attribute("eval.phantom_citations", ", ".join(phantom_citations))
+            span.set_attribute("eval.phantom_citation_count", len(phantom_citations))
+            corrected = await _correct_phantom_citations(
+                session_id=session_id,
+                phantom_citations=phantom_citations,
+                valid_ids=valid_ids,
+            )
+            if corrected:
+                answer = corrected
+                event_count += 1
+                span.set_attribute("eval.citation_correction_applied", True)
+                span.set_attribute("output.value", answer)
         document_relevance = evaluate_document_relevance(question)
         faithfulness = evaluate_faithfulness(
             question,
@@ -83,12 +99,15 @@ async def ask_agent(question: str) -> dict[str, object]:
             extra_context=extra_context,
             extra_context_ids=extra_context_ids,
         )
+        answer_quality = _assess_answer_quality(question, answer, faithfulness, document_relevance)
         span.set_attribute("eval.faithfulness.label", str(faithfulness["label"]))
         span.set_attribute("eval.faithfulness.score", float(faithfulness["score"]))
         span.set_attribute("eval.faithfulness.explanation", str(faithfulness["explanation"]))
         span.set_attribute("eval.document_relevance.label", str(document_relevance["label"]))
         span.set_attribute("eval.document_relevance.score", float(document_relevance["score"]))
         span.set_attribute("eval.document_relevance.explanation", str(document_relevance["explanation"]))
+        span.set_attribute("eval.answer_quality.label", str(answer_quality["label"]))
+        span.set_attribute("eval.answer_quality.explanation", str(answer_quality["explanation"]))
         failure_mode = _classify_failure_mode(faithfulness, document_relevance)
         span.set_attribute("eval.failure_mode", failure_mode)
         summary = record_trace_summary(
@@ -96,6 +115,7 @@ async def ask_agent(question: str) -> dict[str, object]:
             answer=answer,
             faithfulness=faithfulness,
             document_relevance=document_relevance,
+            answer_quality=answer_quality,
             failure_mode=failure_mode,
             session_id=session_id,
             event_count=event_count,
@@ -110,7 +130,9 @@ async def ask_agent(question: str) -> dict[str, object]:
             "answer": answer,
             "faithfulness": faithfulness,
             "document_relevance": document_relevance,
+            "answer_quality": answer_quality,
             "failure_mode": failure_mode,
+            "phantom_citations": sorted(phantom_citations),
             "improvement_case": improvement_case,
             "session_id": session_id,
             "event_count": event_count,
@@ -151,3 +173,103 @@ def _classify_failure_mode(
     if relevance_score < 0.75:
         return "retrieval"
     return "generation"
+
+
+def _assess_answer_quality(
+    question: str,
+    answer: str,
+    faithfulness: dict[str, object],
+    document_relevance: dict[str, object],
+) -> dict[str, object]:
+    reasons: list[str] = []
+    normalized_question = question.lower()
+    normalized_answer = answer.lower()
+    relevance_score = float(document_relevance.get("score", 0.0))
+    faithfulness_score = float(faithfulness.get("score", 0.0))
+
+    if _looks_spanish(normalized_question) and _looks_english(normalized_answer):
+        reasons.append("language_mismatch")
+
+    abstention_markers = (
+        "cannot answer",
+        "can't answer",
+        "i do not know",
+        "no puedo responder",
+        "no puedo contestar",
+        "no se puede responder",
+        "no lo se",
+    )
+    if relevance_score >= 0.75 and any(marker in normalized_answer for marker in abstention_markers):
+        reasons.append("possible_over_abstention")
+
+    if (
+        "trabajador" in normalized_question
+        and ("inherent capacity" in normalized_answer or "diligence" in normalized_answer or "work ethic" in normalized_answer)
+    ):
+        reasons.append("possible_intent_drift")
+
+    label = "suspicious" if reasons else "ok"
+    explanation = (
+        "Faithful answer, but potentially poor user-intent handling: " + ", ".join(reasons)
+        if label == "suspicious" and faithfulness_score >= 0.75
+        else "Unfaithful answer also shows answer-quality warning(s): " + ", ".join(reasons)
+        if label == "suspicious"
+        else "No obvious answer-quality issue detected."
+    )
+    return {
+        "label": label,
+        "reasons": reasons,
+        "explanation": explanation,
+    }
+
+
+_CITATION_RE = re.compile(r"\[([^\]]+)\]")
+
+
+async def _correct_phantom_citations(
+    session_id: str,
+    phantom_citations: set[str],
+    valid_ids: set[str],
+) -> str:
+    """Send a correction turn in the same session to strip phantom citations."""
+    phantom_list = ", ".join(sorted(phantom_citations))
+    valid_list = ", ".join(sorted(valid_ids)) if valid_ids else "none"
+    correction = (
+        f"Your previous answer cited document IDs that were NOT returned by retrieve_documents: {phantom_list}. "
+        f"These pages do not exist in the retrieved context. "
+        f"The only valid citation IDs for this query are: {valid_list}. "
+        "Please rewrite your answer using only those IDs. "
+        "If the retrieved documents do not contain enough information to answer a part of the question, "
+        "say so explicitly instead of citing other pages."
+    )
+    correction_message = types.Content(
+        role="user",
+        parts=[types.Part.from_text(text=correction)],
+    )
+    corrected_answer = ""
+    async for event in _runner().run_async(
+        user_id=USER_ID,
+        session_id=session_id,
+        new_message=correction_message,
+    ):
+        if event.is_final_response() and event.content:
+            text = _content_text(event.content)
+            if text:
+                corrected_answer = text
+    return corrected_answer
+
+
+def _find_phantom_citations(answer: str, valid_ids: set[str]) -> set[str]:
+    """Return citation IDs in the answer that were not in the retrieved set."""
+    found = {m.group(1) for m in _CITATION_RE.finditer(answer)}
+    return {cid for cid in found if cid not in valid_ids and cid.startswith("pdf:")}
+
+
+def _looks_spanish(text: str) -> bool:
+    markers = ("andaluc", "segun", "puede", "pueden", "trabajador", "derechos")
+    return any(marker in text for marker in markers)
+
+
+def _looks_english(text: str) -> bool:
+    markers = ("based on", "i cannot", "the documents", "the context", "work ethic", "inherent capacity")
+    return any(marker in text for marker in markers)

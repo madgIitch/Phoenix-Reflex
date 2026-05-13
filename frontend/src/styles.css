@@ -141,7 +141,12 @@ pre {
 
 .searchBox, .actions {
   display: flex;
+  align-items: center;
   gap: 10px;
+}
+.actionStatus {
+  color: #2aa198;
+  font-size: 13px;
 }
 .searchBox input {
   width: 360px;

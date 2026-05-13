@@ -60,7 +60,7 @@ def generate_prompt_candidate() -> dict[str, Any]:
             )
         ).strip()
         if not candidate:
-            candidate = _fallback_candidate(current_prompt)
+            candidate = _safety_net_candidate(current_prompt)
 
         record = upsert_prompt("candidate", candidate, source="regression_v1")
         span.set_attribute("prompt.candidate.version", record["version"])
@@ -182,7 +182,8 @@ def _format_cases(cases: list[dict[str, Any]]) -> str:
     )
 
 
-def _fallback_candidate(current_prompt: str) -> str:
+def _safety_net_candidate(current_prompt: str) -> str:
+    """Only used when the LLM candidate generator returns empty text."""
     return (
         current_prompt
         + " Before answering, explicitly check whether retrieved context supports "

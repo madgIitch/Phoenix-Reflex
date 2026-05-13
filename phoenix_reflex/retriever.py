@@ -42,13 +42,19 @@ def retrieve_documents(query: str, top_k: int = 4) -> dict[str, Any]:
 
         results = _rank(query, top_k)
         max_score = results[0]["score"] if results else 0.0
+        valid_citation_ids = [item["id"] for item in results]
         span.set_attribute("retrieval.result_count", len(results))
         span.set_attribute("retrieval.max_score", max_score)
-        span.set_attribute("output.value", ", ".join(item["id"] for item in results))
+        span.set_attribute("output.value", ", ".join(valid_citation_ids))
         return {
             "query": query,
             "top_k": top_k,
             "max_score": max_score,
+            "valid_citation_ids": valid_citation_ids,
+            "citation_rule": (
+                "You MUST only cite IDs from valid_citation_ids. "
+                "Any other page or chunk ID does not exist in the retrieved context."
+            ),
             "documents": results,
         }
 

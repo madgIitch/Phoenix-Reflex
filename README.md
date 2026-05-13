@@ -1,38 +1,35 @@
 # Phoenix Reflex
 
-**Phoenix Reflex** is a self-improving RAG agent that not only answers questions, but also observes, evaluates, and improves itself through its own execution traces.
+**Phoenix Reflex** is a regression-driven RAG system: every failed answer becomes a regression test, an improvement hypothesis, and a comparison against production.
 
-The project combines a RAG pipeline with **Arize AX tracing**, OpenInference instrumentation for Google/Gemini, Phoenix MCP-style runtime introspection, and an **LLM-as-a-judge evaluation loop** to detect low-confidence answers, possible hallucinations, weak retrieval results, and reasoning failures.
+The project combines a RAG pipeline with **Arize AX tracing**, OpenInference instrumentation for Google/Gemini, runtime introspection tools, and an **LLM-as-a-judge evaluation loop** to classify failures, capture them as `improvement_case` records, generate prompt candidates, and compare those candidates against production before a human promotes them to staging.
 
 ## Core Idea
 
 Most RAG agents answer and stop.
 
-Phoenix Reflex closes the loop:
+Phoenix Reflex turns failures into versioned regression pressure:
 
 1. A user asks a question.
 2. The RAG agent retrieves context and generates an answer.
 3. Every step is traced in Arize AX.
-4. The agent detects possible failure signals:
-   - low confidence
-   - weak retrieval
-   - missing citations
-   - possible hallucination
-   - inconsistent reasoning
-5. The agent queries its own traces through MCP-backed observability tools.
-6. An LLM-as-a-judge evaluates the answer.
-7. If the answer is weak, the system automatically creates an improvement case.
+4. The evaluators score faithfulness and document relevance.
+5. The system classifies failures as `retrieval`, `generation`, or `none`.
+6. Weak answers become `improvement_case` records in the `regression_v1` queue.
+7. A candidate prompt is generated from the regression cases.
+8. The candidate is compared against production on both regression cases and known-good questions.
+9. Promotion to `staging` stays manual so a human keeps the release decision.
 
 ## What It Generates
 
 When a problematic answer is detected, Phoenix Reflex can automatically create:
 
-- a new regression test question
+- a regression test question
 - a dataset example for future evaluation
-- a supervised correction
-- a GitHub issue
-- a failure report
-- a prompt or retrieval improvement suggestion
+- a failure report with retrieved context and evaluator output
+- a failure-mode label: `retrieval`, `generation`, or `none`
+- a prompt or retrieval improvement hypothesis
+- a candidate prompt for comparative testing
 
 ## Why It Matters
 
@@ -40,7 +37,7 @@ RAG systems usually fail silently.
 
 Phoenix Reflex makes failures visible, traceable, and actionable.
 
-Instead of treating observability as a dashboard only for humans, this project turns observability into a runtime tool that the agent itself can use to improve.
+Instead of treating observability as a dashboard only for humans, this project turns runtime traces into the next regression suite. The strongest demo path is compliance and local regulation: dense PDFs such as `estatuto81.pdf`, where unsupported answers are easy to miss and costly to trust.
 
 ## Architecture
 
@@ -60,13 +57,16 @@ Arize AX Tracing
 Failure Detection
      |
      v
-MCP Trace Query
+Failure Mode Classification
      |
      v
-LLM-as-a-Judge Evaluation
+Improvement Case
      |
      v
-Improvement Case Generator
+Prompt Candidate Experiment
+     |
+     v
+Manual Promotion to Staging
 ```
 
 ## Sprint 0
@@ -309,12 +309,14 @@ Promotion is still manual so the demo keeps a human approval point.
 Sprint 5 adds optional robustness layers without changing the main demo path:
 
 - `Document Relevance` evaluator to separate retrieval failures from generation failures.
-- Explicit `critic_agent` definition for the multi-agent narrative.
+- `Answer Quality` heuristics to flag faithful but suspicious answers, such as language mismatch, over-abstention, or user-intent drift.
+- Evaluator spans are tagged with `critic.agent=critic_agent`, but the real evaluation path lives in `phoenix_reflex/evaluator.py`.
 - Prompt cache with fallback to the last valid prompt registry state.
 - Structured failure mode classification:
   - `none`
   - `retrieval`
   - `generation`
+  - `answer_quality`
 - Local human-review style improvement cases remain visible through `/improvement-cases`.
 
 Validate document relevance:
@@ -330,6 +332,7 @@ Invoke-RestMethod "http://localhost:8080/eval/document-relevance?query=Cual%20es
 {
   "faithfulness": {"label": "faithful", "score": 1.0},
   "document_relevance": {"label": "relevant", "score": 1.0},
+  "answer_quality": {"label": "ok", "reasons": []},
   "failure_mode": "none"
 }
 ```
@@ -340,6 +343,42 @@ This makes failures easier to explain:
 low relevance + low faithfulness -> retrieval problem
 high relevance + low faithfulness -> generation problem
 ```
+
+## Demo Path: Regulation PDF
+
+Use `estatuto81.pdf` as the vertical demo corpus. It keeps the story concrete: a compliance-style RAG system answering from dense local regulation.
+
+Recommended anchor questions:
+
+```text
+Andalucia tiene a Madrid como municipio?
+Jerez es un municipio de Andalucia?
+Cuales son las competencias de la Comunidad Autonoma?
+```
+
+Expected interpretation:
+
+- Madrid question: supported abstention or correction, `failure_mode: none`.
+- Jerez question: plausible answer without direct retrieved support, `failure_mode: retrieval`.
+- Competencias question: related but incomplete retrieval, useful for explaining partial relevance.
+
+After the failure cases exist, run the prompt loop:
+
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8080/prompts/candidate" -Method Post
+Invoke-RestMethod -Uri "http://localhost:8080/experiments/prompt" -Method Post
+py scripts/promote_tag.py --base-url http://localhost:8080 --source-tag candidate --target-tag staging
+```
+
+For the agentic moment, ask:
+
+```text
+Que has aprendido sobre tus fallos recientes?
+```
+
+Use it live only after three successful rehearsals where the agent calls `list_improvement_cases` or `list_recent_trace_summaries`. If any rehearsal misses the tool call, show the captured Arize AX trace and narrate the introspection instead.
+
+Judge-model caveat for Q&A: the hackathon version uses a strict, separate judge prompt with explicit scoring criteria. A production deployment should mitigate correlated model bias with a different judge family or sampled human review.
 
 ## PDF Ingestion UI
 
