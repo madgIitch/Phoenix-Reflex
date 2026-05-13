@@ -132,6 +132,35 @@ The service should expose:
 - `/health` for Cloud Run readiness checks.
 - `/hello` for validating that a trace reaches Arize AX.
 
+## Sprint 1
+
+Sprint 1 adds the smallest useful RAG loop:
+
+- Curated corpus of 12 short documents in `phoenix_reflex/corpus.py`.
+- Intentional failure cases: Phoenix naming ambiguity, partially supported questions, and unsupported topics.
+- BM25-style retriever in `phoenix_reflex/retriever.py`.
+- `retrieve_documents` tool connected to `qa_agent`.
+- `/retrieve` endpoint for inspecting retrieval directly.
+- `/ask` endpoint for running the ADK agent with retrieval and cited answers.
+
+Try retrieval directly:
+
+```powershell
+Invoke-RestMethod "http://localhost:8080/retrieve?query=que%20hace%20sprint%201&top_k=2"
+```
+
+Ask the agent:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "http://localhost:8080/ask" `
+  -Method Post `
+  -ContentType "application/json" `
+  -Body '{"question":"Que agrega el sprint 1 y que debe hacer si no hay contexto?"}'
+```
+
+The answer should cite corpus document ids such as `[s1-goal]` and `[s1-prompt]`. In Arize AX, the trace should show the top-level ask span, retrieval span, ADK invocation, tool call, and model generation activity.
+
 ## Phoenix MCP
 
 The Arize hackathon starter configures Phoenix MCP through Gemini CLI rather than inside the Python ADK service. This repo follows that pattern for sprint 0:

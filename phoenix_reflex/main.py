@@ -5,8 +5,15 @@ from contextlib import asynccontextmanager
 from datetime import datetime, UTC
 
 from fastapi import FastAPI
+from pydantic import BaseModel, Field
 
 from phoenix_reflex.observability import configure_tracing, get_tracer
+from phoenix_reflex.qa import ask_agent
+from phoenix_reflex.retriever import retrieve_documents
+
+
+class AskRequest(BaseModel):
+    question: str = Field(..., min_length=1, max_length=1000)
 
 
 @asynccontextmanager
@@ -61,3 +68,13 @@ def hello() -> dict[str, str]:
             "project": project,
             "timestamp": datetime.now(UTC).isoformat(),
         }
+
+
+@app.get("/retrieve")
+def retrieve(query: str, top_k: int = 4) -> dict[str, object]:
+    return retrieve_documents(query=query, top_k=top_k)
+
+
+@app.post("/ask")
+async def ask(request: AskRequest) -> dict[str, object]:
+    return await ask_agent(request.question)
