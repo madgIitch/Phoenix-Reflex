@@ -211,6 +211,60 @@ Invoke-RestMethod `
 
 This should return `unfaithful` because the corpus does not support the budget claim.
 
+## Sprint 3
+
+Sprint 3 adds self-introspection and improvement-case generation:
+
+- `list_recent_trace_summaries`: lets the agent inspect recent `/ask` runs.
+- `get_trace_summary`: fetches one stored trace summary by session id.
+- `list_improvement_cases`: exposes generated regression candidates.
+- `add_improvement_case`: records low-faithfulness answers into the local `regression_v1` queue.
+- Optional Phoenix MCP toolset in `phoenix_reflex/mcp.py`, enabled only with `ENABLE_PHOENIX_MCP=1` and Phoenix credentials.
+
+The local improvement queue is intentionally lightweight for the hackathon demo. It proves the self-correction loop without requiring a database:
+
+```text
+answer -> faithfulness eval -> low score -> improvement case -> regression_v1
+```
+
+Generate a failing case:
+
+```powershell
+$body = @{
+  question = "Cual es el presupuesto exacto del equipo?"
+  answer = "El presupuesto exacto del equipo es 50000 euros."
+} | ConvertTo-Json -Compress
+
+Invoke-RestMethod `
+  -Uri "http://localhost:8080/eval/faithfulness" `
+  -Method Post `
+  -ContentType "application/json" `
+  -Body $body
+```
+
+Inspect generated cases:
+
+```powershell
+Invoke-RestMethod "http://localhost:8080/improvement-cases"
+```
+
+Ask the agent to inspect itself:
+
+```powershell
+$body = @{ question = "Resume tus ultimas trazas y casos de mejora" } | ConvertTo-Json -Compress
+Invoke-RestMethod -Uri "http://localhost:8080/ask" -Method Post -ContentType "application/json" -Body $body
+```
+
+To enable the official Phoenix MCP server later:
+
+```env
+ENABLE_PHOENIX_MCP=1
+PHOENIX_HOST=https://app.phoenix.arize.com/s/your-space
+PHOENIX_API_KEY=px_live_...
+```
+
+When enabled, the ADK agent adds MCP tools for Phoenix traces, spans, datasets, and prompts through `@arizeai/phoenix-mcp`.
+
 ## Phoenix MCP
 
 The Arize hackathon starter configures Phoenix MCP through Gemini CLI rather than inside the Python ADK service. This repo follows that pattern for sprint 0:

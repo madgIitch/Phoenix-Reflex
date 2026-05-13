@@ -5,6 +5,12 @@ import os
 from dotenv import load_dotenv
 from google.adk.agents import Agent
 
+from phoenix_reflex.mcp import optional_phoenix_mcp_tools
+from phoenix_reflex.reflex import (
+    get_trace_summary,
+    list_improvement_cases,
+    list_recent_trace_summaries,
+)
 from phoenix_reflex.retriever import retrieve_documents
 
 
@@ -24,7 +30,15 @@ root_agent = Agent(
         "before answering. Cite document ids in square brackets, for example "
         "[s1-goal]. If the retrieved context is missing, weak, or unrelated, say "
         "you do not know based on the corpus and explain what is missing. Do not "
-        "invent facts beyond the retrieved documents."
+        "invent facts beyond the retrieved documents. You can inspect recent "
+        "runtime behavior with list_recent_trace_summaries, get_trace_summary, "
+        "and list_improvement_cases when asked to debug or improve yourself."
     ),
-    tools=[retrieve_documents],
+    tools=[
+        retrieve_documents,
+        list_recent_trace_summaries,
+        get_trace_summary,
+        list_improvement_cases,
+        *optional_phoenix_mcp_tools(),
+    ],
 )

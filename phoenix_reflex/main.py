@@ -10,6 +10,11 @@ from pydantic import BaseModel, Field
 from phoenix_reflex.evaluator import evaluate_faithfulness
 from phoenix_reflex.observability import configure_tracing, get_tracer
 from phoenix_reflex.qa import ask_agent
+from phoenix_reflex.reflex import (
+    add_improvement_case,
+    list_improvement_cases,
+    list_recent_trace_summaries,
+)
 from phoenix_reflex.retriever import retrieve_documents
 
 
@@ -88,8 +93,30 @@ async def ask(request: AskRequest) -> dict[str, object]:
 
 @app.post("/eval/faithfulness")
 def eval_faithfulness(request: FaithfulnessDemoRequest) -> dict[str, object]:
+    faithfulness = evaluate_faithfulness(request.question, request.answer)
+    improvement_case = None
+    if float(faithfulness.get("score", 0.0)) < 0.75:
+        improvement_case = add_improvement_case(
+            question=request.question,
+            answer=request.answer,
+            faithfulness_label=str(faithfulness.get("label", "unknown")),
+            faithfulness_score=float(faithfulness.get("score", 0.0)),
+            explanation=str(faithfulness.get("explanation", "")),
+            source_session_id="manual-eval",
+        )
     return {
         "question": request.question,
         "answer": request.answer,
-        "faithfulness": evaluate_faithfulness(request.question, request.answer),
+        "faithfulness": faithfulness,
+        "improvement_case": improvement_case,
     }
+
+
+@app.get("/introspection/traces")
+def introspection_traces(limit: int = 5) -> dict[str, object]:
+    return list_recent_trace_summaries(limit=limit)
+
+
+@app.get("/improvement-cases")
+def improvement_cases(limit: int = 10) -> dict[str, object]:
+    return list_improvement_cases(limit=limit)

@@ -41,22 +41,33 @@ JSON schema:
 """
 
 
-def evaluate_faithfulness(question: str, answer: str) -> dict[str, Any]:
+def evaluate_faithfulness(
+    question: str,
+    answer: str,
+    extra_context: str | None = None,
+    extra_context_ids: list[str] | None = None,
+) -> dict[str, Any]:
     """Evaluate final answer faithfulness against retrieved context."""
     tracer = get_tracer()
     with tracer.start_as_current_span("faithfulness_eval") as span:
         retrieved = retrieve_documents(question, top_k=5)
         context = _format_context(retrieved["documents"])
+        if extra_context:
+            context = f"{context}\n\n{extra_context}"
+        context_doc_ids = [doc["id"] for doc in retrieved["documents"]]
+        if extra_context_ids:
+            context_doc_ids.extend(extra_context_ids)
+
         span.set_attribute("input.value", question)
         span.set_attribute("eval.name", "faithfulness")
-        span.set_attribute("eval.context_doc_ids", ", ".join(doc["id"] for doc in retrieved["documents"]))
+        span.set_attribute("eval.context_doc_ids", ", ".join(context_doc_ids))
 
         if not answer.strip():
             result = {
                 "label": "unfaithful",
                 "score": 0.0,
                 "explanation": "No answer was produced.",
-                "context_doc_ids": [doc["id"] for doc in retrieved["documents"]],
+                "context_doc_ids": context_doc_ids,
             }
             _set_eval_attributes(span, result)
             return result
@@ -71,7 +82,7 @@ def evaluate_faithfulness(question: str, answer: str) -> dict[str, Any]:
                 "explanation": f"Faithfulness judge failed: {exc}",
             }
 
-        result["context_doc_ids"] = [doc["id"] for doc in retrieved["documents"]]
+        result["context_doc_ids"] = context_doc_ids
         _set_eval_attributes(span, result)
         return result
 

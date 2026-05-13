@@ -9,6 +9,11 @@ from google.genai import types
 
 from phoenix_reflex.evaluator import evaluate_faithfulness
 from phoenix_reflex.observability import get_tracer
+from phoenix_reflex.reflex import (
+    format_reflex_context,
+    maybe_create_improvement_case,
+    record_trace_summary,
+)
 from phoenix_reflex_agent.agent import root_agent
 
 APP_NAME = "phoenix-reflex"
@@ -63,14 +68,36 @@ async def ask_agent(question: str) -> dict[str, object]:
         span.set_attribute("qa.event_count", event_count)
         span.set_attribute("qa.final_author", final_author or "")
         span.set_attribute("output.value", answer)
-        faithfulness = evaluate_faithfulness(question, answer)
+        extra_context = None
+        extra_context_ids = None
+        if _is_introspection_question(question):
+            extra_context, extra_context_ids = format_reflex_context()
+
+        faithfulness = evaluate_faithfulness(
+            question,
+            answer,
+            extra_context=extra_context,
+            extra_context_ids=extra_context_ids,
+        )
         span.set_attribute("eval.faithfulness.label", str(faithfulness["label"]))
         span.set_attribute("eval.faithfulness.score", float(faithfulness["score"]))
         span.set_attribute("eval.faithfulness.explanation", str(faithfulness["explanation"]))
+        summary = record_trace_summary(
+            question=question,
+            answer=answer,
+            faithfulness=faithfulness,
+            session_id=session_id,
+            event_count=event_count,
+        )
+        improvement_case = maybe_create_improvement_case(summary)
+        if improvement_case:
+            span.set_attribute("improvement.case_id", improvement_case["case_id"])
+            span.set_attribute("improvement.dataset", improvement_case["dataset"])
         return {
             "question": question,
             "answer": answer,
             "faithfulness": faithfulness,
+            "improvement_case": improvement_case,
             "session_id": session_id,
             "event_count": event_count,
         }
@@ -80,3 +107,19 @@ def _content_text(content: types.Content) -> str:
     parts = content.parts or []
     texts = [part.text for part in parts if getattr(part, "text", None)]
     return "\n".join(texts).strip()
+
+
+def _is_introspection_question(question: str) -> bool:
+    normalized = question.lower()
+    keywords = (
+        "traza",
+        "trace",
+        "caso de mejora",
+        "casos de mejora",
+        "improvement",
+        "regression",
+        "regresion",
+        "introspeccion",
+        "introspection",
+    )
+    return any(keyword in normalized for keyword in keywords)
