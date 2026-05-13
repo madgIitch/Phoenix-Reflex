@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import os
 import re
 from collections import Counter
 from typing import Any
@@ -10,6 +11,10 @@ from phoenix_reflex.document_store import list_chunks
 from phoenix_reflex.observability import get_tracer
 
 TOKEN_PATTERN = re.compile(r"[a-z0-9]+")
+
+
+def _semantic_available() -> bool:
+    return bool(os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY"))
 
 
 def _tokenize(text: str) -> list[str]:
@@ -40,16 +45,19 @@ def retrieve_documents(query: str, top_k: int = 4) -> dict[str, Any]:
         span.set_attribute("input.value", query)
         span.set_attribute("retrieval.top_k", top_k)
 
-        results = _rank(query, top_k)
+        use_semantic = _semantic_available()
+        results = _hybrid_rank(query, top_k) if use_semantic else _rank(query, top_k)
         max_score = results[0]["score"] if results else 0.0
         valid_citation_ids = [item["id"] for item in results]
         span.set_attribute("retrieval.result_count", len(results))
         span.set_attribute("retrieval.max_score", max_score)
+        span.set_attribute("retrieval.method", "hybrid" if use_semantic else "bm25")
         span.set_attribute("output.value", ", ".join(valid_citation_ids))
         return {
             "query": query,
             "top_k": top_k,
             "max_score": max_score,
+            "retrieval_method": "hybrid" if use_semantic else "bm25",
             "valid_citation_ids": valid_citation_ids,
             "citation_rule": (
                 "You MUST only cite IDs from valid_citation_ids. "
@@ -57,6 +65,51 @@ def retrieve_documents(query: str, top_k: int = 4) -> dict[str, Any]:
             ),
             "documents": results,
         }
+
+
+_RRF_K = 60
+
+
+def _hybrid_rank(query: str, top_k: int) -> list[dict[str, Any]]:
+    """Reciprocal Rank Fusion of BM25 and semantic rankings."""
+    candidate_n = max(top_k * 4, 20)
+    bm25_results = _rank(query, candidate_n)
+    semantic_results = _semantic_rank(query, candidate_n)
+
+    doc_by_id: dict[str, dict[str, Any]] = {}
+    rrf_scores: dict[str, float] = {}
+
+    for rank, doc in enumerate(bm25_results):
+        doc_id = doc["id"]
+        doc_by_id[doc_id] = doc
+        rrf_scores[doc_id] = rrf_scores.get(doc_id, 0.0) + 1.0 / (_RRF_K + rank + 1)
+
+    for rank, doc in enumerate(semantic_results):
+        doc_id = doc["id"]
+        doc_by_id[doc_id] = doc
+        rrf_scores[doc_id] = rrf_scores.get(doc_id, 0.0) + 1.0 / (_RRF_K + rank + 1)
+
+    ranked = sorted(rrf_scores.items(), key=lambda item: item[1], reverse=True)
+    return [_serialize(doc_by_id[doc_id], round(score, 6)) for doc_id, score in ranked[:top_k]]
+
+
+def _semantic_rank(query: str, top_k: int) -> list[dict[str, Any]]:
+    from phoenix_reflex.embeddings import cosine_similarity, embed_query, ensure_embeddings
+
+    docs = _searchable_documents()
+    ensure_embeddings(docs)
+
+    from phoenix_reflex.embeddings import get_chunk_embedding
+
+    query_emb = embed_query(query)
+    scored: list[tuple[float, dict[str, Any]]] = []
+    for doc in docs:
+        doc_emb = get_chunk_embedding(doc["id"], doc["text"])
+        score = cosine_similarity(query_emb, doc_emb)
+        scored.append((score, doc))
+
+    scored.sort(key=lambda item: item[0], reverse=True)
+    return [_serialize(doc, round(score, 6)) for score, doc in scored[:top_k]]
 
 
 def _rank(query: str, top_k: int) -> list[dict[str, Any]]:
