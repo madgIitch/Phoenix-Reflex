@@ -4,6 +4,7 @@ import os
 
 from dotenv import load_dotenv
 from google.adk.agents import Agent
+from google.genai import types
 
 from phoenix_reflex.prompts import PRODUCTION_PROMPT
 from phoenix_reflex.reflex import list_improvement_cases
@@ -21,6 +22,7 @@ root_agent = Agent(
     model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
     description="RAG QA agent for Phoenix Reflex.",
     instruction=PRODUCTION_PROMPT,
+    generate_content_config=types.GenerateContentConfig(temperature=0.0),
     tools=[
         retrieve_documents,
         list_improvement_cases,

@@ -6,6 +6,7 @@ from typing import Any
 
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
 
 from phoenix_reflex.evaluator import evaluate_faithfulness
 from phoenix_reflex.document_store import list_chunks
@@ -226,7 +227,11 @@ def _generate_text(prompt: str) -> str:
         raise RuntimeError("GEMINI_API_KEY or GOOGLE_API_KEY is required")
     client = genai.Client(api_key=api_key)
     model = os.getenv("GEMINI_JUDGE_MODEL", os.getenv("GEMINI_MODEL", "gemini-2.5-flash"))
-    response = client.models.generate_content(model=model, contents=prompt)
+    response = client.models.generate_content(
+        model=model,
+        contents=prompt,
+        config=types.GenerateContentConfig(temperature=0.0),
+    )
     return response.text or ""
 
 

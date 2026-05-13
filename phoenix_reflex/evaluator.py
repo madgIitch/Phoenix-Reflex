@@ -6,6 +6,7 @@ from typing import Any
 
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
 
 from phoenix_reflex.observability import get_tracer
 from phoenix_reflex.retriever import retrieve_documents
@@ -21,6 +22,9 @@ Rules:
 - Score 0.5 when the answer is mostly supported but contains minor unsupported wording.
 - Score 0.0 when the answer contains important unsupported claims or contradicts the context.
 - If the answer correctly abstains because context is missing, score 1.0.
+- Absence of a restriction in the context is not support for a positive claim.
+- Do not reward claims justified by "the context does not say otherwise."
+- A claim about broad applicability, eligibility, identity, location, relationship, or legal effect is supported only if the context states it directly.
 - Return JSON only.
 
 JSON schema:
@@ -177,6 +181,7 @@ def _judge(question: str, answer: str, context: str) -> str:
             context=context,
             answer=answer,
         ),
+        config=types.GenerateContentConfig(temperature=0.0),
     )
     return response.text or ""
 
@@ -194,6 +199,7 @@ def _judge_relevance(question: str, context: str) -> str:
             question=question,
             context=context,
         ),
+        config=types.GenerateContentConfig(temperature=0.0),
     )
     return response.text or ""
 
