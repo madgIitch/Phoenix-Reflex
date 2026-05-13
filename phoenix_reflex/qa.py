@@ -104,12 +104,16 @@ async def ask_agent(question: str) -> dict[str, object]:
                 break
         if phantom_citations:
             span.set_attribute("eval.citation_correction_failed", True)
-        document_relevance = evaluate_document_relevance(question)
+        document_relevance = evaluate_document_relevance(
+            question,
+            retrieved_documents=retrieved_documents,
+        )
         faithfulness = evaluate_faithfulness(
             question,
             answer,
             extra_context=extra_context,
             extra_context_ids=extra_context_ids,
+            retrieved_documents=retrieved_documents,
         )
         answer_quality = _assess_answer_quality(question, answer, faithfulness, document_relevance)
         span.set_attribute("eval.faithfulness.label", str(faithfulness["label"]))

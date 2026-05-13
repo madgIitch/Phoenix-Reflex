@@ -70,15 +70,19 @@ def evaluate_faithfulness(
     answer: str,
     extra_context: str | None = None,
     extra_context_ids: list[str] | None = None,
+    retrieved_documents: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Evaluate final answer faithfulness against retrieved context."""
     tracer = get_tracer()
     with tracer.start_as_current_span("faithfulness_eval") as span:
-        retrieved = retrieve_documents(question, top_k=5)
-        context = _format_context(retrieved["documents"])
+        if retrieved_documents is not None:
+            docs = retrieved_documents
+        else:
+            docs = retrieve_documents(question, top_k=5)["documents"]
+        context = _format_context(docs)
         if extra_context:
             context = f"{context}\n\n{extra_context}"
-        context_doc_ids = [doc["id"] for doc in retrieved["documents"]]
+        context_doc_ids = [doc["id"] for doc in docs]
         if extra_context_ids:
             context_doc_ids.extend(extra_context_ids)
 
@@ -112,19 +116,25 @@ def evaluate_faithfulness(
         return result
 
 
-def evaluate_document_relevance(question: str) -> dict[str, Any]:
+def evaluate_document_relevance(
+    question: str,
+    retrieved_documents: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     """Evaluate whether retrieval found enough context for the question."""
     tracer = get_tracer()
     with tracer.start_as_current_span("document_relevance_eval") as span:
-        retrieved = retrieve_documents(question, top_k=5)
-        context = _format_context(retrieved["documents"])
-        context_doc_ids = [doc["id"] for doc in retrieved["documents"]]
+        if retrieved_documents is not None:
+            docs = retrieved_documents
+        else:
+            docs = retrieve_documents(question, top_k=5)["documents"]
+        context = _format_context(docs)
+        context_doc_ids = [doc["id"] for doc in docs]
         span.set_attribute("input.value", question)
         span.set_attribute("eval.name", "document_relevance")
         span.set_attribute("eval.context_doc_ids", ", ".join(context_doc_ids))
         span.set_attribute("critic.agent", "critic_agent")
 
-        if not retrieved["documents"]:
+        if not docs:
             result = {
                 "label": "irrelevant",
                 "score": 0.0,
