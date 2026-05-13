@@ -8,7 +8,9 @@ from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
 from phoenix_reflex.evaluator import evaluate_faithfulness
+from phoenix_reflex.experiments import generate_prompt_candidate, run_prompt_experiment
 from phoenix_reflex.observability import configure_tracing, get_tracer
+from phoenix_reflex.prompts import list_prompts, promote_prompt_tag
 from phoenix_reflex.qa import ask_agent
 from phoenix_reflex.reflex import (
     add_improvement_case,
@@ -120,3 +122,23 @@ def introspection_traces(limit: int = 5) -> dict[str, object]:
 @app.get("/improvement-cases")
 def improvement_cases(limit: int = 10) -> dict[str, object]:
     return list_improvement_cases(limit=limit)
+
+
+@app.get("/prompts")
+def prompts() -> dict[str, object]:
+    return list_prompts()
+
+
+@app.post("/prompts/candidate")
+def prompts_candidate() -> dict[str, object]:
+    return generate_prompt_candidate()
+
+
+@app.post("/experiments/prompt")
+def prompt_experiment() -> dict[str, object]:
+    return run_prompt_experiment()
+
+
+@app.post("/prompts/promote")
+def promote_prompt(source_tag: str = "candidate", target_tag: str = "staging") -> dict[str, object]:
+    return promote_prompt_tag(source_tag=source_tag, target_tag=target_tag)

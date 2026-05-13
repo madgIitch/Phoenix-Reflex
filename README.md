@@ -265,6 +265,45 @@ PHOENIX_API_KEY=px_live_...
 
 When enabled, the ADK agent adds MCP tools for Phoenix traces, spans, datasets, and prompts through `@arizeai/phoenix-mcp`.
 
+## Sprint 4
+
+Sprint 4 closes the loop from regression case to prompt candidate:
+
+- Prompt registry with `production`, `candidate`, and `staging` tags in `phoenix_reflex/prompts.py`.
+- Candidate generation from `regression_v1` cases in `phoenix_reflex/experiments.py`.
+- Comparative experiment:
+  - production baseline uses the captured bad answer from the failure case.
+  - candidate generates a fresh answer from retrieved context.
+  - good questions are tested with both prompts to catch regressions.
+- Manual promotion endpoint and `scripts/promote_tag.py`.
+
+Generate a candidate:
+
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8080/prompts/candidate" -Method Post
+```
+
+Run the experiment:
+
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8080/experiments/prompt" -Method Post
+```
+
+Promote candidate to staging manually:
+
+```powershell
+py scripts/promote_tag.py --base-url http://localhost:8080 --source-tag candidate --target-tag staging
+```
+
+The promotion rule is:
+
+```text
+candidate_regression_avg > production_regression_avg
+and candidate_good_avg >= production_good_avg
+```
+
+Promotion is still manual so the demo keeps a human approval point.
+
 ## Phoenix MCP
 
 The Arize hackathon starter configures Phoenix MCP through Gemini CLI rather than inside the Python ADK service. This repo follows that pattern for sprint 0:
