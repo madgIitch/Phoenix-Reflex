@@ -7,7 +7,7 @@ from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
 
-from phoenix_reflex.evaluator import evaluate_faithfulness
+from phoenix_reflex.evaluator import evaluate_document_relevance, evaluate_faithfulness
 from phoenix_reflex.observability import get_tracer
 from phoenix_reflex.reflex import (
     format_reflex_context,
@@ -73,6 +73,7 @@ async def ask_agent(question: str) -> dict[str, object]:
         if _is_introspection_question(question):
             extra_context, extra_context_ids = format_reflex_context()
 
+        document_relevance = evaluate_document_relevance(question)
         faithfulness = evaluate_faithfulness(
             question,
             answer,
@@ -82,10 +83,17 @@ async def ask_agent(question: str) -> dict[str, object]:
         span.set_attribute("eval.faithfulness.label", str(faithfulness["label"]))
         span.set_attribute("eval.faithfulness.score", float(faithfulness["score"]))
         span.set_attribute("eval.faithfulness.explanation", str(faithfulness["explanation"]))
+        span.set_attribute("eval.document_relevance.label", str(document_relevance["label"]))
+        span.set_attribute("eval.document_relevance.score", float(document_relevance["score"]))
+        span.set_attribute("eval.document_relevance.explanation", str(document_relevance["explanation"]))
+        failure_mode = _classify_failure_mode(faithfulness, document_relevance)
+        span.set_attribute("eval.failure_mode", failure_mode)
         summary = record_trace_summary(
             question=question,
             answer=answer,
             faithfulness=faithfulness,
+            document_relevance=document_relevance,
+            failure_mode=failure_mode,
             session_id=session_id,
             event_count=event_count,
         )
@@ -97,6 +105,8 @@ async def ask_agent(question: str) -> dict[str, object]:
             "question": question,
             "answer": answer,
             "faithfulness": faithfulness,
+            "document_relevance": document_relevance,
+            "failure_mode": failure_mode,
             "improvement_case": improvement_case,
             "session_id": session_id,
             "event_count": event_count,
@@ -123,3 +133,16 @@ def _is_introspection_question(question: str) -> bool:
         "introspection",
     )
     return any(keyword in normalized for keyword in keywords)
+
+
+def _classify_failure_mode(
+    faithfulness: dict[str, object],
+    document_relevance: dict[str, object],
+) -> str:
+    faithfulness_score = float(faithfulness.get("score", 0.0))
+    relevance_score = float(document_relevance.get("score", 0.0))
+    if faithfulness_score >= 0.75:
+        return "none"
+    if relevance_score < 0.75:
+        return "retrieval"
+    return "generation"

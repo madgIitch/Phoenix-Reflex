@@ -17,6 +17,8 @@ def record_trace_summary(
     question: str,
     answer: str,
     faithfulness: dict[str, Any],
+    document_relevance: dict[str, Any] | None = None,
+    failure_mode: str = "unknown",
     session_id: str,
     event_count: int,
 ) -> dict[str, Any]:
@@ -27,6 +29,8 @@ def record_trace_summary(
         "question": question,
         "answer": answer,
         "faithfulness": faithfulness,
+        "document_relevance": document_relevance,
+        "failure_mode": failure_mode,
         "event_count": event_count,
     }
     with LOCK:
@@ -46,6 +50,7 @@ def maybe_create_improvement_case(summary: dict[str, Any]) -> dict[str, Any] | N
         faithfulness_score=float(faithfulness.get("score", 0.0)),
         explanation=str(faithfulness.get("explanation", "")),
         source_session_id=summary["session_id"],
+        failure_mode=str(summary.get("failure_mode", "unknown")),
     )
 
 
@@ -76,6 +81,7 @@ def add_improvement_case(
     faithfulness_score: float,
     explanation: str,
     source_session_id: str,
+    failure_mode: str = "unknown",
 ) -> dict[str, Any]:
     """Add a regression case candidate for future evaluation datasets."""
     tracer = get_tracer()
@@ -89,10 +95,10 @@ def add_improvement_case(
             "bad_answer": answer,
             "faithfulness_label": faithfulness_label,
             "faithfulness_score": faithfulness_score,
+            "failure_mode": failure_mode,
             "failure_report": explanation,
             "suggested_fix": (
-                "Improve retrieval coverage or tighten the prompt so unsupported "
-                "claims become explicit abstentions."
+                _suggest_fix(failure_mode)
             ),
         }
         with LOCK:
@@ -103,6 +109,7 @@ def add_improvement_case(
         span.set_attribute("improvement.source_session_id", source_session_id)
         span.set_attribute("eval.faithfulness.label", faithfulness_label)
         span.set_attribute("eval.faithfulness.score", faithfulness_score)
+        span.set_attribute("eval.failure_mode", failure_mode)
         span.set_attribute("output.value", case["failure_report"])
         return case
 
@@ -136,6 +143,8 @@ def format_reflex_context(limit: int = 5) -> tuple[str, list[str]]:
                     f"- session_id={trace['session_id']} "
                     f"faithfulness={trace['faithfulness'].get('label')} "
                     f"score={trace['faithfulness'].get('score')} "
+                    f"document_relevance={_relevance_label(trace)} "
+                    f"failure_mode={trace.get('failure_mode')} "
                     f"question={trace['question']!r}"
                 )
                 for trace in traces
@@ -155,6 +164,7 @@ def format_reflex_context(limit: int = 5) -> tuple[str, list[str]]:
                     f"bad_answer={case['bad_answer']!r} "
                     f"label={case['faithfulness_label']} "
                     f"score={case['faithfulness_score']} "
+                    f"failure_mode={case.get('failure_mode')} "
                     f"report={case['failure_report']!r} "
                     f"suggested_fix={case['suggested_fix']!r}"
                 )
@@ -165,3 +175,16 @@ def format_reflex_context(limit: int = 5) -> tuple[str, list[str]]:
         sections.append("[regression_v1]\nNo improvement cases.")
 
     return "\n\n".join(sections), context_ids
+
+
+def _suggest_fix(failure_mode: str) -> str:
+    if failure_mode == "retrieval":
+        return "Improve corpus coverage or retrieval ranking for this question."
+    if failure_mode == "generation":
+        return "Tighten the prompt so unsupported claims become explicit abstentions."
+    return "Improve retrieval coverage or tighten the prompt so unsupported claims become explicit abstentions."
+
+
+def _relevance_label(trace: dict[str, Any]) -> str:
+    relevance = trace.get("document_relevance") or {}
+    return str(relevance.get("label", "unknown"))

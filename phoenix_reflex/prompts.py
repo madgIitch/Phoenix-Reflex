@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import json
+import os
 from datetime import UTC, datetime
+from pathlib import Path
 from threading import Lock
 from typing import Any
 
@@ -16,6 +19,7 @@ PRODUCTION_PROMPT = (
 )
 
 LOCK = Lock()
+CACHE_PATH = Path(os.getenv("PROMPT_CACHE_PATH", "/tmp/phoenix_reflex_prompt_cache.json"))
 PROMPTS: dict[str, dict[str, Any]] = {
     "production": {
         "tag": "production",
@@ -26,6 +30,39 @@ PROMPTS: dict[str, dict[str, Any]] = {
     }
 }
 PROMOTIONS: list[dict[str, Any]] = []
+
+
+def _load_cache() -> None:
+    if not CACHE_PATH.exists():
+        return
+    try:
+        data = json.loads(CACHE_PATH.read_text(encoding="utf-8"))
+        prompts = data.get("prompts", {})
+        promotions = data.get("promotions", [])
+        if isinstance(prompts, dict):
+            PROMPTS.update(prompts)
+        if isinstance(promotions, list):
+            PROMOTIONS.extend(promotions)
+    except Exception:
+        return
+
+
+def _save_cache() -> None:
+    try:
+        CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        CACHE_PATH.write_text(
+            json.dumps(
+                {
+                    "prompts": PROMPTS,
+                    "promotions": PROMOTIONS,
+                },
+                indent=2,
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+    except Exception:
+        return
 
 
 def get_prompt(tag: str = "production") -> dict[str, Any]:
@@ -41,6 +78,7 @@ def list_prompts() -> dict[str, Any]:
         return {
             "prompts": [dict(prompt) for prompt in PROMPTS.values()],
             "promotions": list(PROMOTIONS),
+            "cache_path": str(CACHE_PATH),
         }
 
 
@@ -59,6 +97,7 @@ def upsert_prompt(tag: str, prompt: str, source: str = "manual") -> dict[str, An
             "prompt": prompt,
         }
         PROMPTS[tag] = record
+        _save_cache()
         return dict(record)
 
 
@@ -82,7 +121,11 @@ def promote_prompt_tag(source_tag: str = "candidate", target_tag: str = "staging
             "target_version": promoted["version"],
         }
         PROMOTIONS.append(event)
+        _save_cache()
         return {
             "promoted_prompt": dict(promoted),
             "promotion": event,
         }
+
+
+_load_cache()

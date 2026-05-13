@@ -7,7 +7,7 @@ from datetime import datetime, UTC
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
-from phoenix_reflex.evaluator import evaluate_faithfulness
+from phoenix_reflex.evaluator import evaluate_document_relevance, evaluate_faithfulness
 from phoenix_reflex.experiments import generate_prompt_candidate, run_prompt_experiment
 from phoenix_reflex.observability import configure_tracing, get_tracer
 from phoenix_reflex.prompts import list_prompts, promote_prompt_tag
@@ -105,12 +105,21 @@ def eval_faithfulness(request: FaithfulnessDemoRequest) -> dict[str, object]:
             faithfulness_score=float(faithfulness.get("score", 0.0)),
             explanation=str(faithfulness.get("explanation", "")),
             source_session_id="manual-eval",
+            failure_mode="generation",
         )
     return {
         "question": request.question,
         "answer": request.answer,
         "faithfulness": faithfulness,
         "improvement_case": improvement_case,
+    }
+
+
+@app.get("/eval/document-relevance")
+def eval_document_relevance(query: str) -> dict[str, object]:
+    return {
+        "query": query,
+        "document_relevance": evaluate_document_relevance(query),
     }
 
 

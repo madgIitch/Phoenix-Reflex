@@ -304,6 +304,43 @@ and candidate_good_avg >= production_good_avg
 
 Promotion is still manual so the demo keeps a human approval point.
 
+## Sprint 5
+
+Sprint 5 adds optional robustness layers without changing the main demo path:
+
+- `Document Relevance` evaluator to separate retrieval failures from generation failures.
+- Explicit `critic_agent` definition for the multi-agent narrative.
+- Prompt cache with fallback to the last valid prompt registry state.
+- Structured failure mode classification:
+  - `none`
+  - `retrieval`
+  - `generation`
+- Local human-review style improvement cases remain visible through `/improvement-cases`.
+
+Validate document relevance:
+
+```powershell
+Invoke-RestMethod "http://localhost:8080/eval/document-relevance?query=Que%20agrega%20el%20sprint%201"
+Invoke-RestMethod "http://localhost:8080/eval/document-relevance?query=Cual%20es%20el%20presupuesto%20exacto%20del%20equipo"
+```
+
+`/ask` now returns both evaluators:
+
+```json
+{
+  "faithfulness": {"label": "faithful", "score": 1.0},
+  "document_relevance": {"label": "relevant", "score": 1.0},
+  "failure_mode": "none"
+}
+```
+
+This makes failures easier to explain:
+
+```text
+low relevance + low faithfulness -> retrieval problem
+high relevance + low faithfulness -> generation problem
+```
+
 ## Phoenix MCP
 
 The Arize hackathon starter configures Phoenix MCP through Gemini CLI rather than inside the Python ADK service. This repo follows that pattern for sprint 0:

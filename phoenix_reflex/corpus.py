@@ -80,6 +80,7 @@ CORPUS: tuple[Document, ...] = (
             "qa_agent must answer only from retrieved context, cite document ids, "
             "and say it does not know when the context is missing, unrelated, or too weak. "
             "When abstaining, it should briefly explain what information is missing. "
+            "It must not invent details beyond the retrieved documents. "
             "This abstention behavior is part of the demo design."
         ),
         tags=("sprint-1", "prompt", "abstention"),

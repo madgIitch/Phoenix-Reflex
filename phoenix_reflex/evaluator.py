@@ -40,6 +40,30 @@ JSON schema:
 {answer}
 """
 
+DOCUMENT_RELEVANCE_PROMPT = """You are a strict retrieval relevance judge for a RAG system.
+
+Evaluate whether the retrieved context contains enough relevant information to answer the question.
+
+Rules:
+- Score 1.0 when the retrieved documents directly contain the information needed to answer.
+- Score 0.5 when the documents are related but incomplete or indirect.
+- Score 0.0 when no documents are retrieved or the documents are unrelated.
+- Return JSON only.
+
+JSON schema:
+{{
+  "label": "relevant" | "partially_relevant" | "irrelevant",
+  "score": 1.0 | 0.5 | 0.0,
+  "explanation": "short explanation"
+}}
+
+[Question]
+{question}
+
+[Retrieved Context]
+{context}
+"""
+
 
 def evaluate_faithfulness(
     question: str,
@@ -61,6 +85,7 @@ def evaluate_faithfulness(
         span.set_attribute("input.value", question)
         span.set_attribute("eval.name", "faithfulness")
         span.set_attribute("eval.context_doc_ids", ", ".join(context_doc_ids))
+        span.set_attribute("critic.agent", "critic_agent")
 
         if not answer.strip():
             result = {
@@ -87,6 +112,43 @@ def evaluate_faithfulness(
         return result
 
 
+def evaluate_document_relevance(question: str) -> dict[str, Any]:
+    """Evaluate whether retrieval found enough context for the question."""
+    tracer = get_tracer()
+    with tracer.start_as_current_span("document_relevance_eval") as span:
+        retrieved = retrieve_documents(question, top_k=5)
+        context = _format_context(retrieved["documents"])
+        context_doc_ids = [doc["id"] for doc in retrieved["documents"]]
+        span.set_attribute("input.value", question)
+        span.set_attribute("eval.name", "document_relevance")
+        span.set_attribute("eval.context_doc_ids", ", ".join(context_doc_ids))
+        span.set_attribute("critic.agent", "critic_agent")
+
+        if not retrieved["documents"]:
+            result = {
+                "label": "irrelevant",
+                "score": 0.0,
+                "explanation": "No documents were retrieved.",
+                "context_doc_ids": context_doc_ids,
+            }
+            _set_relevance_attributes(span, result)
+            return result
+
+        try:
+            response_text = _judge_relevance(question=question, context=context)
+            result = _parse_relevance_response(response_text)
+        except Exception as exc:
+            result = {
+                "label": "eval_error",
+                "score": 0.0,
+                "explanation": f"Document relevance judge failed: {exc}",
+            }
+
+        result["context_doc_ids"] = context_doc_ids
+        _set_relevance_attributes(span, result)
+        return result
+
+
 def _judge(question: str, answer: str, context: str) -> str:
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
@@ -100,6 +162,23 @@ def _judge(question: str, answer: str, context: str) -> str:
             question=question,
             context=context,
             answer=answer,
+        ),
+    )
+    return response.text or ""
+
+
+def _judge_relevance(question: str, context: str) -> str:
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        raise RuntimeError("GEMINI_API_KEY or GOOGLE_API_KEY is required for document relevance eval")
+
+    client = genai.Client(api_key=api_key)
+    model = os.getenv("GEMINI_JUDGE_MODEL", os.getenv("GEMINI_MODEL", "gemini-2.5-flash"))
+    response = client.models.generate_content(
+        model=model,
+        contents=DOCUMENT_RELEVANCE_PROMPT.format(
+            question=question,
+            context=context,
         ),
     )
     return response.text or ""
@@ -127,6 +206,28 @@ def _parse_judge_response(response_text: str) -> dict[str, Any]:
     }
 
 
+def _parse_relevance_response(response_text: str) -> dict[str, Any]:
+    cleaned = response_text.strip()
+    if cleaned.startswith("```"):
+        cleaned = cleaned.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+
+    data = json.loads(cleaned)
+    label = str(data.get("label", "irrelevant"))
+    score = float(data.get("score", 0.0))
+    explanation = str(data.get("explanation", "")).strip()
+
+    if label not in {"relevant", "partially_relevant", "irrelevant"}:
+        label = "irrelevant"
+    if score not in {0.0, 0.5, 1.0}:
+        score = max(0.0, min(1.0, score))
+
+    return {
+        "label": label,
+        "score": score,
+        "explanation": explanation,
+    }
+
+
 def _format_context(documents: list[dict[str, Any]]) -> str:
     if not documents:
         return "No documents retrieved."
@@ -139,4 +240,11 @@ def _set_eval_attributes(span: Any, result: dict[str, Any]) -> None:
     span.set_attribute("eval.faithfulness.label", str(result["label"]))
     span.set_attribute("eval.faithfulness.score", float(result["score"]))
     span.set_attribute("eval.faithfulness.explanation", str(result["explanation"]))
+    span.set_attribute("output.value", json.dumps(result, ensure_ascii=False))
+
+
+def _set_relevance_attributes(span: Any, result: dict[str, Any]) -> None:
+    span.set_attribute("eval.document_relevance.label", str(result["label"]))
+    span.set_attribute("eval.document_relevance.score", float(result["score"]))
+    span.set_attribute("eval.document_relevance.explanation", str(result["explanation"]))
     span.set_attribute("output.value", json.dumps(result, ensure_ascii=False))
