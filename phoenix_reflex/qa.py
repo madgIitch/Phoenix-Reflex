@@ -108,6 +108,24 @@ async def ask_agent(question: str) -> dict[str, object]:
         span.set_attribute("eval.phantom_citations_corrected_count", len(corrected_phantom_citations))
         if phantom_citations:
             span.set_attribute("eval.citation_correction_failed", True)
+        style_issues = _find_answer_style_issues(answer)
+        style_correction_applied = False
+        if style_issues:
+            corrected = await _correct_answer_style(
+                session_id=session_id,
+                style_issues=style_issues,
+                valid_ids=valid_ids,
+            )
+            event_count += 1
+            if corrected:
+                answer = corrected
+                style_correction_applied = True
+                span.set_attribute("eval.style_correction_applied", True)
+                span.set_attribute("eval.style_issues", ", ".join(style_issues))
+                span.set_attribute("output.value", answer)
+                phantom_citations = _find_phantom_citations(answer, valid_ids)
+                if phantom_citations:
+                    span.set_attribute("eval.style_correction_phantom_citations", ", ".join(phantom_citations))
         document_relevance = evaluate_document_relevance(
             question,
             retrieved_documents=retrieved_documents,
@@ -155,6 +173,7 @@ async def ask_agent(question: str) -> dict[str, object]:
             "phantom_citations": sorted(phantom_citations),
             "phantom_citations_detected_count": len(detected_phantom_citations),
             "phantom_citations_corrected_count": len(corrected_phantom_citations),
+            "style_correction_applied": style_correction_applied,
             "improvement_case": improvement_case,
             "session_id": session_id,
             "event_count": event_count,
@@ -231,6 +250,9 @@ def _assess_answer_quality(
         marker in normalized_answer for marker in abstention_markers
     ):
         reasons.append("possible_over_abstention")
+
+    if _find_answer_style_issues(answer):
+        reasons.append("internal_mechanics_leak")
 
     label = "suspicious" if reasons else "ok"
     explanation = (
@@ -314,10 +336,67 @@ async def _correct_phantom_citations(
     return corrected_answer
 
 
+async def _correct_answer_style(
+    session_id: str,
+    style_issues: list[str],
+    valid_ids: set[str],
+) -> str:
+    """Send a correction turn when the answer violates generic response constraints."""
+    valid_list = ", ".join(sorted(valid_ids)) if valid_ids else "none"
+    issue_list = ", ".join(style_issues)
+    correction = (
+        f"Your previous answer violated these answer constraints: {issue_list}. "
+        "Rewrite the answer for the user. Do not mention retrieval mechanics, tools, context, or the system. "
+        "Use only facts directly supported by the returned documents. "
+        "For each part of a compound question, answer only if the returned text directly supports it; "
+        "otherwise say that the provided documents do not cover that part. "
+        "Do not use background knowledge or common-sense assumptions to bridge gaps. "
+        "Do not turn incomplete sentence fragments into standalone facts. "
+        f"Use only these citation IDs: {valid_list}."
+    )
+    correction_message = types.Content(
+        role="user",
+        parts=[types.Part.from_text(text=correction)],
+    )
+    corrected_answer = ""
+    async for event in _runner().run_async(
+        user_id=USER_ID,
+        session_id=session_id,
+        new_message=correction_message,
+    ):
+        if event.is_final_response() and event.content:
+            text = _content_text(event.content)
+            if text:
+                corrected_answer = text
+    return corrected_answer
+
+
 def _find_phantom_citations(answer: str, valid_ids: set[str]) -> set[str]:
     """Return citation IDs in the answer that were not in the retrieved set."""
     found = {m.group(1) for m in _CITATION_RE.finditer(answer)}
     return {cid for cid in found if cid not in valid_ids and cid.startswith("pdf:")}
+
+
+def _find_answer_style_issues(answer: str) -> list[str]:
+    normalized = _normalize_for_language_hint(answer)
+    issues: list[str] = []
+    internal_markers = (
+        " retrieved ",
+        " retrieved documents ",
+        " retrieved context ",
+        " context ",
+        " tool ",
+        " system ",
+        " recuperado ",
+        " recuperados ",
+        " documentos recuperados ",
+        " contexto ",
+        " herramienta ",
+        " sistema ",
+    )
+    if any(marker in normalized for marker in internal_markers):
+        issues.append("mentions_internal_mechanics")
+    return issues
 
 
 def _looks_spanish(text: str) -> bool:

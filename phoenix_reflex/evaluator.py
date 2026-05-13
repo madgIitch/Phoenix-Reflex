@@ -48,6 +48,10 @@ Rules:
 - Score 1.0 when the retrieved documents directly contain the information needed to answer.
 - Score 0.5 when the documents are related but incomplete or indirect.
 - Score 0.0 when no documents are retrieved or the documents are unrelated.
+- For compound questions, evaluate whether the context supports each required part.
+- Do not infer missing applicability conditions from general topic overlap.
+- A document that discusses a category does not automatically answer questions about every entity, place, relationship, or condition in that category.
+- Treat incomplete sentence fragments as incomplete evidence.
 - Return JSON only.
 
 JSON schema:
