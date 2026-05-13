@@ -75,11 +75,17 @@ async def ask_agent(question: str) -> dict[str, object]:
         if _is_introspection_question(question):
             extra_context, extra_context_ids = format_reflex_context()
 
-        retrieved = retrieve_documents(question, top_k=5)
-        retrieved_documents = retrieved.get("documents", [])
-        valid_ids = set(retrieved.get("valid_citation_ids", []))
+        agent_retrieved = await _extract_agent_retrieval(session_id)
+        if agent_retrieved:
+            retrieved_documents = agent_retrieved["documents"]
+            valid_ids = set(agent_retrieved["valid_citation_ids"])
+        else:
+            fallback = retrieve_documents(question, top_k=5)
+            retrieved_documents = fallback.get("documents", [])
+            valid_ids = set(fallback.get("valid_citation_ids", []))
         phantom_citations = _find_phantom_citations(answer, valid_ids)
-        if phantom_citations:
+        correction_rounds = 0
+        while phantom_citations and correction_rounds < 2:
             span.set_attribute("eval.phantom_citations", ", ".join(phantom_citations))
             span.set_attribute("eval.phantom_citation_count", len(phantom_citations))
             corrected = await _correct_phantom_citations(
@@ -87,11 +93,17 @@ async def ask_agent(question: str) -> dict[str, object]:
                 phantom_citations=phantom_citations,
                 valid_ids=valid_ids,
             )
+            correction_rounds += 1
+            event_count += 1
             if corrected:
                 answer = corrected
-                event_count += 1
                 span.set_attribute("eval.citation_correction_applied", True)
                 span.set_attribute("output.value", answer)
+                phantom_citations = _find_phantom_citations(answer, valid_ids)
+            else:
+                break
+        if phantom_citations:
+            span.set_attribute("eval.citation_correction_failed", True)
         document_relevance = evaluate_document_relevance(question)
         faithfulness = evaluate_faithfulness(
             question,
@@ -224,6 +236,37 @@ def _assess_answer_quality(
 
 
 _CITATION_RE = re.compile(r"\[([^\]]+)\]")
+
+
+async def _extract_agent_retrieval(session_id: str) -> dict[str, object] | None:
+    """Read retrieve_documents results from the agent's actual tool calls in this session."""
+    try:
+        session = await _session_service().get_session(
+            app_name=APP_NAME,
+            user_id=USER_ID,
+            session_id=session_id,
+        )
+        if not session:
+            return None
+        documents: list[dict] = []
+        valid_ids: list[str] = []
+        for event in session.events or []:
+            if not event.content:
+                continue
+            for part in event.content.parts or []:
+                fr = getattr(part, "function_response", None)
+                if fr and getattr(fr, "name", None) == "retrieve_documents":
+                    response = fr.response or {}
+                    ids = response.get("valid_citation_ids", [])
+                    docs = response.get("documents", [])
+                    if ids:
+                        valid_ids = ids
+                        documents = docs
+        if not valid_ids:
+            return None
+        return {"valid_citation_ids": valid_ids, "documents": documents}
+    except Exception:
+        return None
 
 
 async def _correct_phantom_citations(
