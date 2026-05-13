@@ -47,10 +47,17 @@ def hello() -> dict[str, str]:
         span.set_attribute("app.sprint", "0")
         span.set_attribute("app.agent", "qa_agent")
         span.set_attribute("app.runtime", "google-adk")
+        project = os.getenv(
+            "ARIZE_PROJECT_NAME",
+            os.getenv("PHOENIX_PROJECT_NAME", "phoenix-reflex"),
+        )
+        backend = "arize-ax" if os.getenv("ARIZE_API_KEY") else "phoenix"
         message = "Phoenix Reflex hello-world trace emitted."
         span.set_attribute("output.value", message)
+        span.set_attribute("app.observability_backend", backend)
         return {
             "message": message,
-            "project": os.getenv("PHOENIX_PROJECT_NAME", "phoenix-reflex"),
+            "observability_backend": backend,
+            "project": project,
             "timestamp": datetime.now(UTC).isoformat(),
         }

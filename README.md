@@ -2,7 +2,7 @@
 
 **Phoenix Reflex** is a self-improving RAG agent that not only answers questions, but also observes, evaluates, and improves itself through its own execution traces.
 
-The project combines a RAG pipeline with **Arize Phoenix**, **Phoenix MCP**, and an **LLM-as-a-judge evaluation loop** to detect low-confidence answers, possible hallucinations, weak retrieval results, and reasoning failures.
+The project combines a RAG pipeline with **Arize AX tracing**, OpenInference instrumentation for Google/Gemini, Phoenix MCP-style runtime introspection, and an **LLM-as-a-judge evaluation loop** to detect low-confidence answers, possible hallucinations, weak retrieval results, and reasoning failures.
 
 ## Core Idea
 
@@ -12,14 +12,14 @@ Phoenix Reflex closes the loop:
 
 1. A user asks a question.
 2. The RAG agent retrieves context and generates an answer.
-3. Every step is traced in Phoenix.
+3. Every step is traced in Arize AX.
 4. The agent detects possible failure signals:
    - low confidence
    - weak retrieval
    - missing citations
    - possible hallucination
    - inconsistent reasoning
-5. The agent queries its own traces through Phoenix MCP.
+5. The agent queries its own traces through MCP-backed observability tools.
 6. An LLM-as-a-judge evaluates the answer.
 7. If the answer is weak, the system automatically creates an improvement case.
 
@@ -54,13 +54,13 @@ RAG Agent
 Retriever + Generator
      |
      v
-Phoenix Tracing
+Arize AX Tracing
      |
      v
 Failure Detection
      |
      v
-Phoenix MCP Trace Query
+MCP Trace Query
      |
      v
 LLM-as-a-Judge Evaluation
@@ -76,8 +76,8 @@ Sprint 0 sets up the empty deployment path before adding RAG logic:
 - FastAPI service with public health check at `/health`.
 - Hello-world trace endpoint at `/hello`.
 - Minimal Google ADK `qa_agent` placeholder in `phoenix_reflex_agent/agent.py`.
-- Phoenix Cloud tracing through `phoenix.otel.register()`.
-- Google ADK OpenInference instrumentation.
+- Arize AX tracing through `arize.otel.register()`.
+- Google ADK and Google GenAI OpenInference instrumentation.
 - Dockerfile with Python and Node, ready for Cloud Run and the later Phoenix MCP `npx` dependency.
 - Gemini CLI MCP config in `.gemini/settings.json` for Phoenix runtime introspection.
 
@@ -87,7 +87,6 @@ Sprint 0 sets up the empty deployment path before adding RAG logic:
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-copy .env.example .env
 uvicorn phoenix_reflex.main:app --reload --port 8080
 ```
 
@@ -96,35 +95,42 @@ Then open:
 - `http://localhost:8080/health`
 - `http://localhost:8080/hello`
 
-The `/hello` request emits a `hello_world` span when `PHOENIX_API_KEY` is set.
+The `/hello` request emits a `hello_world` span when `ARIZE_API_KEY` and `ARIZE_SPACE_ID` are set.
 
-Use Phoenix Cloud credentials, not Arize AX credentials:
+Use Arize AX credentials from your space:
 
-- `PHOENIX_API_KEY`: Phoenix key from `app.phoenix.arize.com`.
-- `PHOENIX_COLLECTOR_ENDPOINT`: Phoenix Cloud Hostname from Settings, including `/s/<space>`.
-- `PHOENIX_PROJECT_NAME`: `phoenix-reflex`.
+- `ARIZE_API_KEY`: key from Arize AX.
+- `ARIZE_SPACE_ID`: space ID from Arize AX.
+- `ARIZE_PROJECT_NAME`: `phoenix-reflex`.
+- `ARIZE_OTEL_ENDPOINT`: `https://otlp.eu-west-1a.arize.com/v1` for the EU region.
+- `GEMINI_API_KEY`: your Gemini API key.
 
-Example collector endpoint:
+Your `.env` should include:
 
-```text
-https://app.phoenix.arize.com/s/your-space
+```env
+ARIZE_API_KEY=...
+ARIZE_SPACE_ID=...
+ARIZE_PROJECT_NAME=phoenix-reflex
+ARIZE_OTEL_ENDPOINT=https://otlp.eu-west-1a.arize.com/v1
+GEMINI_API_KEY=...
+GOOGLE_API_KEY=...
+GEMINI_MODEL=gemini-2.5-flash
 ```
 
 ## Cloud Run
 
-Create Secret Manager secrets named `PHOENIX_API_KEY` and `GOOGLE_API_KEY`, then deploy:
+Create Secret Manager secrets named `ARIZE_API_KEY`, `ARIZE_SPACE_ID`, and `GEMINI_API_KEY`, then deploy:
 
 ```powershell
 .\scripts\deploy-cloud-run.ps1 `
   -ProjectId your-gcp-project-id `
-  -PhoenixCollectorEndpoint https://app.phoenix.arize.com/s/your-space `
   -Region europe-west1
 ```
 
 The service should expose:
 
 - `/health` for Cloud Run readiness checks.
-- `/hello` for validating that a trace reaches Phoenix Cloud.
+- `/hello` for validating that a trace reaches Arize AX.
 
 ## Phoenix MCP
 
