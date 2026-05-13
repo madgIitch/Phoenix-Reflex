@@ -1,0 +1,139 @@
+{
+  "session_id": "session-f7f6f85673294c41af3e6c8d9ade9e2f",
+  "timestamp": "2026-05-13T20:54:30.554416+00:00",
+  "question": "Los Andaluces pueden ser trabajadores? Dime cuales serían sus principales derechos laborales, en caso de que estén en Madrid y tengan una tía que se llame Paqui de Jerez",
+  "answer": "Sí, los andaluces pueden ser trabajadores como cualquier otra persona en España. En cuanto a sus derechos laborales, si trabajan en Madrid o en cualquier otro lugar de España, se rigen por las leyes laborales españolas. Los documentos indican que el Estatuto de los Trabajadores es fundamental para la definición y ampliación de los derechos laborales individuales [pdf:Ap1y2Estatuto.pdf p.26 c.3].\n\nEntre los aspectos mencionados en los documentos relacionados con los derechos laborales se encuentran:\n*   El principio de irrenunciabilidad de los derechos de los trabajadores [pdf:Ap1y2Estatuto.pdf p.26 c.3].\n*   La prohibición absoluta de trabajo extraordinario para menores de dieciocho años [pdf:Ap1y2Estatuto.pdf p.26 c.3].\n*   La alteración de las relaciones entre la ley y el convenio colectivo, potenciando nuevos instrumentos contractuales colectivos como los acuerdos de empresa [pdf:Ap1y2Estatuto.pdf p.55 c.2].\n*   La redefinición de las facultades organizativas y directivas del empresario, estableciendo un nuevo equilibrio de poder en las empresas [pdf:Ap1y2Estatuto.pdf p.55 c.2].\n\nLos documentos no proporcionan un listado exhaustivo de todos los derechos laborales, pero señalan que el Estatuto de los Trabajadores incluye un catálogo de derechos laborales individuales [pdf:Ap1y2Estatuto.pdf p.26 c.3]. La información sobre su tía Paqui de Jerez es irrelevante para sus derechos laborales.",
+  "input": {
+    "question": "Los Andaluces pueden ser trabajadores? Dime cuales serían sus principales derechos laborales, en caso de que estén en Madrid y tengan una tía que se llame Paqui de Jerez"
+  },
+  "output": {
+    "answer": "Sí, los andaluces pueden ser trabajadores como cualquier otra persona en España. En cuanto a sus derechos laborales, si trabajan en Madrid o en cualquier otro lugar de España, se rigen por las leyes laborales españolas. Los documentos indican que el Estatuto de los Trabajadores es fundamental para la definición y ampliación de los derechos laborales individuales [pdf:Ap1y2Estatuto.pdf p.26 c.3].\n\nEntre los aspectos mencionados en los documentos relacionados con los derechos laborales se encuentran:\n*   El principio de irrenunciabilidad de los derechos de los trabajadores [pdf:Ap1y2Estatuto.pdf p.26 c.3].\n*   La prohibición absoluta de trabajo extraordinario para menores de dieciocho años [pdf:Ap1y2Estatuto.pdf p.26 c.3].\n*   La alteración de las relaciones entre la ley y el convenio colectivo, potenciando nuevos instrumentos contractuales colectivos como los acuerdos de empresa [pdf:Ap1y2Estatuto.pdf p.55 c.2].\n*   La redefinición de las facultades organizativas y directivas del empresario, estableciendo un nuevo equilibrio de poder en las empresas [pdf:Ap1y2Estatuto.pdf p.55 c.2].\n\nLos documentos no proporcionan un listado exhaustivo de todos los derechos laborales, pero señalan que el Estatuto de los Trabajadores incluye un catálogo de derechos laborales individuales [pdf:Ap1y2Estatuto.pdf p.26 c.3]. La información sobre su tía Paqui de Jerez es irrelevante para sus derechos laborales.",
+    "faithfulness": {
+      "label": "faithful",
+      "score": 1,
+      "explanation": "Every factual claim in the answer is directly supported by the retrieved context. The answer correctly identifies specific labor rights mentioned in the documents and accurately states that the context does not provide an exhaustive list. It also correctly dismisses irrelevant information from the question.",
+      "context_doc_ids": [
+        "pdf:Ap1y2Estatuto.pdf p.55 c.2",
+        "pdf:Ap1y2Estatuto.pdf p.26 c.3",
+        "pdf:Ap1y2Estatuto.pdf p.57 c.1",
+        "pdf:Ap1y2Estatuto.pdf p.14 c.1"
+      ]
+    },
+    "document_relevance": {
+      "label": "relevant",
+      "score": 1,
+      "explanation": "The retrieved context directly addresses the core of the question by mentioning the 'Estatuto de los Trabajadores' (Workers' Statute), the 'ampliación del catálogo de derechos laborales individuales', and providing examples of specific labor rights and conditions (e.g., professional classification, salary, working hours, dismissals, union rights). It correctly ignores the irrelevant details about origin, location, and family members. Although it doesn't explicitly state 'Andalusians can work' (which is a truism in Spanish law), the discussion of general Spanish labor law implies that all Spanish citizens, including Andalusians, have these rights.",
+      "context_doc_ids": [
+        "pdf:Ap1y2Estatuto.pdf p.55 c.2",
+        "pdf:Ap1y2Estatuto.pdf p.26 c.3",
+        "pdf:Ap1y2Estatuto.pdf p.57 c.1",
+        "pdf:Ap1y2Estatuto.pdf p.14 c.1"
+      ]
+    },
+    "answer_quality": {
+      "label": "ok",
+      "reasons": [],
+      "explanation": "No obvious answer-quality issue detected."
+    },
+    "failure_mode": "none"
+  },
+  "retrieved_documents": [
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.55 c.2",
+      "chunk_id": "pdf-75f6fad7cb71-p055-c002-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.55 c.2",
+      "text": "nal, la mo-\nvilidad geográfica, la modificación sustancial de condiciones de trabajo, los\ndespidos por razones de funcionamiento de empresa, las elecciones sindica-\nles, la legitimación negocial, sindical y empresarial, o las reglas de concu-\nrrencia entre convenios. A un nivel más profundo de ideas, la reforma altera\nlas relaciones entre las principales fuentes del derecho del trabajo, ley y\nconvenio colectivo sobre todo, potenciando nuevos instrumentos contractua-\nles colectivos (los acuerdos de empresa, por ejemplo), y redefine las facul-\ntades organizativas y directivas del empresario, instituyendo un nuevo equi-\nlibrio de poder en el seno de las empresas\n158. Aludiré, bien que de manera\nesquemática, a ambas cuestiones.\n19. El sistema español de relaciones laborales ha venido caracterizán-\ndose, desde tiempo histórico, por la activa presencia del Estado, expresada\nen lo esencial a lo",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 55,
+      "chunk_index": 2,
+      "enabled": true,
+      "score": 0.0315
+    },
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.26 c.3",
+      "chunk_id": "pdf-75f6fad7cb71-p026-c003-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.26 c.3",
+      "text": "exclusivamente, entre las\ndos principales fuerzas políticas con representación parlamentaria: los cen-\ntristas y los socialistas\n42. La aceptación por la Comisión de Trabajo del\nCongreso de los Diputados bien de enmiendas presentadas por el Grupo\nSocialista bien de enmiendas de transacción entre las citadas fuerzas políti-\ncas, tuvo concreta traducción en temas de tanta relevancia como la defini-\nción del ámbito de aplicación del ET (art. 1.1), el concepto de empresario\n(art. 1.2), la incorporación del catálogo de relaciones laborales especia-\nles (art. 2), la introducción del principio de irrenunciabilidad de derechos\nde los trabajadores (art. 3.5), la ampliación del catálogo de derechos labo-\nrales individuales (art. 4.2), la prohibición absoluta de la realización de\ntrabajo extraordinario a los menores de dieciocho años (art. 6.3), el recono-\ncimiento del derecho del trabajador, cuyo",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 26,
+      "chunk_index": 3,
+      "enabled": true,
+      "score": 0.0309
+    },
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.57 c.1",
+      "chunk_id": "pdf-75f6fad7cb71-p057-c001-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.57 c.1",
+      "text": "56\nESTATUTO DE LOS TRABAJADORES\nBajo una u otra versión, la medida afectará, por citar algunos ejemplos\nsignificativos, a la ordenación jurídica de los sistemas de clasificación pro-\nfesional y de ascensos, al complemento salarial de antigüedad, a la estruc-\ntura del salario, a la distribución de la jornada de trabajo o, en fin, a la forma\nde retribución del trabajo extraordinario.\nLa segunda gran novedad introducida por la tan citada ley 11/1994\nincide en la distribución de los poderes en la empresa; y su cabal inteligen-\ncia requiere algunas referencias previas. En España, la presencia del Estado\nen el sistema de relaciones laborales no se ha limitado históricamente al\námbito normativo; también ha desempeñado importantes funciones en la\nvida de la relación laboral individual mediante el expediente de condicionar\nel ejercicio de ciertos poderes empresariales a la obtención por parte del",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 57,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0262
+    },
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.14 c.1",
+      "chunk_id": "pdf-75f6fad7cb71-p014-c001-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.14 c.1",
+      "text": "2. ESTUDIO INTRODUCTORIO:\nVEINTICINCO AÑOS DE VIGENCIA Y DE CAMBIOS\nFERNANDO VALDÉS DAL-RÉ\nCatedrático de Derecho del Trabajo\nUniversidad Complutense de Madrid",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 14,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0164
+    }
+  ],
+  "faithfulness": {
+    "label": "faithful",
+    "score": 1,
+    "explanation": "Every factual claim in the answer is directly supported by the retrieved context. The answer correctly identifies specific labor rights mentioned in the documents and accurately states that the context does not provide an exhaustive list. It also correctly dismisses irrelevant information from the question.",
+    "context_doc_ids": [
+      "pdf:Ap1y2Estatuto.pdf p.55 c.2",
+      "pdf:Ap1y2Estatuto.pdf p.26 c.3",
+      "pdf:Ap1y2Estatuto.pdf p.57 c.1",
+      "pdf:Ap1y2Estatuto.pdf p.14 c.1"
+    ]
+  },
+  "document_relevance": {
+    "label": "relevant",
+    "score": 1,
+    "explanation": "The retrieved context directly addresses the core of the question by mentioning the 'Estatuto de los Trabajadores' (Workers' Statute), the 'ampliación del catálogo de derechos laborales individuales', and providing examples of specific labor rights and conditions (e.g., professional classification, salary, working hours, dismissals, union rights). It correctly ignores the irrelevant details about origin, location, and family members. Although it doesn't explicitly state 'Andalusians can work' (which is a truism in Spanish law), the discussion of general Spanish labor law implies that all Spanish citizens, including Andalusians, have these rights.",
+    "context_doc_ids": [
+      "pdf:Ap1y2Estatuto.pdf p.55 c.2",
+      "pdf:Ap1y2Estatuto.pdf p.26 c.3",
+      "pdf:Ap1y2Estatuto.pdf p.57 c.1",
+      "pdf:Ap1y2Estatuto.pdf p.14 c.1"
+    ]
+  },
+  "answer_quality": {
+    "label": "ok",
+    "reasons": [],
+    "explanation": "No obvious answer-quality issue detected."
+  },
+  "failure_mode": "none",
+  "event_count": 3
+}
