@@ -5,13 +5,8 @@ import os
 from dotenv import load_dotenv
 from google.adk.agents import Agent
 
-from phoenix_reflex.mcp import optional_phoenix_mcp_tools
 from phoenix_reflex.prompts import PRODUCTION_PROMPT
-from phoenix_reflex.reflex import (
-    get_trace_summary,
-    list_improvement_cases,
-    list_recent_trace_summaries,
-)
+from phoenix_reflex.reflex import list_improvement_cases
 from phoenix_reflex.retriever import retrieve_documents
 
 
@@ -28,9 +23,6 @@ root_agent = Agent(
     instruction=PRODUCTION_PROMPT,
     tools=[
         retrieve_documents,
-        list_recent_trace_summaries,
-        get_trace_summary,
         list_improvement_cases,
-        *optional_phoenix_mcp_tools(),
     ],
 )

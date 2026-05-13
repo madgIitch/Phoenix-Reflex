@@ -1,85 +1,17 @@
 # Phoenix Reflex
 
-**Phoenix Reflex** is a regression-driven RAG system: every failed answer becomes a regression test, an improvement hypothesis, and a comparison against production.
+Phoenix Reflex is a regression-driven PDF RAG system: weak answers become regression cases, improvement hypotheses, and prompt-candidate comparisons before a human promotes a change.
 
-The project combines a RAG pipeline with **Arize AX tracing**, OpenInference instrumentation for Google/Gemini, runtime introspection tools, and an **LLM-as-a-judge evaluation loop** to classify failures, capture them as `improvement_case` records, generate prompt candidates, and compare those candidates against production before a human promotes them to staging.
+## Core Flow
 
-## Core Idea
-
-Most RAG agents answer and stop.
-
-Phoenix Reflex turns failures into versioned regression pressure:
-
-1. A user asks a question.
-2. The RAG agent retrieves context and generates an answer.
-3. Every step is traced in Arize AX.
-4. The evaluators score faithfulness and document relevance.
-5. The system classifies failures as `retrieval`, `generation`, or `none`.
-6. Weak answers become `improvement_case` records in the `regression_v1` queue.
-7. A candidate prompt is generated from the regression cases.
-8. The candidate is compared against production on both regression cases and known-good questions.
-9. Promotion to `staging` stays manual so a human keeps the release decision.
-
-## What It Generates
-
-When a problematic answer is detected, Phoenix Reflex can automatically create:
-
-- a regression test question
-- a dataset example for future evaluation
-- a failure report with retrieved context and evaluator output
-- a failure-mode label: `retrieval`, `generation`, or `none`
-- a prompt or retrieval improvement hypothesis
-- a candidate prompt for comparative testing
-
-## Why It Matters
-
-RAG systems usually fail silently.
-
-Phoenix Reflex makes failures visible, traceable, and actionable.
-
-Instead of treating observability as a dashboard only for humans, this project turns runtime traces into the next regression suite. The strongest demo path is compliance and local regulation: dense PDFs such as `estatuto81.pdf`, where unsupported answers are easy to miss and costly to trust.
-
-## Architecture
-
-```text
-User Question
-     |
-     v
-RAG Agent
-     |
-     v
-Retriever + Generator
-     |
-     v
-Arize AX Tracing
-     |
-     v
-Failure Detection
-     |
-     v
-Failure Mode Classification
-     |
-     v
-Improvement Case
-     |
-     v
-Prompt Candidate Experiment
-     |
-     v
-Manual Promotion to Staging
-```
-
-## Sprint 0
-
-Sprint 0 sets up the empty deployment path before adding RAG logic:
-
-- FastAPI service with public health check at `/health`.
-- Hello-world trace endpoint at `/hello`.
-- Minimal Google ADK `qa_agent` placeholder in `phoenix_reflex_agent/agent.py`.
-- Arize AX tracing through `arize.otel.register()`.
-- Google ADK and Google GenAI OpenInference instrumentation.
-- Dockerfile with Python and Node, ready for Cloud Run and the later Phoenix MCP `npx` dependency.
-- Gemini CLI MCP config in `.gemini/settings.json` for Phoenix runtime introspection.
+1. Upload one or more text-based PDFs.
+2. The backend extracts pages, chunks text, and stores local JSON records under `data/`.
+3. Retrieval ranks enabled chunks with BM25 or hybrid BM25 + embeddings when Gemini credentials are available.
+4. The QA agent answers from returned chunks only and cites returned PDF chunk IDs.
+5. Evaluators score faithfulness, document relevance, and lightweight answer quality.
+6. Low-scoring or suspicious answers become `improvement_case` records in `regression_v1`.
+7. A candidate prompt can be generated from regression cases and compared against production.
+8. Promotion to `staging` is manual.
 
 ## Local Run
 
@@ -90,318 +22,7 @@ pip install -r requirements.txt
 uvicorn phoenix_reflex.main:app --reload --port 8080
 ```
 
-Then open:
-
-- `http://localhost:8080/health`
-- `http://localhost:8080/hello`
-
-The `/hello` request emits a `hello_world` span when `ARIZE_API_KEY` and `ARIZE_SPACE_ID` are set.
-
-Use Arize AX credentials from your space:
-
-- `ARIZE_API_KEY`: key from Arize AX.
-- `ARIZE_SPACE_ID`: space ID from Arize AX.
-- `ARIZE_PROJECT_NAME`: `phoenix-reflex`.
-- `ARIZE_OTEL_ENDPOINT`: `https://otlp.eu-west-1a.arize.com/v1` for the EU region.
-- `GEMINI_API_KEY`: your Gemini API key.
-
-Your `.env` should include:
-
-```env
-ARIZE_API_KEY=...
-ARIZE_SPACE_ID=...
-ARIZE_PROJECT_NAME=phoenix-reflex
-ARIZE_OTEL_ENDPOINT=https://otlp.eu-west-1a.arize.com/v1
-GEMINI_API_KEY=...
-GOOGLE_API_KEY=...
-GEMINI_MODEL=gemini-2.5-flash
-```
-
-## Cloud Run
-
-Create Secret Manager secrets named `ARIZE_API_KEY`, `ARIZE_SPACE_ID`, and `GEMINI_API_KEY`, then deploy:
-
-```powershell
-.\scripts\deploy-cloud-run.ps1 `
-  -ProjectId your-gcp-project-id `
-  -Region europe-west1
-```
-
-The service should expose:
-
-- `/health` for Cloud Run readiness checks.
-- `/hello` for validating that a trace reaches Arize AX.
-
-## Sprint 1
-
-Sprint 1 adds the smallest useful RAG loop:
-
-- Curated corpus of 12 short documents in `phoenix_reflex/corpus.py`.
-- Intentional failure cases: Phoenix naming ambiguity, partially supported questions, and unsupported topics.
-- BM25-style retriever in `phoenix_reflex/retriever.py`.
-- `retrieve_documents` tool connected to `qa_agent`.
-- `/retrieve` endpoint for inspecting retrieval directly.
-- `/ask` endpoint for running the ADK agent with retrieval and cited answers.
-
-Try retrieval directly:
-
-```powershell
-Invoke-RestMethod "http://localhost:8080/retrieve?query=que%20hace%20sprint%201&top_k=2"
-```
-
-Ask the agent:
-
-```powershell
-Invoke-RestMethod `
-  -Uri "http://localhost:8080/ask" `
-  -Method Post `
-  -ContentType "application/json" `
-  -Body '{"question":"Que agrega el sprint 1 y que debe hacer si no hay contexto?"}'
-```
-
-The answer should cite corpus document ids such as `[s1-goal]` and `[s1-prompt]`. In Arize AX, the trace should show the top-level ask span, retrieval span, ADK invocation, tool call, and model generation activity.
-
-## Sprint 2
-
-Sprint 2 adds inline faithfulness evaluation:
-
-- LLM-as-a-judge evaluator in `phoenix_reflex/evaluator.py`.
-- Every `/ask` response is checked against retrieved documents.
-- The API response includes `faithfulness.label`, `faithfulness.score`, and `faithfulness.explanation`.
-- Arize AX traces include a `faithfulness_eval` span and `eval.faithfulness.*` attributes on `qa_agent.ask`.
-
-Example response shape:
-
-```json
-{
-  "question": "...",
-  "answer": "...",
-  "faithfulness": {
-    "label": "faithful",
-    "score": 1.0,
-    "explanation": "...",
-    "context_doc_ids": ["s1-goal", "s1-prompt"]
-  }
-}
-```
-
-Useful validation questions:
-
-```text
-Que agrega el sprint 1 y que debe hacer si no hay contexto?
-Cual es el presupuesto exacto del equipo y la biografia de cada miembro?
-```
-
-The first should be answered with citations and a high faithfulness score. The second should abstain and still receive a high score because the abstention is supported by the missing context.
-
-To demonstrate an intentionally unfaithful answer without weakening the normal agent behavior, use the manual eval endpoint:
-
-```powershell
-$body = @{
-  question = "Cual es el presupuesto exacto del equipo?"
-  answer = "El presupuesto exacto del equipo es 50000 euros."
-} | ConvertTo-Json -Compress
-
-Invoke-RestMethod `
-  -Uri "http://localhost:8080/eval/faithfulness" `
-  -Method Post `
-  -ContentType "application/json" `
-  -Body $body
-```
-
-This should return `unfaithful` because the corpus does not support the budget claim.
-
-## Sprint 3
-
-Sprint 3 adds self-introspection and improvement-case generation:
-
-- `list_recent_trace_summaries`: lets the agent inspect recent `/ask` runs.
-- `get_trace_summary`: fetches one stored trace summary by session id.
-- `list_improvement_cases`: exposes generated regression candidates.
-- `add_improvement_case`: records low-faithfulness answers into the local `regression_v1` queue.
-- Optional Phoenix MCP toolset in `phoenix_reflex/mcp.py`, enabled only with `ENABLE_PHOENIX_MCP=1` and Phoenix credentials.
-
-The local improvement queue is intentionally lightweight for the hackathon demo. It proves the self-correction loop without requiring a database:
-
-```text
-answer -> faithfulness eval -> low score -> improvement case -> regression_v1
-```
-
-Generate a failing case:
-
-```powershell
-$body = @{
-  question = "Cual es el presupuesto exacto del equipo?"
-  answer = "El presupuesto exacto del equipo es 50000 euros."
-} | ConvertTo-Json -Compress
-
-Invoke-RestMethod `
-  -Uri "http://localhost:8080/eval/faithfulness" `
-  -Method Post `
-  -ContentType "application/json" `
-  -Body $body
-```
-
-Inspect generated cases:
-
-```powershell
-Invoke-RestMethod "http://localhost:8080/improvement-cases"
-```
-
-Ask the agent to inspect itself:
-
-```powershell
-$body = @{ question = "Resume tus ultimas trazas y casos de mejora" } | ConvertTo-Json -Compress
-Invoke-RestMethod -Uri "http://localhost:8080/ask" -Method Post -ContentType "application/json" -Body $body
-```
-
-To enable the official Phoenix MCP server later:
-
-```env
-ENABLE_PHOENIX_MCP=1
-PHOENIX_HOST=https://app.phoenix.arize.com/s/your-space
-PHOENIX_API_KEY=px_live_...
-```
-
-When enabled, the ADK agent adds MCP tools for Phoenix traces, spans, datasets, and prompts through `@arizeai/phoenix-mcp`.
-
-## Sprint 4
-
-Sprint 4 closes the loop from regression case to prompt candidate:
-
-- Prompt registry with `production`, `candidate`, and `staging` tags in `phoenix_reflex/prompts.py`.
-- Candidate generation from `regression_v1` cases in `phoenix_reflex/experiments.py`.
-- Comparative experiment:
-  - production baseline uses the captured bad answer from the failure case.
-  - candidate generates a fresh answer from retrieved context.
-  - good questions are tested with both prompts to catch regressions.
-- Manual promotion endpoint and `scripts/promote_tag.py`.
-
-Generate a candidate:
-
-```powershell
-Invoke-RestMethod -Uri "http://localhost:8080/prompts/candidate" -Method Post
-```
-
-Run the experiment:
-
-```powershell
-Invoke-RestMethod -Uri "http://localhost:8080/experiments/prompt" -Method Post
-```
-
-Promote candidate to staging manually:
-
-```powershell
-py scripts/promote_tag.py --base-url http://localhost:8080 --source-tag candidate --target-tag staging
-```
-
-The promotion rule is:
-
-```text
-candidate_regression_avg > production_regression_avg
-and candidate_good_avg >= production_good_avg
-```
-
-Promotion is still manual so the demo keeps a human approval point.
-
-## Sprint 5
-
-Sprint 5 adds optional robustness layers without changing the main demo path:
-
-- `Document Relevance` evaluator to separate retrieval failures from generation failures.
-- `Answer Quality` heuristics to flag faithful but suspicious answers, such as language mismatch, over-abstention, or user-intent drift.
-- Evaluator spans are tagged with `critic.agent=critic_agent`, but the real evaluation path lives in `phoenix_reflex/evaluator.py`.
-- Prompt cache with fallback to the last valid prompt registry state.
-- Structured failure mode classification:
-  - `none`
-  - `retrieval`
-  - `generation`
-  - `answer_quality`
-- Local human-review style improvement cases remain visible through `/improvement-cases`.
-
-Validate document relevance:
-
-```powershell
-Invoke-RestMethod "http://localhost:8080/eval/document-relevance?query=Que%20agrega%20el%20sprint%201"
-Invoke-RestMethod "http://localhost:8080/eval/document-relevance?query=Cual%20es%20el%20presupuesto%20exacto%20del%20equipo"
-```
-
-`/ask` now returns both evaluators:
-
-```json
-{
-  "faithfulness": {"label": "faithful", "score": 1.0},
-  "document_relevance": {"label": "relevant", "score": 1.0},
-  "answer_quality": {"label": "ok", "reasons": []},
-  "failure_mode": "none"
-}
-```
-
-This makes failures easier to explain:
-
-```text
-low relevance + low faithfulness -> retrieval problem
-high relevance + low faithfulness -> generation problem
-```
-
-## Demo Path: Regulation PDF
-
-Use `estatuto81.pdf` as the vertical demo corpus. It keeps the story concrete: a compliance-style RAG system answering from dense local regulation.
-
-Recommended anchor questions:
-
-```text
-Andalucia tiene a Madrid como municipio?
-Jerez es un municipio de Andalucia?
-Cuales son las competencias de la Comunidad Autonoma?
-```
-
-Expected interpretation:
-
-- Madrid question: supported abstention or correction, `failure_mode: none`.
-- Jerez question: plausible answer without direct retrieved support, `failure_mode: retrieval`.
-- Competencias question: related but incomplete retrieval, useful for explaining partial relevance.
-
-After the failure cases exist, run the prompt loop:
-
-```powershell
-Invoke-RestMethod -Uri "http://localhost:8080/prompts/candidate" -Method Post
-Invoke-RestMethod -Uri "http://localhost:8080/experiments/prompt" -Method Post
-py scripts/promote_tag.py --base-url http://localhost:8080 --source-tag candidate --target-tag staging
-```
-
-For the agentic moment, ask:
-
-```text
-Que has aprendido sobre tus fallos recientes?
-```
-
-Use it live only after three successful rehearsals where the agent calls `list_improvement_cases` or `list_recent_trace_summaries`. If any rehearsal misses the tool call, show the captured Arize AX trace and narrate the introspection instead.
-
-Judge-model caveat for Q&A: the hackathon version uses a strict, separate judge prompt with explicit scoring criteria. A production deployment should mitigate correlated model bias with a different judge family or sampled human review.
-
-## PDF Ingestion UI
-
-The PDF ingestion feature is local-first and extends the existing RAG corpus without replacing it:
-
-```text
-PDF upload -> text extraction -> chunking -> JSON store -> BM25 retrieval -> cited answer
-```
-
-It stores local demo data under `data/`, which is ignored by git:
-
-- `data/documents.json`
-- `data/chunks.json`
-- `data/uploads/`
-
-Run the backend:
-
-```powershell
-pip install -r requirements.txt
-uvicorn phoenix_reflex.main:app --reload --port 8080
-```
-
-Run the local review UI:
+Run the UI:
 
 ```powershell
 cd frontend
@@ -411,42 +32,81 @@ npm run dev
 
 Open `http://127.0.0.1:5173`.
 
-The UI lets you upload a PDF, inspect extracted chunks, enable or disable chunks, test retrieval, ask the RAG agent, and review faithfulness, document relevance, and failure mode outputs.
+## Environment
 
-The `Traces` tab shows captured local trace inputs and outputs:
-
-- user question
-- generated answer
-- retrieved manual/PDF documents
-- faithfulness output
-- document relevance output
-- failure mode
-
-Use `Export JSON` to download the last captured trace summaries, or export one selected trace from the inspector.
-
-Useful API checks:
-
-```powershell
-Invoke-RestMethod "http://localhost:8080/documents"
-Invoke-RestMethod "http://localhost:8080/documents/search?query=sprint%201&top_k=5"
-Invoke-RestMethod "http://localhost:8080/introspection/traces/export?limit=50"
+```env
+GEMINI_API_KEY=...
+GOOGLE_API_KEY=...
+GEMINI_MODEL=gemini-2.5-flash
 ```
 
-PDF chunks are included in `/retrieve` and `/ask` only when `enabled=true`. PDF citations render as:
+Tracing is optional. If configured, the service can emit OpenTelemetry spans:
+
+```env
+ARIZE_API_KEY=...
+ARIZE_SPACE_ID=...
+ARIZE_PROJECT_NAME=phoenix-reflex
+ARIZE_OTEL_ENDPOINT=https://otlp.eu-west-1a.arize.com/v1
+```
+
+## API Checks
+
+```powershell
+Invoke-RestMethod "http://localhost:8080/health"
+Invoke-RestMethod "http://localhost:8080/documents"
+Invoke-RestMethod "http://localhost:8080/documents/search?query=your%20question&top_k=5"
+```
+
+Ask the agent:
+
+```powershell
+$body = @{ question = "Your question about the uploaded PDFs" } | ConvertTo-Json -Compress
+Invoke-RestMethod -Uri "http://localhost:8080/ask" -Method Post -ContentType "application/json" -Body $body
+```
+
+Expected citations use the returned chunk IDs:
 
 ```text
 [pdf:filename.pdf p.3 c.2]
 ```
 
-This feature is not deployed to Cloud Run yet. Cloud persistence should use Cloud Storage plus Firestore, Cloud SQL, or another durable document store before enabling uploaded PDFs in production.
+## Prompt Loop
 
-## Phoenix MCP
+Create a candidate prompt from captured improvement cases:
 
-The Arize hackathon starter configures Phoenix MCP through Gemini CLI rather than inside the Python ADK service. This repo follows that pattern for sprint 0:
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8080/prompts/candidate" -Method Post
+```
 
-- Edit `.gemini/settings.json`.
-- Replace `https://app.phoenix.arize.com/s/your-space` with the same Phoenix Cloud hostname used for tracing.
-- Put the API key in the Gemini CLI environment or fill the `--apiKey` value locally.
-- Start Gemini CLI from the repo root so it can load the MCP server config.
+Compare candidate and production:
 
-Once traces exist, Gemini CLI can inspect Phoenix traces, prompts, datasets, experiments, and sessions through `@arizeai/phoenix-mcp`.
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8080/experiments/prompt?n_runs=3" -Method Post
+```
+
+Promote manually:
+
+```powershell
+py scripts/promote_tag.py --base-url http://localhost:8080 --source-tag candidate --target-tag staging
+```
+
+## PDF Data
+
+Local data is stored under `data/`, which is ignored by git:
+
+- `data/documents.json`
+- `data/chunks.json`
+- `data/uploads/`
+- `data/embeddings.json`
+
+PDF chunks are retrieved only when `enabled=true`.
+
+## Demo Discipline
+
+Use any text-based PDF whose contents you can verify. Precompute embeddings before a live demo:
+
+```powershell
+py scripts/precompute_embeddings.py
+```
+
+Avoid uploading a large new PDF live unless you have already timed ingestion and embedding generation.

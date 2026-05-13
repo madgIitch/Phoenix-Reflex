@@ -54,7 +54,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Phoenix Reflex",
-    description="Sprint 0: trivial ADK app with Phoenix tracing.",
+    description="Regression-driven PDF RAG service.",
     version="0.1.0",
     lifespan=lifespan,
 )
@@ -87,7 +87,6 @@ def root() -> dict[str, str]:
 def hello() -> dict[str, str]:
     tracer = get_tracer()
     with tracer.start_as_current_span("hello_world") as span:
-        span.set_attribute("app.sprint", "0")
         span.set_attribute("app.agent", "qa_agent")
         span.set_attribute("app.runtime", "google-adk")
         project = os.getenv(
@@ -229,8 +228,8 @@ def prompts_candidate() -> dict[str, object]:
 
 
 @app.post("/experiments/prompt")
-def prompt_experiment() -> dict[str, object]:
-    return run_prompt_experiment()
+def prompt_experiment(n_runs: int = 1) -> dict[str, object]:
+    return run_prompt_experiment(n_runs=n_runs)
 
 
 @app.post("/prompts/promote")

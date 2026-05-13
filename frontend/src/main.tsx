@@ -88,9 +88,9 @@ function App() {
   const [chunks, setChunks] = useState<ChunkRecord[]>([]);
   const [selectedChunk, setSelectedChunk] = useState<ChunkRecord | null>(null);
   const [status, setStatus] = useState('Ready');
-  const [query, setQuery] = useState('Que agrega el sprint 1?');
+  const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState<RetrievalResult[]>([]);
-  const [question, setQuestion] = useState('Que agrega el sprint 1 y que debe hacer si no hay contexto?');
+  const [question, setQuestion] = useState('');
   const [askResponse, setAskResponse] = useState<AskResponse | null>(null);
   const [cases, setCases] = useState<ImprovementCase[]>([]);
   const [traces, setTraces] = useState<TraceSummary[]>([]);

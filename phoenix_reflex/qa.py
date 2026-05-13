@@ -84,6 +84,7 @@ async def ask_agent(question: str) -> dict[str, object]:
             retrieved_documents = fallback.get("documents", [])
             valid_ids = set(fallback.get("valid_citation_ids", []))
         phantom_citations = _find_phantom_citations(answer, valid_ids)
+        detected_phantom_citations = set(phantom_citations)
         correction_rounds = 0
         while phantom_citations and correction_rounds < 2:
             span.set_attribute("eval.phantom_citations", ", ".join(phantom_citations))
@@ -102,6 +103,9 @@ async def ask_agent(question: str) -> dict[str, object]:
                 phantom_citations = _find_phantom_citations(answer, valid_ids)
             else:
                 break
+        corrected_phantom_citations = detected_phantom_citations - phantom_citations
+        span.set_attribute("eval.phantom_citations_detected_count", len(detected_phantom_citations))
+        span.set_attribute("eval.phantom_citations_corrected_count", len(corrected_phantom_citations))
         if phantom_citations:
             span.set_attribute("eval.citation_correction_failed", True)
         document_relevance = evaluate_document_relevance(
@@ -124,7 +128,7 @@ async def ask_agent(question: str) -> dict[str, object]:
         span.set_attribute("eval.document_relevance.explanation", str(document_relevance["explanation"]))
         span.set_attribute("eval.answer_quality.label", str(answer_quality["label"]))
         span.set_attribute("eval.answer_quality.explanation", str(answer_quality["explanation"]))
-        failure_mode = _classify_failure_mode(faithfulness, document_relevance)
+        failure_mode = _classify_failure_mode(faithfulness, document_relevance, answer_quality)
         span.set_attribute("eval.failure_mode", failure_mode)
         summary = record_trace_summary(
             question=question,
@@ -149,6 +153,8 @@ async def ask_agent(question: str) -> dict[str, object]:
             "answer_quality": answer_quality,
             "failure_mode": failure_mode,
             "phantom_citations": sorted(phantom_citations),
+            "phantom_citations_detected_count": len(detected_phantom_citations),
+            "phantom_citations_corrected_count": len(corrected_phantom_citations),
             "improvement_case": improvement_case,
             "session_id": session_id,
             "event_count": event_count,
@@ -181,9 +187,15 @@ def _is_introspection_question(question: str) -> bool:
 def _classify_failure_mode(
     faithfulness: dict[str, object],
     document_relevance: dict[str, object],
+    answer_quality: dict[str, object] | None = None,
 ) -> str:
     faithfulness_score = float(faithfulness.get("score", 0.0))
     relevance_score = float(document_relevance.get("score", 0.0))
+    if (
+        faithfulness_score >= 0.75
+        and (answer_quality or {}).get("label") == "suspicious"
+    ):
+        return "answer_quality"
     if faithfulness_score >= 0.75:
         return "none"
     if relevance_score < 0.75:
@@ -198,8 +210,8 @@ def _assess_answer_quality(
     document_relevance: dict[str, object],
 ) -> dict[str, object]:
     reasons: list[str] = []
-    normalized_question = question.lower()
-    normalized_answer = answer.lower()
+    normalized_question = _normalize_for_language_hint(question)
+    normalized_answer = _normalize_for_language_hint(answer)
     relevance_score = float(document_relevance.get("score", 0.0))
     faithfulness_score = float(faithfulness.get("score", 0.0))
 
@@ -215,14 +227,10 @@ def _assess_answer_quality(
         "no se puede responder",
         "no lo se",
     )
-    if relevance_score >= 0.75 and any(marker in normalized_answer for marker in abstention_markers):
-        reasons.append("possible_over_abstention")
-
-    if (
-        "trabajador" in normalized_question
-        and ("inherent capacity" in normalized_answer or "diligence" in normalized_answer or "work ethic" in normalized_answer)
+    if relevance_score >= 0.75 and any(
+        marker in normalized_answer for marker in abstention_markers
     ):
-        reasons.append("possible_intent_drift")
+        reasons.append("possible_over_abstention")
 
     label = "suspicious" if reasons else "ok"
     explanation = (
@@ -313,10 +321,60 @@ def _find_phantom_citations(answer: str, valid_ids: set[str]) -> set[str]:
 
 
 def _looks_spanish(text: str) -> bool:
-    markers = ("andaluc", "segun", "puede", "pueden", "trabajador", "derechos")
-    return any(marker in text for marker in markers)
+    """Demo-grade language hint; replace with a real detector before production."""
+    markers = (
+        " el ",
+        " la ",
+        " los ",
+        " las ",
+        " un ",
+        " una ",
+        " de ",
+        " es ",
+        " a ",
+        " que ",
+        " como ",
+        " cual ",
+        " cuales ",
+        " donde ",
+        " puede ",
+        " pueden ",
+        " tiene ",
+        " segun ",
+        " sobre ",
+        " para ",
+        " con ",
+        " no ",
+    )
+    return _marker_hits(text, markers) >= 2
 
 
 def _looks_english(text: str) -> bool:
-    markers = ("based on", "i cannot", "the documents", "the context", "work ethic", "inherent capacity")
-    return any(marker in text for marker in markers)
+    """Demo-grade language hint; replace with a real detector before production."""
+    markers = (
+        " the ",
+        " and ",
+        " or ",
+        " of ",
+        " to ",
+        " in ",
+        " based on ",
+        " according to ",
+        " i cannot ",
+        " i can ",
+        " documents ",
+        " context ",
+        " question ",
+        " answer ",
+    )
+    return _marker_hits(text, markers) >= 2
+
+
+def _normalize_for_language_hint(text: str) -> str:
+    normalized = text.lower()
+    normalized = re.sub(r"\s+", " ", normalized)
+    return f" {normalized.strip()} "
+
+
+def _marker_hits(text: str, markers: tuple[str, ...]) -> int:
+    return sum(1 for marker in markers if marker in text)

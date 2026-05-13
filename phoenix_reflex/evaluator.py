@@ -89,7 +89,7 @@ def evaluate_faithfulness(
         span.set_attribute("input.value", question)
         span.set_attribute("eval.name", "faithfulness")
         span.set_attribute("eval.context_doc_ids", ", ".join(context_doc_ids))
-        span.set_attribute("critic.agent", "critic_agent")
+        span.set_attribute("critic.implementation", "llm_judge")
 
         if not answer.strip():
             result = {
@@ -132,7 +132,7 @@ def evaluate_document_relevance(
         span.set_attribute("input.value", question)
         span.set_attribute("eval.name", "document_relevance")
         span.set_attribute("eval.context_doc_ids", ", ".join(context_doc_ids))
-        span.set_attribute("critic.agent", "critic_agent")
+        span.set_attribute("critic.implementation", "llm_judge")
 
         if not docs:
             result = {

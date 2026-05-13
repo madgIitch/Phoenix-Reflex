@@ -1,1 +1,1 @@
-"""Phoenix Reflex sprint 0 application package."""
+"""Phoenix Reflex application package."""

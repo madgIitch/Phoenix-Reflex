@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import os
+from statistics import mean, pstdev
 from typing import Any
 
 from dotenv import load_dotenv
 from google import genai
 
 from phoenix_reflex.evaluator import evaluate_faithfulness
+from phoenix_reflex.document_store import list_chunks
 from phoenix_reflex.observability import get_tracer
 from phoenix_reflex.prompts import get_prompt, upsert_prompt
 from phoenix_reflex.reflex import list_improvement_cases
@@ -41,12 +43,6 @@ abstain instead of inventing details.
 {context}
 """
 
-GOOD_QUESTIONS = (
-    "Que agrega el sprint 1 y que debe hacer si no hay contexto?",
-    "Que diferencia hay entre Arize AX y Phoenix Cloud en este proyecto?",
-)
-
-
 def generate_prompt_candidate() -> dict[str, Any]:
     tracer = get_tracer()
     with tracer.start_as_current_span("generate_prompt_candidate") as span:
@@ -72,7 +68,8 @@ def generate_prompt_candidate() -> dict[str, Any]:
         }
 
 
-def run_prompt_experiment() -> dict[str, Any]:
+def run_prompt_experiment(n_runs: int = 1) -> dict[str, Any]:
+    n_runs = max(1, min(n_runs, 5))
     tracer = get_tracer()
     with tracer.start_as_current_span("prompt_experiment") as span:
         candidate = get_prompt("candidate")
@@ -80,14 +77,29 @@ def run_prompt_experiment() -> dict[str, Any]:
         regression_cases = list_improvement_cases(limit=10)["cases"]
 
         regression_results = [
-            _evaluate_regression_case(case, candidate["prompt"]) for case in regression_cases
+            _evaluate_regression_case(case, candidate["prompt"], n_runs=n_runs)
+            for case in regression_cases
         ]
-        good_results = [_evaluate_good_question(question, production["prompt"], candidate["prompt"]) for question in GOOD_QUESTIONS]
+        good_results = [
+            _evaluate_good_question(
+                question,
+                production["prompt"],
+                candidate["prompt"],
+                n_runs=n_runs,
+            )
+            for question in _good_questions()
+        ]
 
         production_regression_avg = _avg(item["production_score"] for item in regression_results)
         candidate_regression_avg = _avg(item["candidate_score"] for item in regression_results)
         production_good_avg = _avg(item["production_score"] for item in good_results)
         candidate_good_avg = _avg(item["candidate_score"] for item in good_results)
+        production_regression_stats = _score_stats(
+            item["production_score"] for item in regression_results
+        )
+        candidate_regression_stats = _run_score_stats(regression_results, "candidate_runs")
+        production_good_stats = _run_score_stats(good_results, "production_runs")
+        candidate_good_stats = _run_score_stats(good_results, "candidate_runs")
 
         should_promote = (
             bool(regression_results)
@@ -96,50 +108,93 @@ def run_prompt_experiment() -> dict[str, Any]:
         )
         result = {
             "candidate_version": candidate["version"],
+            "n_runs": n_runs,
             "production_regression_avg": production_regression_avg,
+            "production_regression_std": production_regression_stats["std"],
             "candidate_regression_avg": candidate_regression_avg,
+            "candidate_regression_std": candidate_regression_stats["std"],
             "production_good_avg": production_good_avg,
+            "production_good_std": production_good_stats["std"],
             "candidate_good_avg": candidate_good_avg,
+            "candidate_good_std": candidate_good_stats["std"],
             "should_promote_to_staging": should_promote,
             "regression_results": regression_results,
             "good_results": good_results,
         }
         span.set_attribute("experiment.candidate_version", candidate["version"])
+        span.set_attribute("experiment.n_runs", n_runs)
         span.set_attribute("experiment.should_promote_to_staging", should_promote)
         span.set_attribute("experiment.production_regression_avg", production_regression_avg)
         span.set_attribute("experiment.candidate_regression_avg", candidate_regression_avg)
         span.set_attribute("experiment.production_good_avg", production_good_avg)
         span.set_attribute("experiment.candidate_good_avg", candidate_good_avg)
+        span.set_attribute("experiment.candidate_regression_std", candidate_regression_stats["std"])
+        span.set_attribute("experiment.candidate_good_std", candidate_good_stats["std"])
         return result
 
 
-def _evaluate_regression_case(case: dict[str, Any], candidate_prompt: str) -> dict[str, Any]:
+def _evaluate_regression_case(
+    case: dict[str, Any],
+    candidate_prompt: str,
+    n_runs: int,
+) -> dict[str, Any]:
     question = case["question"]
     production_eval = evaluate_faithfulness(question, case["bad_answer"])
-    candidate_answer = _answer_with_prompt(question, candidate_prompt)
-    candidate_eval = evaluate_faithfulness(question, candidate_answer)
+    candidate_runs = [
+        _evaluate_generated_answer(question, candidate_prompt)
+        for _ in range(n_runs)
+    ]
+    candidate_stats = _score_stats(run["score"] for run in candidate_runs)
     return {
         "case_id": case["case_id"],
         "question": question,
         "production_answer_source": "captured_failure",
         "production_score": float(production_eval["score"]),
-        "candidate_score": float(candidate_eval["score"]),
-        "candidate_label": candidate_eval["label"],
-        "candidate_answer": candidate_answer,
+        "candidate_score": candidate_stats["mean"],
+        "candidate_score_std": candidate_stats["std"],
+        "candidate_label": candidate_runs[-1]["label"],
+        "candidate_answer": candidate_runs[-1]["answer"],
+        "candidate_runs": candidate_runs,
     }
 
 
-def _evaluate_good_question(question: str, production_prompt: str, candidate_prompt: str) -> dict[str, Any]:
-    production_answer = _answer_with_prompt(question, production_prompt)
-    candidate_answer = _answer_with_prompt(question, candidate_prompt)
-    production_eval = evaluate_faithfulness(question, production_answer)
-    candidate_eval = evaluate_faithfulness(question, candidate_answer)
+def _evaluate_good_question(
+    question: str,
+    production_prompt: str,
+    candidate_prompt: str,
+    n_runs: int,
+) -> dict[str, Any]:
+    production_runs = [
+        _evaluate_generated_answer(question, production_prompt)
+        for _ in range(n_runs)
+    ]
+    candidate_runs = [
+        _evaluate_generated_answer(question, candidate_prompt)
+        for _ in range(n_runs)
+    ]
+    production_stats = _score_stats(run["score"] for run in production_runs)
+    candidate_stats = _score_stats(run["score"] for run in candidate_runs)
     return {
         "question": question,
-        "production_score": float(production_eval["score"]),
-        "candidate_score": float(candidate_eval["score"]),
-        "production_label": production_eval["label"],
-        "candidate_label": candidate_eval["label"],
+        "production_score": production_stats["mean"],
+        "production_score_std": production_stats["std"],
+        "candidate_score": candidate_stats["mean"],
+        "candidate_score_std": candidate_stats["std"],
+        "production_label": production_runs[-1]["label"],
+        "candidate_label": candidate_runs[-1]["label"],
+        "production_runs": production_runs,
+        "candidate_runs": candidate_runs,
+    }
+
+
+def _evaluate_generated_answer(question: str, prompt: str) -> dict[str, Any]:
+    answer = _answer_with_prompt(question, prompt)
+    evaluation = evaluate_faithfulness(question, answer)
+    return {
+        "answer": answer,
+        "score": float(evaluation["score"]),
+        "label": evaluation["label"],
+        "explanation": evaluation["explanation"],
     }
 
 
@@ -155,6 +210,14 @@ def _answer_with_prompt(question: str, prompt: str) -> str:
             context=context,
         )
     ).strip()
+
+
+def _good_questions(limit: int = 2) -> list[str]:
+    chunks = list_chunks(enabled_only=True)[:limit]
+    return [
+        f"Resume la informacion disponible en {chunk['title']}."
+        for chunk in chunks
+    ]
 
 
 def _generate_text(prompt: str) -> str:
@@ -197,3 +260,21 @@ def _avg(values: Any) -> float:
     if not values:
         return 0.0
     return round(sum(float(value) for value in values) / len(values), 4)
+
+
+def _score_stats(values: Any) -> dict[str, float]:
+    scores = [float(value) for value in values]
+    if not scores:
+        return {"mean": 0.0, "std": 0.0}
+    return {
+        "mean": round(mean(scores), 4),
+        "std": round(pstdev(scores), 4),
+    }
+
+
+def _run_score_stats(results: list[dict[str, Any]], run_key: str) -> dict[str, float]:
+    return _score_stats(
+        run["score"]
+        for result in results
+        for run in result.get(run_key, [])
+    )

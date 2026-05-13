@@ -6,7 +6,6 @@ import re
 from collections import Counter
 from typing import Any
 
-from phoenix_reflex.corpus import CORPUS
 from phoenix_reflex.document_store import list_chunks
 from phoenix_reflex.observability import get_tracer
 
@@ -38,7 +37,7 @@ def _index() -> dict[str, Any]:
 
 
 def retrieve_documents(query: str, top_k: int = 4) -> dict[str, Any]:
-    """Retrieve relevant Phoenix Reflex corpus documents for a user question."""
+    """Retrieve relevant uploaded PDF chunks for a user question."""
     top_k = max(1, min(top_k, 8))
     tracer = get_tracer()
     with tracer.start_as_current_span("retrieve_documents") as span:
@@ -159,18 +158,7 @@ def _bm25_score(
 
 
 def _searchable_documents() -> list[dict[str, Any]]:
-    manual_docs = [
-        {
-            "id": doc.id,
-            "title": doc.title,
-            "text": doc.text,
-            "tags": list(doc.tags),
-            "source_type": "manual",
-        }
-        for doc in CORPUS
-    ]
-    pdf_docs = [_chunk_to_document(chunk) for chunk in list_chunks(enabled_only=True)]
-    return manual_docs + pdf_docs
+    return [_chunk_to_document(chunk) for chunk in list_chunks(enabled_only=True)]
 
 
 def _chunk_to_document(chunk: dict[str, Any]) -> dict[str, Any]:
