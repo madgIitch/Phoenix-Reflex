@@ -21,13 +21,25 @@ def record_trace_summary(
     failure_mode: str = "unknown",
     session_id: str,
     event_count: int,
+    retrieved_documents: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Store a compact runtime summary for agent self-introspection."""
+    retrieved_documents = retrieved_documents or []
     summary = {
         "session_id": session_id,
         "timestamp": datetime.now(UTC).isoformat(),
         "question": question,
         "answer": answer,
+        "input": {
+            "question": question,
+        },
+        "output": {
+            "answer": answer,
+            "faithfulness": faithfulness,
+            "document_relevance": document_relevance,
+            "failure_mode": failure_mode,
+        },
+        "retrieved_documents": retrieved_documents,
         "faithfulness": faithfulness,
         "document_relevance": document_relevance,
         "failure_mode": failure_mode,
@@ -72,6 +84,18 @@ def get_trace_summary(session_id: str) -> dict[str, Any]:
             if trace["session_id"] == session_id:
                 return {"found": True, "trace": trace}
     return {"found": False, "trace": None}
+
+
+def export_trace_io(limit: int = 50) -> dict[str, Any]:
+    """Export captured trace inputs, outputs, retrieval context, and eval outputs."""
+    limit = max(1, min(limit, 50))
+    with LOCK:
+        traces = list(TRACE_SUMMARIES)[:limit]
+    return {
+        "exported_at": datetime.now(UTC).isoformat(),
+        "trace_count": len(traces),
+        "traces": traces,
+    }
 
 
 def add_improvement_case(

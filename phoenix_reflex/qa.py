@@ -14,6 +14,7 @@ from phoenix_reflex.reflex import (
     maybe_create_improvement_case,
     record_trace_summary,
 )
+from phoenix_reflex.retriever import retrieve_documents
 from phoenix_reflex_agent.agent import root_agent
 
 APP_NAME = "phoenix-reflex"
@@ -73,6 +74,8 @@ async def ask_agent(question: str) -> dict[str, object]:
         if _is_introspection_question(question):
             extra_context, extra_context_ids = format_reflex_context()
 
+        retrieved = retrieve_documents(question, top_k=5)
+        retrieved_documents = retrieved.get("documents", [])
         document_relevance = evaluate_document_relevance(question)
         faithfulness = evaluate_faithfulness(
             question,
@@ -96,6 +99,7 @@ async def ask_agent(question: str) -> dict[str, object]:
             failure_mode=failure_mode,
             session_id=session_id,
             event_count=event_count,
+            retrieved_documents=retrieved_documents,
         )
         improvement_case = maybe_create_improvement_case(summary)
         if improvement_case:
@@ -110,6 +114,7 @@ async def ask_agent(question: str) -> dict[str, object]:
             "improvement_case": improvement_case,
             "session_id": session_id,
             "event_count": event_count,
+            "retrieved_documents": retrieved_documents,
         }
 
 

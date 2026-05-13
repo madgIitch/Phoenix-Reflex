@@ -4,16 +4,27 @@ import os
 from contextlib import asynccontextmanager
 from datetime import datetime, UTC
 
-from fastapi import FastAPI
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from phoenix_reflex.document_store import (
+    delete_document,
+    get_document,
+    list_chunks,
+    list_documents,
+    update_chunk_enabled,
+)
 from phoenix_reflex.evaluator import evaluate_document_relevance, evaluate_faithfulness
 from phoenix_reflex.experiments import generate_prompt_candidate, run_prompt_experiment
+from phoenix_reflex.ingestion import ingest_pdf
 from phoenix_reflex.observability import configure_tracing, get_tracer
 from phoenix_reflex.prompts import list_prompts, promote_prompt_tag
 from phoenix_reflex.qa import ask_agent
 from phoenix_reflex.reflex import (
     add_improvement_case,
+    export_trace_io,
+    get_trace_summary,
     list_improvement_cases,
     list_recent_trace_summaries,
 )
@@ -29,6 +40,10 @@ class FaithfulnessDemoRequest(BaseModel):
     answer: str = Field(..., min_length=1, max_length=4000)
 
 
+class ChunkUpdateRequest(BaseModel):
+    enabled: bool
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     tracer_provider = configure_tracing()
@@ -42,6 +57,14 @@ app = FastAPI(
     description="Sprint 0: trivial ADK app with Phoenix tracing.",
     version="0.1.0",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -88,6 +111,55 @@ def retrieve(query: str, top_k: int = 4) -> dict[str, object]:
     return retrieve_documents(query=query, top_k=top_k)
 
 
+@app.post("/documents/pdf")
+async def upload_pdf(file: UploadFile = File(...)) -> dict[str, object]:
+    try:
+        return await ingest_pdf(file)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/documents")
+def documents() -> dict[str, object]:
+    return {"documents": list_documents()}
+
+
+@app.get("/documents/search")
+def documents_search(query: str, top_k: int = 6) -> dict[str, object]:
+    return retrieve_documents(query=query, top_k=top_k)
+
+
+@app.get("/documents/{document_id}")
+def document(document_id: str) -> dict[str, object]:
+    found = get_document(document_id)
+    if found is None:
+        raise HTTPException(status_code=404, detail="Document not found")
+    return {"document": found}
+
+
+@app.get("/documents/{document_id}/chunks")
+def document_chunks(document_id: str) -> dict[str, object]:
+    if get_document(document_id) is None:
+        raise HTTPException(status_code=404, detail="Document not found")
+    return {"chunks": list_chunks(document_id=document_id)}
+
+
+@app.patch("/documents/chunks/{chunk_id}")
+def patch_chunk(chunk_id: str, request: ChunkUpdateRequest) -> dict[str, object]:
+    updated = update_chunk_enabled(chunk_id, request.enabled)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Chunk not found")
+    return {"chunk": updated}
+
+
+@app.delete("/documents/{document_id}")
+def remove_document(document_id: str) -> dict[str, object]:
+    deleted = delete_document(document_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Document not found")
+    return {"deleted": True, "document_id": document_id}
+
+
 @app.post("/ask")
 async def ask(request: AskRequest) -> dict[str, object]:
     return await ask_agent(request.question)
@@ -126,6 +198,19 @@ def eval_document_relevance(query: str) -> dict[str, object]:
 @app.get("/introspection/traces")
 def introspection_traces(limit: int = 5) -> dict[str, object]:
     return list_recent_trace_summaries(limit=limit)
+
+
+@app.get("/introspection/traces/export")
+def introspection_trace_export(limit: int = 50) -> dict[str, object]:
+    return export_trace_io(limit=limit)
+
+
+@app.get("/introspection/traces/{session_id}")
+def introspection_trace(session_id: str) -> dict[str, object]:
+    trace = get_trace_summary(session_id)
+    if not trace["found"]:
+        raise HTTPException(status_code=404, detail="Trace summary not found")
+    return trace
 
 
 @app.get("/improvement-cases")

@@ -1,0 +1,306 @@
+{
+  "exported_at": "2026-05-13T18:28:01.561826+00:00",
+  "trace_count": 2,
+  "traces": [
+    {
+      "session_id": "session-e3f6a1a726d94c9094ad3e7e3a4da8f4",
+      "timestamp": "2026-05-13T18:27:38.776594+00:00",
+      "question": "Cuales son las competencias de la Comunidad Autónoma???",
+      "answer": "Según los documentos proporcionados, las competencias de la Comunidad Autónoma de Andalucía incluyen lo siguiente:\n\n*   Cuando su competencia consiste en el desarrollo o reglamentación de la legislación del Estado, las normas dictadas por la Comunidad Autónoma serán de aplicación preferente a cualquier otra de igual naturaleza y rango [pdf:estatuto81.pdf p.14 c.1].\n*   Promoverá las condiciones para que la libertad y la igualdad del individuo y de los grupos sean reales y efectivas, eliminando los obstáculos que impidan o dificulten su plenitud [pdf:estatuto81.pdf p.14 c.1].\n*   Puede asumir competencias en materia de sanidad y Seguridad Social, ajustándose a criterios de participación democrática, con la alta inspección del Estado [pdf:estatuto81.pdf p.29 c.1].\n*   Puede solicitar al Estado la transferencia o delegación de competencias que no estén expresamente atribuidas al Estado por la Constitución, o aquellas que, estando atribuidas al Estado, sean susceptibles de transferencia o delegación por su propia naturaleza [pdf:estatuto81.pdf p.29 c.1].\n\nLa información disponible no proporciona una lista exhaustiva de todas las competencias de la Comunidad Autónoma, sino que se centra en aspectos específicos de su marco competencial.",
+      "input": {
+        "question": "Cuales son las competencias de la Comunidad Autónoma???"
+      },
+      "output": {
+        "answer": "Según los documentos proporcionados, las competencias de la Comunidad Autónoma de Andalucía incluyen lo siguiente:\n\n*   Cuando su competencia consiste en el desarrollo o reglamentación de la legislación del Estado, las normas dictadas por la Comunidad Autónoma serán de aplicación preferente a cualquier otra de igual naturaleza y rango [pdf:estatuto81.pdf p.14 c.1].\n*   Promoverá las condiciones para que la libertad y la igualdad del individuo y de los grupos sean reales y efectivas, eliminando los obstáculos que impidan o dificulten su plenitud [pdf:estatuto81.pdf p.14 c.1].\n*   Puede asumir competencias en materia de sanidad y Seguridad Social, ajustándose a criterios de participación democrática, con la alta inspección del Estado [pdf:estatuto81.pdf p.29 c.1].\n*   Puede solicitar al Estado la transferencia o delegación de competencias que no estén expresamente atribuidas al Estado por la Constitución, o aquellas que, estando atribuidas al Estado, sean susceptibles de transferencia o delegación por su propia naturaleza [pdf:estatuto81.pdf p.29 c.1].\n\nLa información disponible no proporciona una lista exhaustiva de todas las competencias de la Comunidad Autónoma, sino que se centra en aspectos específicos de su marco competencial.",
+        "faithfulness": {
+          "label": "faithful",
+          "score": 1,
+          "explanation": "Every factual claim in the answer is directly supported by the retrieved context. The answer also correctly identifies that the context does not provide an exhaustive list of competencies.",
+          "context_doc_ids": [
+            "pdf:estatuto81.pdf p.14 c.1",
+            "pdf:estatuto81.pdf p.54 c.2",
+            "pdf:estatuto81.pdf p.29 c.1",
+            "pdf:estatuto81.pdf p.10 c.1",
+            "pdf:estatuto81.pdf p.59 c.1"
+          ]
+        },
+        "document_relevance": {
+          "label": "partially_relevant",
+          "score": 0.5,
+          "explanation": "The retrieved context mentions a few specific competencies of the Autonomous Community, such as 'sanidad y Seguridad Social' (health and social security) and 'fomenten el pleno empleo y el desarrollo económico y social' (foster full employment and economic and social development). It also discusses the nature of these competencies (e.g., development/regulation of state legislation, transfer of competencies). However, it does not provide a comprehensive list of all competencies, which is what the question 'Cuales son las competencias de la Comunidad Autónoma???' implies. Therefore, the information is related but incomplete.",
+          "context_doc_ids": [
+            "pdf:estatuto81.pdf p.14 c.1",
+            "pdf:estatuto81.pdf p.54 c.2",
+            "pdf:estatuto81.pdf p.29 c.1",
+            "pdf:estatuto81.pdf p.10 c.1",
+            "pdf:estatuto81.pdf p.59 c.1"
+          ]
+        },
+        "failure_mode": "none"
+      },
+      "retrieved_documents": [
+        {
+          "id": "pdf:estatuto81.pdf p.14 c.1",
+          "chunk_id": "pdf-d4da2e6ac5be-p014-c001-estatuto81.pdf",
+          "document_id": "pdf-d4da2e6ac5be",
+          "title": "pdf:estatuto81.pdf p.14 c.1",
+          "text": "virtud del artículo 150.2 de la Constitución, es el apli-\ncable con preferencia a cualquier otro en el territorio\nandaluz. En todo caso, el derecho estatal tiene carácter\nsupletorio del derecho propio de Andalucía.\nCuando la competencia de la Comunidad Autónoma\nconsista en el desarrollo o reglamentación de la legisla-\nción del Estado, las normas dictadas por aquélla serán\nde aplicación preferente a cualquier otra de igual natu-\nraleza y rango.\nArtículo 11\nLos derechos, libertades y deberes fundamentales de\nlos andaluces son los establecidos en la Constitución.\nLa Comunidad Autónoma garantiza el respeto a las\nminorías que residan en ella.\nArtículo 12\n1. La Comunidad Autónoma de Andalucía promove-\nrá las condiciones para que la libertad y la igualdad del\nindividuo y de los grupos en que se integran sean rea-\nles y efectivas; removerá los obstáculos que impidan o\ndificulten su plenitud y fa",
+          "tags": [
+            "pdf",
+            "uploaded"
+          ],
+          "source_type": "pdf",
+          "source": "estatuto81.pdf",
+          "page": 14,
+          "chunk_index": 1,
+          "enabled": true,
+          "score": 7.9071
+        },
+        {
+          "id": "pdf:estatuto81.pdf p.54 c.2",
+          "chunk_id": "pdf-d4da2e6ac5be-p054-c002-estatuto81.pdf",
+          "document_id": "pdf-d4da2e6ac5be",
+          "title": "pdf:estatuto81.pdf p.54 c.2",
+          "text": ".\n2. El porcentaje de participación de la Comunidad\nAutónoma podrá ser objeto de revisión en los siguien-\ntes supuestos:\na) Cuando se amplíen o reduzcan las competencias\nasumidas por la Comunidad Autónoma y que ante-\nriormente realizase el Estado.\nb) Cuando se produzca la cesión de nuevos tributos.\nEstatuto de Autonomía para Andalucía\n51",
+          "tags": [
+            "pdf",
+            "uploaded"
+          ],
+          "source_type": "pdf",
+          "source": "estatuto81.pdf",
+          "page": 54,
+          "chunk_index": 2,
+          "enabled": true,
+          "score": 6.8264
+        },
+        {
+          "id": "pdf:estatuto81.pdf p.29 c.1",
+          "chunk_id": "pdf-d4da2e6ac5be-p029-c001-estatuto81.pdf",
+          "document_id": "pdf-d4da2e6ac5be",
+          "title": "pdf:estatuto81.pdf p.29 c.1",
+          "text": "instituciones, entidades y funciones en materia de\nsanidad y Seguridad Social, reservándose el Estado la\nalta inspección conducente al cumplimiento de las\nfunciones y competencias contenidas en este artículo.\n5. La Comunidad Autónoma de Andalucía ajustará\nel ejercicio de las competencias que asuma en materia\nde sanidad y de Seguridad Social a criterios de partici-\npación democrática de todos los interesados, así\ncomo de los sindicatos de trabajadores y asociaciones\nempresariales en los términos que la ley establezca.\nArtículo 21\nLa Comunidad Autónoma de Andalucía podrá solici-\ntar en cualquier momento al Estado la transferencia o\ndelegación de competencias que, aún no asumidas en\nel presente Estatuto, no estén atribuidas expresamen-\nte al Estado por la Constitución, y de aquellas otras\nque, atribuidas expresamente al Estado, por su propia\nnaturaleza, sean susceptibles de transferencia o",
+          "tags": [
+            "pdf",
+            "uploaded"
+          ],
+          "source_type": "pdf",
+          "source": "estatuto81.pdf",
+          "page": 29,
+          "chunk_index": 1,
+          "enabled": true,
+          "score": 6.7715
+        },
+        {
+          "id": "pdf:estatuto81.pdf p.10 c.1",
+          "chunk_id": "pdf-d4da2e6ac5be-p010-c001-estatuto81.pdf",
+          "document_id": "pdf-d4da2e6ac5be",
+          "title": "pdf:estatuto81.pdf p.10 c.1",
+          "text": "Artículo 4\n1. La provincia es una entidad local con personali-\ndad jurídica propia, determinada por la agrupación de\nmunicipios, y constituye, también, ámbito territorial\npara el desarrollo y gestión de las competencias y fun-\nciones de la Comunidad Autónoma. Cualquier altera-\nción de los límites provinciales habrá de ser aprobada\npor las Cortes Generales mediante Ley Orgánica.\n2. El gobierno y la administración autónoma de la\nprovincia corresponden a la Diputación, como órgano\nrepresentativo de la misma, con plena autonomía\npara la gestión de sus intereses específicos.\n3. Serán competencias de la Diputación las siguientes:\na) Las que con carácter específico y para el fomento\ny la administración de los intereses peculiares de la\nprovincia le vengan atribuidas por la legislación básica\ndel Estado y por la legislación que dicte la Comunidad\nAutónoma en desarrollo de la misma.\nb) Las que pu",
+          "tags": [
+            "pdf",
+            "uploaded"
+          ],
+          "source_type": "pdf",
+          "source": "estatuto81.pdf",
+          "page": 10,
+          "chunk_index": 1,
+          "enabled": true,
+          "score": 6.6672
+        },
+        {
+          "id": "pdf:estatuto81.pdf p.59 c.1",
+          "chunk_id": "pdf-d4da2e6ac5be-p059-c001-estatuto81.pdf",
+          "document_id": "pdf-d4da2e6ac5be",
+          "title": "pdf:estatuto81.pdf p.59 c.1",
+          "text": "5. La Comunidad Autónoma podrá realizar ciertas\noperaciones de crédito, por plazo superior a un año,\ncualquiera que sea la forma como se documente,\nsiempre que se cumplan los siguientes requisitos:\na) Que el importe total del crédito sea destinado\nexclusivamente a la realización de gastos de inversión.\nb) Que el importe total de las anualidades de amor-\ntización por capital e intereses, no exceda del veinti-\ncinco por ciento de los ingresos corrientes de la\nComunidad Autónoma.\nArtículo 66\nLa Comunidad Autónoma queda facultada para\nconstituir instituciones que fomenten el pleno empleo\ny el desarrollo económico y social en el marco de sus\ncompetencias.\nArtículo 67\nLa Comunidad Autónoma, de acuerdo con lo que\nestablezcan las leyes del Estado, designará sus propios\nrepresentantes en los organismos económicos, las ins-\ntituciones financieras y las empresas públicas del\nEstado cuya competencia",
+          "tags": [
+            "pdf",
+            "uploaded"
+          ],
+          "source_type": "pdf",
+          "source": "estatuto81.pdf",
+          "page": 59,
+          "chunk_index": 1,
+          "enabled": true,
+          "score": 6.3827
+        }
+      ],
+      "faithfulness": {
+        "label": "faithful",
+        "score": 1,
+        "explanation": "Every factual claim in the answer is directly supported by the retrieved context. The answer also correctly identifies that the context does not provide an exhaustive list of competencies.",
+        "context_doc_ids": [
+          "pdf:estatuto81.pdf p.14 c.1",
+          "pdf:estatuto81.pdf p.54 c.2",
+          "pdf:estatuto81.pdf p.29 c.1",
+          "pdf:estatuto81.pdf p.10 c.1",
+          "pdf:estatuto81.pdf p.59 c.1"
+        ]
+      },
+      "document_relevance": {
+        "label": "partially_relevant",
+        "score": 0.5,
+        "explanation": "The retrieved context mentions a few specific competencies of the Autonomous Community, such as 'sanidad y Seguridad Social' (health and social security) and 'fomenten el pleno empleo y el desarrollo económico y social' (foster full employment and economic and social development). It also discusses the nature of these competencies (e.g., development/regulation of state legislation, transfer of competencies). However, it does not provide a comprehensive list of all competencies, which is what the question 'Cuales son las competencias de la Comunidad Autónoma???' implies. Therefore, the information is related but incomplete.",
+        "context_doc_ids": [
+          "pdf:estatuto81.pdf p.14 c.1",
+          "pdf:estatuto81.pdf p.54 c.2",
+          "pdf:estatuto81.pdf p.29 c.1",
+          "pdf:estatuto81.pdf p.10 c.1",
+          "pdf:estatuto81.pdf p.59 c.1"
+        ]
+      },
+      "failure_mode": "none",
+      "event_count": 3
+    },
+    {
+      "session_id": "session-26e34b8feb7e42459cceec2b324ffd54",
+      "timestamp": "2026-05-13T18:25:06.155472+00:00",
+      "question": "Jerez es un municipio de Andalucia?",
+      "answer": "Sí, Jerez de la Frontera es un municipio de Andalucía. El Estatuto de Autonomía establece que el territorio de Andalucía comprende los municipios de las provincias de Almería, Cádiz, Córdoba, Granada, Huelva, Jaén, Málaga y Sevilla, siendo el municipio la entidad territorial básica de la Comunidad Autónoma [pdf:estatuto81.pdf p.9 c.1].",
+      "input": {
+        "question": "Jerez es un municipio de Andalucia?"
+      },
+      "output": {
+        "answer": "Sí, Jerez de la Frontera es un municipio de Andalucía. El Estatuto de Autonomía establece que el territorio de Andalucía comprende los municipios de las provincias de Almería, Cádiz, Córdoba, Granada, Huelva, Jaén, Málaga y Sevilla, siendo el municipio la entidad territorial básica de la Comunidad Autónoma [pdf:estatuto81.pdf p.9 c.1].",
+        "faithfulness": {
+          "label": "unfaithful",
+          "score": 0,
+          "explanation": "The context explains that Andalucía's territory comprises municipalities of specific provinces (Almería, Cádiz, Córdoba, Granada, Huelva, Jaén, Málaga y Sevilla) and that the municipality is the basic territorial entity. However, it does not mention 'Jerez' or 'Jerez de la Frontera' at all, nor does it provide information that would allow one to infer that Jerez de la Frontera is a municipality of Andalucía. The answer makes a direct claim about Jerez that is not supported by the retrieved context.",
+          "context_doc_ids": [
+            "pdf:estatuto81.pdf p.9 c.1",
+            "pdf:estatuto81.pdf p.63 c.1",
+            "pdf:estatuto81.pdf p.31 c.1",
+            "pdf:estatuto81.pdf p.70 c.1",
+            "pdf:estatuto81.pdf p.71 c.1"
+          ]
+        },
+        "document_relevance": {
+          "label": "partially_relevant",
+          "score": 0.5,
+          "explanation": "The context states that the territory of Andalusia comprises the municipalities of its provinces (including Cádiz). It also defines a municipality as the basic territorial entity of the autonomous community. However, it does not explicitly mention 'Jerez' or confirm if it is a municipality within one of the listed Andalusian provinces, which is necessary to directly answer the question.",
+          "context_doc_ids": [
+            "pdf:estatuto81.pdf p.9 c.1",
+            "pdf:estatuto81.pdf p.63 c.1",
+            "pdf:estatuto81.pdf p.31 c.1",
+            "pdf:estatuto81.pdf p.70 c.1",
+            "pdf:estatuto81.pdf p.71 c.1"
+          ]
+        },
+        "failure_mode": "retrieval"
+      },
+      "retrieved_documents": [
+        {
+          "id": "pdf:estatuto81.pdf p.9 c.1",
+          "chunk_id": "pdf-d4da2e6ac5be-p009-c001-estatuto81.pdf",
+          "document_id": "pdf-d4da2e6ac5be",
+          "title": "pdf:estatuto81.pdf p.9 c.1",
+          "text": "2. El Estatuto de Autonomía aspira a hacer realidad\nlos principios de libertad, igualdad y justicia para\ntodos los andaluces, en el marco de igualdad y solida-\nridad con las demás nacionalidades y regiones de\nEspaña.\n3. Los poderes de la Comunidad Autónoma emanan\nde la Constitución y del pueblo andaluz en los térmi-\nnos del presente Estatuto.\nArtículo 2\nEl territorio de Andalucía comprende el de los muni-\ncipios de las actuales provincias de Almería, Cádiz,\nCórdoba, Granada, Huelva, Jaén, Málaga y Sevilla.\nArtículo 3\n1. El municipio es la entidad territorial básica de la\nComunidad Autónoma. Goza de personalidad jurídica\npropia y de plena autonomía en el ámbito de sus com-\npetencias. Su representación, gobierno y administra-\nción corresponden a los respectivos Ayuntamientos.\n2. La alteración de términos municipales y la fusión\nde municipios limítrofes se realizarán de acuerdo con\nla legis",
+          "tags": [
+            "pdf",
+            "uploaded"
+          ],
+          "source_type": "pdf",
+          "source": "estatuto81.pdf",
+          "page": 9,
+          "chunk_index": 1,
+          "enabled": true,
+          "score": 5.7232
+        },
+        {
+          "id": "pdf:estatuto81.pdf p.63 c.1",
+          "chunk_id": "pdf-d4da2e6ac5be-p063-c001-estatuto81.pdf",
+          "document_id": "pdf-d4da2e6ac5be",
+          "title": "pdf:estatuto81.pdf p.63 c.1",
+          "text": "TÍTULO VI\nReforma del Estatuto\nArtículo 74\n1. La reforma del Estatuto se ajustará al siguiente\nprocedimiento:\na) La iniciativa de la reforma corresponderá al Con-\nsejo de Gobierno o al Parlamento Andaluz, a propues-\nta de una tercera parte de sus miembros, o a las\nCortes Generales.\nb) La propuesta de reforma requerirá, en todo caso,\nla aprobación del Parlamento Andaluz por mayoría de\ntres quintos, la aprobación de las Cortes Generales\nmediante Ley Orgánica y, finalmente, el referéndum\npositivo de los electores andaluces.\n2. Si la propuesta de reforma no es aprobada por el\nParlamento o por las Cortes Generales, o no es con-\nfirmada mediante referéndum del cuerpo electoral,\nno podrá ser sometida nuevamente a debate y vota-\nción del Parlamento hasta que haya transcurrido un\naño.\n3. La Ley Orgánica que apruebe la reforma del\nEstatuto establecerá el plazo dentro del cual el\nEstatuto de Autono",
+          "tags": [
+            "pdf",
+            "uploaded"
+          ],
+          "source_type": "pdf",
+          "source": "estatuto81.pdf",
+          "page": 63,
+          "chunk_index": 1,
+          "enabled": true,
+          "score": 4.7492
+        },
+        {
+          "id": "pdf:estatuto81.pdf p.31 c.1",
+          "chunk_id": "pdf-d4da2e6ac5be-p031-c001-estatuto81.pdf",
+          "document_id": "pdf-d4da2e6ac5be",
+          "title": "pdf:estatuto81.pdf p.31 c.1",
+          "text": "TÍTULO II\nOrganización Institucional de la Comunidad\nAutónoma\nArtículo 24\n1. La Junta de Andalucía es la institución en que se\norganiza políticamente el autogobierno de la Comuni-\ndad Autónoma. La Junta de Andalucía está integrada\npor el Parlamento, el Consejo de Gobierno y el\nPresidente de la Junta.\n2. El Tribunal Superior de Justicia de Andalucía es el\nórgano jurisdiccional que, sin perjuicio de la jurisdic-\nción que corresponde al Tribunal Supremo, culmina la\norganización judicial en el territorio andaluz.\nCAPÍTULO PRIMERO\nEl Parlamento de Andalucía\nArtículo 25\n1. El Parlamento de Andalucía representa al pueblo\nandaluz.\n2. El Parlamento de Andalucía es inviolable.\nEstatuto de Autonomía para Andalucía\n28",
+          "tags": [
+            "pdf",
+            "uploaded"
+          ],
+          "source_type": "pdf",
+          "source": "estatuto81.pdf",
+          "page": 31,
+          "chunk_index": 1,
+          "enabled": true,
+          "score": 3.9048
+        },
+        {
+          "id": "pdf:estatuto81.pdf p.70 c.1",
+          "chunk_id": "pdf-d4da2e6ac5be-p070-c001-estatuto81.pdf",
+          "document_id": "pdf-d4da2e6ac5be",
+          "title": "pdf:estatuto81.pdf p.70 c.1",
+          "text": "Quinta\n1. La actual Junta Preautonómica de Andalucía con-\ntinuará en sus funciones hasta la elección de los órga-\nnos que hayan de sustituirla, de acuerdo con el pre-\nsente Estatuto.\n2. Una vez proclamados los resultados de las eleccio-\nnes y en un término máximo de quince días, el Parla-\nmento de Andalucía se constituirá bajo una Mesa de\nedad integrada por un Presidente y dos Secretarios, y\nprocederá inmediatamente a elegir la Mesa provisional,\nque estará compuesta por un Presidente, dos Vicepresi-\ndentes y dos Secretarios, siendo aplicable con carácter\nsupletorio el Reglamento del Congreso de los Diputados.\nSexta\n1. Hasta que se haya completado el traspaso de los\nservicios correspondientes a las competencias atribui-\ndas a la Comunidad por el presente Estatuto, el Estado\ngarantizará la financiación de los servicios transferidos\ncon una cantidad mínima equivalente al coste efecti-\nvo de",
+          "tags": [
+            "pdf",
+            "uploaded"
+          ],
+          "source_type": "pdf",
+          "source": "estatuto81.pdf",
+          "page": 70,
+          "chunk_index": 1,
+          "enabled": true,
+          "score": 3.2491
+        },
+        {
+          "id": "pdf:estatuto81.pdf p.71 c.1",
+          "chunk_id": "pdf-d4da2e6ac5be-p071-c001-estatuto81.pdf",
+          "document_id": "pdf-d4da2e6ac5be",
+          "title": "pdf:estatuto81.pdf p.71 c.1",
+          "text": "do-Comunidad Autónoma, que adoptará un método\nencaminado a fijar el porcentaje de participación pre-\nvisto en el artículo 58. 3. El método a seguir tendrá en\ncuenta tanto los costes directos como los costes indi-\nrectos de los servicios, así como los gastos de inversión\nsuficientes para atender las necesidades de la\nComunidad Andaluza con objeto de que alcance, al\nmenos, la cobertura media nacional.\n3. La Comisión Mixta fijará el citado porcentaje,\nmientras dure el período transitorio, con una antela-\nción mínima de un mes a la presentación en las Cortes\nde los Presupuestos Generales del Estado.\n4. A partir del método fijado en el apartado segundo,\nse establecerá un porcentaje en el que se considerará\nel coste efectivo global de los servicios transferidos por\nel Estado minorado por el total de la recaudación\nobtenida por la Comunidad Autónoma por los tribu-\ntos cedidos, en relación con l",
+          "tags": [
+            "pdf",
+            "uploaded"
+          ],
+          "source_type": "pdf",
+          "source": "estatuto81.pdf",
+          "page": 71,
+          "chunk_index": 1,
+          "enabled": true,
+          "score": 3.1737
+        }
+      ],
+      "faithfulness": {
+        "label": "unfaithful",
+        "score": 0,
+        "explanation": "The context explains that Andalucía's territory comprises municipalities of specific provinces (Almería, Cádiz, Córdoba, Granada, Huelva, Jaén, Málaga y Sevilla) and that the municipality is the basic territorial entity. However, it does not mention 'Jerez' or 'Jerez de la Frontera' at all, nor does it provide information that would allow one to infer that Jerez de la Frontera is a municipality of Andalucía. The answer makes a direct claim about Jerez that is not supported by the retrieved context.",
+        "context_doc_ids": [
+          "pdf:estatuto81.pdf p.9 c.1",
+          "pdf:estatuto81.pdf p.63 c.1",
+          "pdf:estatuto81.pdf p.31 c.1",
+          "pdf:estatuto81.pdf p.70 c.1",
+          "pdf:estatuto81.pdf p.71 c.1"
+        ]
+      },
+      "document_relevance": {
+        "label": "partially_relevant",
+        "score": 0.5,
+        "explanation": "The context states that the territory of Andalusia comprises the municipalities of its provinces (including Cádiz). It also defines a municipality as the basic territorial entity of the autonomous community. However, it does not explicitly mention 'Jerez' or confirm if it is a municipality within one of the listed Andalusian provinces, which is necessary to directly answer the question.",
+        "context_doc_ids": [
+          "pdf:estatuto81.pdf p.9 c.1",
+          "pdf:estatuto81.pdf p.63 c.1",
+          "pdf:estatuto81.pdf p.31 c.1",
+          "pdf:estatuto81.pdf p.70 c.1",
+          "pdf:estatuto81.pdf p.71 c.1"
+        ]
+      },
+      "failure_mode": "retrieval",
+      "event_count": 3
+    }
+  ]
+}

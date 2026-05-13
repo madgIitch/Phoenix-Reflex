@@ -1,0 +1,150 @@
+{
+  "session_id": "session-55eca4af5e8142a598d523110fdefbbe",
+  "timestamp": "2026-05-13T18:31:35.796588+00:00",
+  "question": "Andalucía tiene a Madrid como municipio",
+  "answer": "No, Andalucía no tiene a Madrid como municipio. El territorio de Andalucía comprende los municipios de las provincias de Almería, Cádiz, Córdoba, Granada, Huelva, Jaén, Málaga y Sevilla [pdf:estatuto81.pdf p.9 c.1].",
+  "input": {
+    "question": "Andalucía tiene a Madrid como municipio"
+  },
+  "output": {
+    "answer": "No, Andalucía no tiene a Madrid como municipio. El territorio de Andalucía comprende los municipios de las provincias de Almería, Cádiz, Córdoba, Granada, Huelva, Jaén, Málaga y Sevilla [pdf:estatuto81.pdf p.9 c.1].",
+    "faithfulness": {
+      "label": "faithful",
+      "score": 1,
+      "explanation": "The answer correctly states that Andalucía does not have Madrid as a municipality and supports this by listing the provinces whose municipalities comprise Andalucía's territory, as stated in the provided context [pdf:estatuto81.pdf p.9 c.1]. Madrid is not included in that list.",
+      "context_doc_ids": [
+        "pdf:estatuto81.pdf p.17 c.1",
+        "pdf:estatuto81.pdf p.12 c.1",
+        "pdf:estatuto81.pdf p.9 c.1",
+        "pdf:estatuto81.pdf p.14 c.1",
+        "pdf:estatuto81.pdf p.13 c.1"
+      ]
+    },
+    "document_relevance": {
+      "label": "relevant",
+      "score": 1,
+      "explanation": "Article 2 of the 'Estatuto de Autonomía para Andalucía' (p.9 c.1) explicitly defines the territory of Andalusia as comprising the municipalities of the provinces of Almería, Cádiz, Córdoba, Granada, Huelva, Jaén, Málaga, and Sevilla. Madrid is not listed among these provinces, directly indicating that Madrid is not a municipality of Andalusia.",
+      "context_doc_ids": [
+        "pdf:estatuto81.pdf p.17 c.1",
+        "pdf:estatuto81.pdf p.12 c.1",
+        "pdf:estatuto81.pdf p.9 c.1",
+        "pdf:estatuto81.pdf p.14 c.1",
+        "pdf:estatuto81.pdf p.13 c.1"
+      ]
+    },
+    "failure_mode": "none"
+  },
+  "retrieved_documents": [
+    {
+      "id": "pdf:estatuto81.pdf p.17 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p017-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.17 c.1",
+      "text": "11.o La reforma agraria entendida como la transfor-\nmación, modernización y desarrollo de las estructuras\nagrarias y como instrumento de una política de creci-\nmiento, pleno empleo y corrección de los desequili-\nbrios territoriales.\nTÍTULO PRIMERO\nCompetencias de la Comunidad Autónoma\nArtículo 13\nLa Comunidad Autónoma de Andalucía tiene com-\npetencia exclusiva sobre las siguientes materias:\n1. Organización y estructura de sus instituciones de\nautogobierno.\n2. Organización y estructura de sus organismos\nautónomos.\n3. Régimen local, sin perjuicio de lo que dispone el\nnúmero 18 del apartado 1 del artículo 149 de la Consti-\ntución.\n4. Procedimiento administrativo derivado de las espe-\ncialidades de la organización propia de la Comunidad\nAutónoma.\n5. Normas y procedimientos electorales para la\nconstitución de sus instituciones de autogobierno.\nEstatuto de Autonomía para Andalucía\n14",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 17,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 5.5953
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.12 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p012-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.12 c.1",
+      "text": "verde– de igual anchura, tal como fue aprobada en la\nAsamblea de Ronda en 1918.\n2. Andalucía tiene himno y escudo propios, que\nserán aprobados definitivamente por Ley del Parlamen-\nto Andaluz, teniendo en cuenta los acuerdos dictados\nsobre tales extremos por la Asamblea de Ronda de\n1918.\nArtículo 7\nLa capital de Andalucía, sede del Gobierno y del Par-\nlamento, será la ciudad que decida éste, por mayoría\nde dos tercios, en su primera sesión ordinaria. En\ndicha sesión se decidirá también la sede del Tribunal\nSuperior de Justicia.\nArtículo 8\n1. A los efectos del presente Estatuto, gozan de la\ncondición política de andaluces los ciudadanos espa-\nñoles que, de acuerdo con las leyes generales del\nEstado, tengan vecindad administrativa en cualquiera\nde los municipios de Andalucía.\n2. Como andaluces, gozan de los derechos políticos\ndefinidos en este Estatuto los ciudadanos españoles\nresidentes e",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 12,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 5.582
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.9 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p009-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.9 c.1",
+      "text": "2. El Estatuto de Autonomía aspira a hacer realidad\nlos principios de libertad, igualdad y justicia para\ntodos los andaluces, en el marco de igualdad y solida-\nridad con las demás nacionalidades y regiones de\nEspaña.\n3. Los poderes de la Comunidad Autónoma emanan\nde la Constitución y del pueblo andaluz en los térmi-\nnos del presente Estatuto.\nArtículo 2\nEl territorio de Andalucía comprende el de los muni-\ncipios de las actuales provincias de Almería, Cádiz,\nCórdoba, Granada, Huelva, Jaén, Málaga y Sevilla.\nArtículo 3\n1. El municipio es la entidad territorial básica de la\nComunidad Autónoma. Goza de personalidad jurídica\npropia y de plena autonomía en el ámbito de sus com-\npetencias. Su representación, gobierno y administra-\nción corresponden a los respectivos Ayuntamientos.\n2. La alteración de términos municipales y la fusión\nde municipios limítrofes se realizarán de acuerdo con\nla legis",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 9,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 4.1487
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.14 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p014-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.14 c.1",
+      "text": "virtud del artículo 150.2 de la Constitución, es el apli-\ncable con preferencia a cualquier otro en el territorio\nandaluz. En todo caso, el derecho estatal tiene carácter\nsupletorio del derecho propio de Andalucía.\nCuando la competencia de la Comunidad Autónoma\nconsista en el desarrollo o reglamentación de la legisla-\nción del Estado, las normas dictadas por aquélla serán\nde aplicación preferente a cualquier otra de igual natu-\nraleza y rango.\nArtículo 11\nLos derechos, libertades y deberes fundamentales de\nlos andaluces son los establecidos en la Constitución.\nLa Comunidad Autónoma garantiza el respeto a las\nminorías que residan en ella.\nArtículo 12\n1. La Comunidad Autónoma de Andalucía promove-\nrá las condiciones para que la libertad y la igualdad del\nindividuo y de los grupos en que se integran sean rea-\nles y efectivas; removerá los obstáculos que impidan o\ndificulten su plenitud y fa",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 14,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 3.6087
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.13 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p013-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.13 c.1",
+      "text": "vecindad administrativa en Andalucía y acrediten esta\ncondición en el correspondiente Consulado de\nEspaña. Gozarán también de estos derechos sus des-\ncendientes inscritos como españoles, si así lo solicitan,\nen la forma que determine la Ley del Estado.\n3. Las comunidades andaluzas asentadas fuera de\nAndalucía podrán solicitar, como tales, el reconoci-\nmiento de la identidad andaluza entendida como el\nderecho a colaborar y compartir la vida social y cultu-\nral del pueblo andaluz. Una Ley del Parlamento\nAndaluz regulará, sin perjuicio de las competencias\ndel Estado, el alcance y contenido del reconocimiento\na dichas comunidades que en ningún caso implicará\nla concesión de derechos políticos.\nArtículo 9\nLas leyes y normas emanadas de las instituciones de\nautogobierno de Andalucía, tendrán eficacia en su\nterritorio.\nArtículo 10\nEl derecho propio de Andalucía, constituido por las\nleyes y norm",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 13,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 3.0134
+    }
+  ],
+  "faithfulness": {
+    "label": "faithful",
+    "score": 1,
+    "explanation": "The answer correctly states that Andalucía does not have Madrid as a municipality and supports this by listing the provinces whose municipalities comprise Andalucía's territory, as stated in the provided context [pdf:estatuto81.pdf p.9 c.1]. Madrid is not included in that list.",
+    "context_doc_ids": [
+      "pdf:estatuto81.pdf p.17 c.1",
+      "pdf:estatuto81.pdf p.12 c.1",
+      "pdf:estatuto81.pdf p.9 c.1",
+      "pdf:estatuto81.pdf p.14 c.1",
+      "pdf:estatuto81.pdf p.13 c.1"
+    ]
+  },
+  "document_relevance": {
+    "label": "relevant",
+    "score": 1,
+    "explanation": "Article 2 of the 'Estatuto de Autonomía para Andalucía' (p.9 c.1) explicitly defines the territory of Andalusia as comprising the municipalities of the provinces of Almería, Cádiz, Córdoba, Granada, Huelva, Jaén, Málaga, and Sevilla. Madrid is not listed among these provinces, directly indicating that Madrid is not a municipality of Andalusia.",
+    "context_doc_ids": [
+      "pdf:estatuto81.pdf p.17 c.1",
+      "pdf:estatuto81.pdf p.12 c.1",
+      "pdf:estatuto81.pdf p.9 c.1",
+      "pdf:estatuto81.pdf p.14 c.1",
+      "pdf:estatuto81.pdf p.13 c.1"
+    ]
+  },
+  "failure_mode": "none",
+  "event_count": 3
+}

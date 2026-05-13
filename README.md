@@ -341,6 +341,66 @@ low relevance + low faithfulness -> retrieval problem
 high relevance + low faithfulness -> generation problem
 ```
 
+## PDF Ingestion UI
+
+The PDF ingestion feature is local-first and extends the existing RAG corpus without replacing it:
+
+```text
+PDF upload -> text extraction -> chunking -> JSON store -> BM25 retrieval -> cited answer
+```
+
+It stores local demo data under `data/`, which is ignored by git:
+
+- `data/documents.json`
+- `data/chunks.json`
+- `data/uploads/`
+
+Run the backend:
+
+```powershell
+pip install -r requirements.txt
+uvicorn phoenix_reflex.main:app --reload --port 8080
+```
+
+Run the local review UI:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Open `http://127.0.0.1:5173`.
+
+The UI lets you upload a PDF, inspect extracted chunks, enable or disable chunks, test retrieval, ask the RAG agent, and review faithfulness, document relevance, and failure mode outputs.
+
+The `Traces` tab shows captured local trace inputs and outputs:
+
+- user question
+- generated answer
+- retrieved manual/PDF documents
+- faithfulness output
+- document relevance output
+- failure mode
+
+Use `Export JSON` to download the last captured trace summaries, or export one selected trace from the inspector.
+
+Useful API checks:
+
+```powershell
+Invoke-RestMethod "http://localhost:8080/documents"
+Invoke-RestMethod "http://localhost:8080/documents/search?query=sprint%201&top_k=5"
+Invoke-RestMethod "http://localhost:8080/introspection/traces/export?limit=50"
+```
+
+PDF chunks are included in `/retrieve` and `/ask` only when `enabled=true`. PDF citations render as:
+
+```text
+[pdf:filename.pdf p.3 c.2]
+```
+
+This feature is not deployed to Cloud Run yet. Cloud persistence should use Cloud Storage plus Firestore, Cloud SQL, or another durable document store before enabling uploaded PDFs in production.
+
 ## Phoenix MCP
 
 The Arize hackathon starter configures Phoenix MCP through Gemini CLI rather than inside the Python ADK service. This repo follows that pattern for sprint 0:
