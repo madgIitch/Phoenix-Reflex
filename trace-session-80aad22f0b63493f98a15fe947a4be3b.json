@@ -1,0 +1,139 @@
+{
+  "session_id": "session-80aad22f0b63493f98a15fe947a4be3b",
+  "timestamp": "2026-05-14T09:23:57.503674+00:00",
+  "question": "¿Qué papel desempeñan los sindicatos y asociaciones empresariales en la configuración de las políticas institucionales tanto a nivel laboral estatal como en la administración autonómica andaluza?",
+  "answer": "Los sindicatos y asociaciones empresariales desempeñan un papel central en la configuración de las políticas institucionales, especialmente en el ámbito laboral. El Estatuto de los Trabajadores, por ejemplo, fue resultado del consenso entre estas organizaciones, y este consenso ha sido fundamental en sus reformas posteriores [pdf:Ap1y2Estatuto.pdf p.12 c.3].\n\nEstos agentes sociales son considerados protagonistas en las decisiones políticas que afectan los intereses de trabajadores y empresarios [pdf:Ap1y2Estatuto.pdf p.12 c.3]. A lo largo de las numerosas reformas del Estatuto de los Trabajadores, tanto los partidos políticos como las organizaciones sindicales y las asociaciones empresariales han sancionado la norma, ejerciendo una \"diversa capacidad de influencia\" sobre el poder legislativo [pdf:Ap1y2Estatuto.pdf p.33 c.3].\n\nEn cuanto a la administración autonómica andaluza, los documentos mencionan las facultades atribuidas a los sindicatos y asociaciones empresariales de las Comunidades Autónomas en relación con los de ámbito estatal [pdf:Ap1y2Estatuto.pdf p.32 c.2]. Un ejemplo de la influencia de estas asociaciones es la CEOE, que ha abogado por reformas en el mercado laboral español para adaptar las condiciones a los cambios en la situación de las empresas, incluyendo la inaplicación de incrementos salariales mediante cláusulas de descuelgue [pdf:Ap1y2Estatuto.pdf p.50 c.2].",
+  "input": {
+    "question": "¿Qué papel desempeñan los sindicatos y asociaciones empresariales en la configuración de las políticas institucionales tanto a nivel laboral estatal como en la administración autonómica andaluza?"
+  },
+  "output": {
+    "answer": "Los sindicatos y asociaciones empresariales desempeñan un papel central en la configuración de las políticas institucionales, especialmente en el ámbito laboral. El Estatuto de los Trabajadores, por ejemplo, fue resultado del consenso entre estas organizaciones, y este consenso ha sido fundamental en sus reformas posteriores [pdf:Ap1y2Estatuto.pdf p.12 c.3].\n\nEstos agentes sociales son considerados protagonistas en las decisiones políticas que afectan los intereses de trabajadores y empresarios [pdf:Ap1y2Estatuto.pdf p.12 c.3]. A lo largo de las numerosas reformas del Estatuto de los Trabajadores, tanto los partidos políticos como las organizaciones sindicales y las asociaciones empresariales han sancionado la norma, ejerciendo una \"diversa capacidad de influencia\" sobre el poder legislativo [pdf:Ap1y2Estatuto.pdf p.33 c.3].\n\nEn cuanto a la administración autonómica andaluza, los documentos mencionan las facultades atribuidas a los sindicatos y asociaciones empresariales de las Comunidades Autónomas en relación con los de ámbito estatal [pdf:Ap1y2Estatuto.pdf p.32 c.2]. Un ejemplo de la influencia de estas asociaciones es la CEOE, que ha abogado por reformas en el mercado laboral español para adaptar las condiciones a los cambios en la situación de las empresas, incluyendo la inaplicación de incrementos salariales mediante cláusulas de descuelgue [pdf:Ap1y2Estatuto.pdf p.50 c.2].",
+    "faithfulness": {
+      "label": "unfaithful",
+      "score": 0,
+      "explanation": "The answer makes a specific claim about the role of unions and business associations in the 'administración autonómica andaluza'. While it cites context mentioning 'facultades atribuidas a los sindicatos y asociaciones empresariales de las Comunidades Autónomas', the context does not specifically name or refer to Andalusia. The answer generalizes from 'Comunidades Autónomas' to 'Andalucía' without direct support for this specific application, which is an important unsupported claim given the specificity of the question.",
+      "context_doc_ids": [
+        "pdf:Ap1y2Estatuto.pdf p.32 c.2",
+        "pdf:Ap1y2Estatuto.pdf p.12 c.3",
+        "pdf:Ap1y2Estatuto.pdf p.33 c.3",
+        "pdf:Ap1y2Estatuto.pdf p.50 c.2"
+      ]
+    },
+    "document_relevance": {
+      "label": "partially_relevant",
+      "score": 0.5,
+      "explanation": "The retrieved context provides information about the role of unions and business associations in shaping institutional policies at the state labor level, specifically regarding the Workers' Statute and its reforms, and the influence of organizations like CEOE. However, it only makes a general mention of 'facultades atribuidas a los sindicatos y asociaciones empresariales de las Comunidades Autónomas' without detailing their specific role in shaping policies within the Andalusian autonomous administration, or any autonomous administration for that matter. It does not specify Andalusia or describe the nature of their policy-shaping role at that level.",
+      "context_doc_ids": [
+        "pdf:Ap1y2Estatuto.pdf p.32 c.2",
+        "pdf:Ap1y2Estatuto.pdf p.12 c.3",
+        "pdf:Ap1y2Estatuto.pdf p.33 c.3",
+        "pdf:Ap1y2Estatuto.pdf p.50 c.2"
+      ]
+    },
+    "answer_quality": {
+      "label": "ok",
+      "reasons": [],
+      "explanation": "No obvious answer-quality issue detected."
+    },
+    "failure_mode": "retrieval"
+  },
+  "retrieved_documents": [
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.32 c.2",
+      "chunk_id": "pdf-75f6fad7cb71-p032-c002-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.32 c.2",
+      "text": "ticas durante su tramitación parlamentaria y, en fin «y\nquizás el más importante en estos momentos, por ser el más contestado, a\nlas facultades atribuidas a los sindicatos y asociaciones empresariales de las\nComunidades Autónomas en relación con los de ámbito estatal»\n66.\nTodas las enmiendas incorporadas por la Cámara Alta 67 fueron ratifica-\ndas, por muy amplia mayoría, por el Congreso de los Diputados en sesión\ncelebrada el día 26 de febrero de 1980; es decir, casi nueve meses después\nde su aprobación por el Gobierno. El 14 de marzo de ese mismo año, el\nB.O.E. publicaba la ley 8/1980, de 10 de marzo, del Estatuto de los Tra-\nbajadores, que, de conformidad con lo previsto en su Disposición Final\nNovena, habría de entrar en vigor al día siguiente; esto es, el 15 de marzo\nde 1980.\n4. LA CENTRALIDAD POLÍTICA Y JURÍDICA DEL ESTATUTO\n4. DE LOS TRABAJADORES, VEINTICINCO AÑOS DESPUÉS\n9. Con mo",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 32,
+      "chunk_index": 2,
+      "enabled": true,
+      "score": 0.0164
+    },
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.12 c.3",
+      "chunk_id": "pdf-75f6fad7cb71-p012-c003-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.12 c.3",
+      "text": "ciones de\ntrabajo. El Estatuto de los Trabajadores fue fruto del consenso entre sindi-\ncatos y organizaciones de empresarios. De ese consenso han bebido tam-\nbién, salvo contadas excepciones, las sucesivas reformas del mismo. Ello ha\nhecho a los agentes sociales protagonistas de toda decisión política que haya\nafectado a los intereses de trabajadores y empresarios. Demostrando, en\ncada ocasión, y justo es reconocerlo, una responsabilidad y una madurez\nfuera de toda duda.",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 12,
+      "chunk_index": 3,
+      "enabled": true,
+      "score": 0.0164
+    },
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.33 c.3",
+      "chunk_id": "pdf-75f6fad7cb71-p033-c003-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.33 c.3",
+      "text": "ntaciones groseramente partidistas. Veinticin-\nco años después de su aprobación, el ET es una ley refractaria a ser adscrita\na una determinada ideología, sea ésta de la naturaleza que fuere. Desde\nluego, las numerosas reformas que el ET ha experimentado a lo largo de su\nya dilatada vigencia han traducido, como no podía ser de otro modo, distin-\ntas alternativas políticas; de política económica o de política social. Pero en\nuna apreciación de conjunto, el ET es hoy una norma que ya ha sido san-\ncionada, en mayor o menor medida, por los partidos políticos, por las orga-\nnizaciones sindicales y por las asociaciones empresariales. Al margen del\ndistinto poder legislativo que aquellos primeros, los partidos políticos, han\nejercido y con independencia de la diversa capacidad de influencia sobre\ndicho poder de estas otras, de las representaciones de intereses de trabaja-\ndores y empresarios, to",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 33,
+      "chunk_index": 3,
+      "enabled": true,
+      "score": 0.0161
+    },
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.50 c.2",
+      "chunk_id": "pdf-75f6fad7cb71-p050-c002-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.50 c.2",
+      "text": "de adaptación a los cambios de la situación de la empresa, considerando la\neventual inaplicación de los incrementos salariales del convenio mediante\ncláusulas de descuelgue\n137. O, en fin y por no alargar los ejemplos, la de\nampliar la posibilidad del cómputo de la jornada en períodos superiores a la\nsemana e inferiores al año, utilizando «otras reglas de ordenación del tiempo\nde trabajo, como son las relativas al descanso»\n138.\nPara la CEOE, «existe un diagnóstico unánime respecto a la repercusión\nnegativa que sobre la competitividad de la economía produce la rigidez del\nmercado laboral en España y determinadas instituciones legales, que han\nterminando constituyendo causas evidentes del cierre de empresas, de la\npérdida de puestos de trabajo y de la ausencia de nuevas contrataciones». De\nahí, la necesidad de emprender «definitivamente su reforma, tomando como\nreferencia esencial el prop",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 50,
+      "chunk_index": 2,
+      "enabled": true,
+      "score": 0.0161
+    }
+  ],
+  "faithfulness": {
+    "label": "unfaithful",
+    "score": 0,
+    "explanation": "The answer makes a specific claim about the role of unions and business associations in the 'administración autonómica andaluza'. While it cites context mentioning 'facultades atribuidas a los sindicatos y asociaciones empresariales de las Comunidades Autónomas', the context does not specifically name or refer to Andalusia. The answer generalizes from 'Comunidades Autónomas' to 'Andalucía' without direct support for this specific application, which is an important unsupported claim given the specificity of the question.",
+    "context_doc_ids": [
+      "pdf:Ap1y2Estatuto.pdf p.32 c.2",
+      "pdf:Ap1y2Estatuto.pdf p.12 c.3",
+      "pdf:Ap1y2Estatuto.pdf p.33 c.3",
+      "pdf:Ap1y2Estatuto.pdf p.50 c.2"
+    ]
+  },
+  "document_relevance": {
+    "label": "partially_relevant",
+    "score": 0.5,
+    "explanation": "The retrieved context provides information about the role of unions and business associations in shaping institutional policies at the state labor level, specifically regarding the Workers' Statute and its reforms, and the influence of organizations like CEOE. However, it only makes a general mention of 'facultades atribuidas a los sindicatos y asociaciones empresariales de las Comunidades Autónomas' without detailing their specific role in shaping policies within the Andalusian autonomous administration, or any autonomous administration for that matter. It does not specify Andalusia or describe the nature of their policy-shaping role at that level.",
+    "context_doc_ids": [
+      "pdf:Ap1y2Estatuto.pdf p.32 c.2",
+      "pdf:Ap1y2Estatuto.pdf p.12 c.3",
+      "pdf:Ap1y2Estatuto.pdf p.33 c.3",
+      "pdf:Ap1y2Estatuto.pdf p.50 c.2"
+    ]
+  },
+  "answer_quality": {
+    "label": "ok",
+    "reasons": [],
+    "explanation": "No obvious answer-quality issue detected."
+  },
+  "failure_mode": "retrieval",
+  "event_count": 3
+}

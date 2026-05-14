@@ -1,0 +1,139 @@
+{
+  "session_id": "session-da0798b4d8654efa92386a847b589cb3",
+  "timestamp": "2026-05-14T09:28:15.232116+00:00",
+  "question": "¿Se aplican las reglas de los contratos temporales y el control judicial a las competencias exclusivas que tiene la Junta o solo al Parlamento andaluz cuando controla la televisión?",
+  "answer": "La Junta de Andalucía es la institución que organiza políticamente el autogobierno de la Comunidad Autónoma, y está integrada por el Parlamento, el Consejo de Gobierno y el Presidente de la Junta [pdf:estatuto81.pdf p.31 c.1]. En el ejercicio de las competencias exclusivas de Andalucía, el Parlamento tiene la potestad legislativa y el Consejo de Gobierno la potestad reglamentaria y la función ejecutiva [pdf:estatuto81.pdf p.42 c.2].\n\nEl Tribunal Superior de Justicia de Andalucía es el órgano jurisdiccional que culmina la organización judicial en el territorio andaluz, sin perjuicio de la jurisdicción del Tribunal Supremo [pdf:estatuto81.pdf p.31 c.1]. La responsabilidad penal del Presidente de la Junta y de los Consejeros es exigible ante la Sala de lo Penal del Tribunal Supremo. Para los Consejeros, en delitos cometidos en el ámbito territorial de su jurisdicción, la responsabilidad es exigible ante el Tribunal Superior de Justicia de Andalucía [pdf:estatuto81.pdf p.42 c.1]. La Comunidad Autónoma tiene competencias en relación con la Administración de Justicia, como ejercer facultades reconocidas por las Leyes Orgánicas del Poder Judicial y del Consejo General del Poder Judicial, y fijar la delimitación de las demarcaciones territoriales de los órganos jurisdiccionales [pdf:estatuto81.pdf p.48 c.1].\n\nLos documentos proporcionados no especifican si las reglas de los contratos temporales se aplican a las competencias exclusivas de la Junta o del Parlamento andaluz. Tampoco detallan la aplicación del control judicial específicamente en relación con el control de la televisión por parte de la Junta o el Parlamento andaluz.",
+  "input": {
+    "question": "¿Se aplican las reglas de los contratos temporales y el control judicial a las competencias exclusivas que tiene la Junta o solo al Parlamento andaluz cuando controla la televisión?"
+  },
+  "output": {
+    "answer": "La Junta de Andalucía es la institución que organiza políticamente el autogobierno de la Comunidad Autónoma, y está integrada por el Parlamento, el Consejo de Gobierno y el Presidente de la Junta [pdf:estatuto81.pdf p.31 c.1]. En el ejercicio de las competencias exclusivas de Andalucía, el Parlamento tiene la potestad legislativa y el Consejo de Gobierno la potestad reglamentaria y la función ejecutiva [pdf:estatuto81.pdf p.42 c.2].\n\nEl Tribunal Superior de Justicia de Andalucía es el órgano jurisdiccional que culmina la organización judicial en el territorio andaluz, sin perjuicio de la jurisdicción del Tribunal Supremo [pdf:estatuto81.pdf p.31 c.1]. La responsabilidad penal del Presidente de la Junta y de los Consejeros es exigible ante la Sala de lo Penal del Tribunal Supremo. Para los Consejeros, en delitos cometidos en el ámbito territorial de su jurisdicción, la responsabilidad es exigible ante el Tribunal Superior de Justicia de Andalucía [pdf:estatuto81.pdf p.42 c.1]. La Comunidad Autónoma tiene competencias en relación con la Administración de Justicia, como ejercer facultades reconocidas por las Leyes Orgánicas del Poder Judicial y del Consejo General del Poder Judicial, y fijar la delimitación de las demarcaciones territoriales de los órganos jurisdiccionales [pdf:estatuto81.pdf p.48 c.1].\n\nLos documentos proporcionados no especifican si las reglas de los contratos temporales se aplican a las competencias exclusivas de la Junta o del Parlamento andaluz. Tampoco detallan la aplicación del control judicial específicamente en relación con el control de la televisión por parte de la Junta o el Parlamento andaluz.",
+    "faithfulness": {
+      "label": "faithful",
+      "score": 1,
+      "explanation": "Every factual claim in the answer is directly supported by the cited context. The answer also correctly identifies that the specific information regarding temporary contracts and judicial control over television, as asked in the question, is not present in the provided documents.",
+      "context_doc_ids": [
+        "pdf:estatuto81.pdf p.42 c.2",
+        "pdf:estatuto81.pdf p.31 c.1",
+        "pdf:estatuto81.pdf p.42 c.1",
+        "pdf:estatuto81.pdf p.48 c.1"
+      ]
+    },
+    "document_relevance": {
+      "label": "partially_relevant",
+      "score": 0.5,
+      "explanation": "The retrieved context defines the Junta de Andalucía, the Parlamento Andaluz, mentions 'competencias exclusivas', and discusses aspects of 'control judicial' (e.g., judicial responsibility, the Tribunal Superior de Justicia). However, it completely lacks any information regarding 'reglas de los contratos temporales' (rules of temporary contracts) and the specific scenario of the Parlamento Andaluz 'cuando controla la televisión' (when it controls television). Without these crucial elements, the context is insufficient to answer the specific applicability question posed.",
+      "context_doc_ids": [
+        "pdf:estatuto81.pdf p.42 c.2",
+        "pdf:estatuto81.pdf p.31 c.1",
+        "pdf:estatuto81.pdf p.42 c.1",
+        "pdf:estatuto81.pdf p.48 c.1"
+      ]
+    },
+    "answer_quality": {
+      "label": "ok",
+      "reasons": [],
+      "explanation": "No obvious answer-quality issue detected."
+    },
+    "failure_mode": "none"
+  },
+  "retrieved_documents": [
+    {
+      "id": "pdf:estatuto81.pdf p.42 c.2",
+      "chunk_id": "pdf-d4da2e6ac5be-p042-c002-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.42 c.2",
+      "text": "n referidas\nal ámbito territorial andaluz.\n2. En el ejercicio de las competencias exclusivas de\nAndalucía corresponden al Parlamento la potestad\nlegislativa y al Consejo de Gobierno la potestad regla-\nmentaria y la función ejecutiva, en los términos del\npresente Estatuto.\nEstatuto de Autonomía para Andalucía\n39",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 42,
+      "chunk_index": 2,
+      "enabled": true,
+      "score": 0.0304
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.31 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p031-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.31 c.1",
+      "text": "TÍTULO II\nOrganización Institucional de la Comunidad\nAutónoma\nArtículo 24\n1. La Junta de Andalucía es la institución en que se\norganiza políticamente el autogobierno de la Comuni-\ndad Autónoma. La Junta de Andalucía está integrada\npor el Parlamento, el Consejo de Gobierno y el\nPresidente de la Junta.\n2. El Tribunal Superior de Justicia de Andalucía es el\nórgano jurisdiccional que, sin perjuicio de la jurisdic-\nción que corresponde al Tribunal Supremo, culmina la\norganización judicial en el territorio andaluz.\nCAPÍTULO PRIMERO\nEl Parlamento de Andalucía\nArtículo 25\n1. El Parlamento de Andalucía representa al pueblo\nandaluz.\n2. El Parlamento de Andalucía es inviolable.\nEstatuto de Autonomía para Andalucía\n28",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 31,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0304
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.42 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p042-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.42 c.1",
+      "text": "ante el Parlamento y el candidato incluido en aquélla\nse entenderá investido de la confianza de la Cámara.\nEl Rey le nombrará Presidente de la Junta\nArtículo 40\n1. La responsabilidad penal del Presidente de la\nJunta y de los Consejeros será exigible ante la Sala de\nlo Penal del Tribunal Supremo. No obstante, la de los\nConsejeros, para los delitos cometidos en el ámbito\nterritorial de su jurisdicción, será exigible ante el\nTribunal Superior de Justicia de Andalucía.\n2. Ante los mismos Tribunales, respectivamente, será\nexigible la responsabilidad civil en que dichas perso-\nnas hubieran incurrido con ocasión del ejercicio de sus\ncargos.\nArtículo 41\n1. Todas las competencias atribuidas a la Comunidad\nAutónoma en el presente Estatuto se entienden referidas\nal ámbito territorial andaluz.\n2. En el ejercicio de las competencias exclusivas de\nAndalucía corresponden al Parlamento la potestad\nlegis",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 42,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0297
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.48 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p048-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.48 c.1",
+      "text": "3. Resolver, en su caso, los conflictos de jurisdicción\nentre órganos de la Comunidad.\n4. Resolver las cuestiones de competencia entre\nórganos judiciales de Andalucía.\n5. Resolver los conflictos de atribuciones entre Cor-\nporaciones Locales.\nArtículo 51\nLos andaluces podrán participar en la administra-\nción de justicia, mediante la institución del Jurado, en\nlos procesos penales que se sustancien ante los\nTribunales radicados en territorio andaluz, en los casos\nque la ley estatal determine.\nArtículo 52\nEn relación con la Administración de Justicia, excep-\ntuada la jurisdicción militar, corresponde a la Comuni-\ndad Autónoma:\n1. Ejercer todas las facultades que las Leyes Orgáni-\ncas del Poder Judicial y del Consejo General del Poder\nJudicial reconozcan o atribuyan al Gobierno del\nEstado.\n2. Fijar la delimitación de las demarcaciones terri-\ntoriales de los órganos jurisdiccionales de Andalu",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 48,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0292
+    }
+  ],
+  "faithfulness": {
+    "label": "faithful",
+    "score": 1,
+    "explanation": "Every factual claim in the answer is directly supported by the cited context. The answer also correctly identifies that the specific information regarding temporary contracts and judicial control over television, as asked in the question, is not present in the provided documents.",
+    "context_doc_ids": [
+      "pdf:estatuto81.pdf p.42 c.2",
+      "pdf:estatuto81.pdf p.31 c.1",
+      "pdf:estatuto81.pdf p.42 c.1",
+      "pdf:estatuto81.pdf p.48 c.1"
+    ]
+  },
+  "document_relevance": {
+    "label": "partially_relevant",
+    "score": 0.5,
+    "explanation": "The retrieved context defines the Junta de Andalucía, the Parlamento Andaluz, mentions 'competencias exclusivas', and discusses aspects of 'control judicial' (e.g., judicial responsibility, the Tribunal Superior de Justicia). However, it completely lacks any information regarding 'reglas de los contratos temporales' (rules of temporary contracts) and the specific scenario of the Parlamento Andaluz 'cuando controla la televisión' (when it controls television). Without these crucial elements, the context is insufficient to answer the specific applicability question posed.",
+    "context_doc_ids": [
+      "pdf:estatuto81.pdf p.42 c.2",
+      "pdf:estatuto81.pdf p.31 c.1",
+      "pdf:estatuto81.pdf p.42 c.1",
+      "pdf:estatuto81.pdf p.48 c.1"
+    ]
+  },
+  "answer_quality": {
+    "label": "ok",
+    "reasons": [],
+    "explanation": "No obvious answer-quality issue detected."
+  },
+  "failure_mode": "none",
+  "event_count": 4
+}

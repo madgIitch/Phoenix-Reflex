@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 from statistics import mean, pstdev
 from typing import Any
@@ -9,7 +10,7 @@ from google import genai
 from google.genai import types
 
 from phoenix_reflex.evaluator import evaluate_faithfulness
-from phoenix_reflex.document_store import list_chunks
+from phoenix_reflex.document_store import list_chunks, list_documents
 from phoenix_reflex.observability import get_tracer
 from phoenix_reflex.prompts import get_prompt, upsert_prompt
 from phoenix_reflex.reflex import list_improvement_cases
@@ -213,12 +214,64 @@ def _answer_with_prompt(question: str, prompt: str) -> str:
     ).strip()
 
 
-def _good_questions(limit: int = 2) -> list[str]:
-    chunks = list_chunks(enabled_only=True)[:limit]
-    return [
-        f"Resume la informacion disponible en {chunk['title']}."
-        for chunk in chunks
-    ]
+ADVERSARIAL_QUESTION_PROMPT = """You are building a regression test suite for a RAG system.
+Given the document chunks below, generate exactly {n_answerable} questions that:
+- Have a specific, verifiable answer found in the chunks (NOT a summarization request)
+- Test comprehension of concrete facts, figures, names, or relationships
+
+Then generate exactly {n_abstain} questions that:
+- Sound plausible given the document's topic
+- Are about details NOT present anywhere in the chunks
+- Would require the system to abstain rather than hallucinate
+
+Return a JSON array of strings, questions in order: answerable ones first, then abstention-forcing ones.
+No explanations, no labels — just the array.
+
+[Document Chunks]
+{chunks_text}
+"""
+
+
+def _good_questions(limit: int = 6) -> list[str]:
+    """Return operator-defined anchor questions if available; otherwise generate adversarial ones.
+
+    Operator-defined questions (set via PUT /documents/{id}/anchor-questions) are the
+    authoritative source. Auto-generated fallback mixes answerable + abstention-forcing
+    questions so the guard is never trivially satisfied by summarization prompts.
+    """
+    anchor_qs: list[str] = []
+    for doc in list_documents():
+        anchor_qs.extend(doc.get("anchor_questions") or [])
+    if anchor_qs:
+        return anchor_qs[:limit]
+    return _generate_adversarial_questions(limit=limit)
+
+
+def _generate_adversarial_questions(limit: int = 4) -> list[str]:
+    chunks = list_chunks(enabled_only=True)[:12]
+    if not chunks:
+        return []
+    chunks_text = "\n\n".join(
+        f"[{chunk['title']}]\n{chunk['text'][:400]}" for chunk in chunks
+    )
+    n_answerable = max(1, limit // 2)
+    n_abstain = limit - n_answerable
+    raw = _generate_text(
+        ADVERSARIAL_QUESTION_PROMPT.format(
+            n_answerable=n_answerable,
+            n_abstain=n_abstain,
+            chunks_text=chunks_text,
+        )
+    ).strip()
+    try:
+        questions = json.loads(raw)
+        if isinstance(questions, list):
+            return [str(q) for q in questions if isinstance(q, str)][:limit]
+    except Exception:
+        pass
+    # Fallback: extract lines that look like questions if JSON parse fails
+    lines = [line.strip().strip('"').strip("'") for line in raw.splitlines()]
+    return [line for line in lines if line.endswith("?")][:limit]
 
 
 def _generate_text(prompt: str) -> str:

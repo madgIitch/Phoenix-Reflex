@@ -1,0 +1,139 @@
+{
+  "session_id": "session-9647b2afab8e4634b923ba7f9c24b9cb",
+  "timestamp": "2026-05-14T09:31:09.634363+00:00",
+  "question": "¿Puede el recién creado Cuerpo de Policía Andaluza dictar mediante convenio colectivo la duración máxima de los contratos de obra y servicio bajo la supervisión del Fondo de Garantía Salarial?",
+  "answer": "La Comunidad Autónoma de Andalucía tiene la competencia para crear un Cuerpo de Policía Andaluza, que operará bajo la dependencia directa de la Junta de Andalucía, sin menoscabo de las funciones de los Cuerpos de Seguridad del Estado [pdf:estatuto81.pdf p.21 c.2] [pdf:estatuto81.pdf p.22 c.1]. El Fondo de Garantía Salarial se menciona en relación con modificaciones del Estatuto de los Trabajadores, específicamente en lo que respecta a su cobertura y a los privilegios de los créditos salariales [pdf:Ap1y2Estatuto.pdf p.83 c.3].\n\nNo se encuentra información en los documentos proporcionados sobre si el Cuerpo de Policía Andaluza puede establecer, a través de un convenio colectivo, la duración máxima de los contratos de obra y servicio, ni si dicha acción estaría supervisada por el Fondo de Garantía Salarial.",
+  "input": {
+    "question": "¿Puede el recién creado Cuerpo de Policía Andaluza dictar mediante convenio colectivo la duración máxima de los contratos de obra y servicio bajo la supervisión del Fondo de Garantía Salarial?"
+  },
+  "output": {
+    "answer": "La Comunidad Autónoma de Andalucía tiene la competencia para crear un Cuerpo de Policía Andaluza, que operará bajo la dependencia directa de la Junta de Andalucía, sin menoscabo de las funciones de los Cuerpos de Seguridad del Estado [pdf:estatuto81.pdf p.21 c.2] [pdf:estatuto81.pdf p.22 c.1]. El Fondo de Garantía Salarial se menciona en relación con modificaciones del Estatuto de los Trabajadores, específicamente en lo que respecta a su cobertura y a los privilegios de los créditos salariales [pdf:Ap1y2Estatuto.pdf p.83 c.3].\n\nNo se encuentra información en los documentos proporcionados sobre si el Cuerpo de Policía Andaluza puede establecer, a través de un convenio colectivo, la duración máxima de los contratos de obra y servicio, ni si dicha acción estaría supervisada por el Fondo de Garantía Salarial.",
+    "faithfulness": {
+      "label": "faithful",
+      "score": 1,
+      "explanation": "Every factual claim in the answer is directly supported by the retrieved context. The answer accurately describes the information available regarding the Andalusian Police Force and the Wage Guarantee Fund, and correctly abstains from answering the core question about contract duration and collective bargaining because that specific information is not present in the provided documents.",
+      "context_doc_ids": [
+        "pdf:estatuto81.pdf p.21 c.2",
+        "pdf:estatuto81.pdf p.4 c.1",
+        "pdf:Ap1y2Estatuto.pdf p.83 c.3",
+        "pdf:estatuto81.pdf p.22 c.1"
+      ]
+    },
+    "document_relevance": {
+      "label": "partially_relevant",
+      "score": 0.5,
+      "explanation": "The context confirms the creation of the Andalusian Police Corps (Cuerpo de Policía Andaluza) and mentions the Fondo de Garantía Salarial in a footnote related to labor law. However, it does not provide information on whether this body can dictate the maximum duration of work and service contracts through collective bargaining, nor does it state that such actions would be under the supervision of the Fondo de Garantía Salarial. The document discussing labor contracts and FOGASA is general and not specifically linked to the statutory regime of the police corps.",
+      "context_doc_ids": [
+        "pdf:estatuto81.pdf p.21 c.2",
+        "pdf:estatuto81.pdf p.4 c.1",
+        "pdf:Ap1y2Estatuto.pdf p.83 c.3",
+        "pdf:estatuto81.pdf p.22 c.1"
+      ]
+    },
+    "answer_quality": {
+      "label": "ok",
+      "reasons": [],
+      "explanation": "No obvious answer-quality issue detected."
+    },
+    "failure_mode": "none"
+  },
+  "retrieved_documents": [
+    {
+      "id": "pdf:estatuto81.pdf p.21 c.2",
+      "chunk_id": "pdf-d4da2e6ac5be-p021-c002-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.21 c.2",
+      "text": "e carácter, y\nmediante Ley Orgánica, sean transferidas por el Estado.\nArtículo 14\n1. Compete a la Comunidad Autónoma de Andalucía\nla creación de un Cuerpo de Policía Andaluza que, sin\nEstatuto de Autonomía para Andalucía\n18",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 21,
+      "chunk_index": 2,
+      "enabled": true,
+      "score": 0.0323
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.4 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p004-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.4 c.1",
+      "text": "ESTATUTO DE AUTONOMÍA\nPARA ANDALUCÍA",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 4,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0164
+    },
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.83 c.3",
+      "chunk_id": "pdf-75f6fad7cb71-p083-c003-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.83 c.3",
+      "text": "el que se impone a los empresarios que incluyan en\nexpedientes de regulación de empleo a trabajadores mayores de cincuenta y\ncinco años o más, que no tuvieran la condición de mutualista el 1 de enero\nde 1967, el deber de abonar las cuotas destinadas a la financiación del\nconvenio especial con la Seguridad Social. Por último, la Ley 22/2003, de\n9 de julio, Concursal\n247 aporta una nueva redacción a los privilegios de los\ncréditos salariales (art. 32 ET) 248, deroga el art. 51.10 ET y adiciona un\nnuevo precepto, con el numeral 57 bis, por el que se ordena la aplicación\nde las especialidades previstas en esa misma ley a los supuestos de «modi-\nficación, suspensión y extinción colectiva de los contratos de trabajo y de\nla transmisión de empresa»\n249.\n244 BOE 7-7.\n245 De modificación del Estatuto de los Trabajadores en materia de cobertura del Fondo de\nGarantía Salarial (BOE 20-12).\n246 De m",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 83,
+      "chunk_index": 3,
+      "enabled": true,
+      "score": 0.0161
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.22 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p022-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.22 c.1",
+      "text": "perjuicio de las funciones de los Cuerpos de Seguridad\ndel Estado y dentro del marco de la correspondiente\nLey Orgánica, desempeñe las que le sean propias bajo\nla directa dependencia de la Junta de Andalucía.\n2. Compete asimismo a la Comunidad Autónoma\nde Andalucía la coordinación de las policías locales\nandaluzas, sin perjuicio de su dependencia de las\nautoridades municipales.\n3. Se creará la Junta de Seguridad, que con represen-\ntación paritaria del Gobierno y de la Junta de Andalucía\ncoordine la actuación de la Policía Autónoma con los\nCuerpos y Fuerzas de Seguridad del Estado.\nArtículo 15\n1. Corresponde a la Comunidad Autónoma de\nAndalucía, en el marco de la regulación general del\nEstado, el desarrollo legislativo y la ejecución de las\nsiguientes materias:\n1.\na Régimen jurídico de la Administración de la\nComunidad Autónoma de Andalucía y régimen esta-\ntutario de sus funcionarios.\n2.",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 22,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0161
+    }
+  ],
+  "faithfulness": {
+    "label": "faithful",
+    "score": 1,
+    "explanation": "Every factual claim in the answer is directly supported by the retrieved context. The answer accurately describes the information available regarding the Andalusian Police Force and the Wage Guarantee Fund, and correctly abstains from answering the core question about contract duration and collective bargaining because that specific information is not present in the provided documents.",
+    "context_doc_ids": [
+      "pdf:estatuto81.pdf p.21 c.2",
+      "pdf:estatuto81.pdf p.4 c.1",
+      "pdf:Ap1y2Estatuto.pdf p.83 c.3",
+      "pdf:estatuto81.pdf p.22 c.1"
+    ]
+  },
+  "document_relevance": {
+    "label": "partially_relevant",
+    "score": 0.5,
+    "explanation": "The context confirms the creation of the Andalusian Police Corps (Cuerpo de Policía Andaluza) and mentions the Fondo de Garantía Salarial in a footnote related to labor law. However, it does not provide information on whether this body can dictate the maximum duration of work and service contracts through collective bargaining, nor does it state that such actions would be under the supervision of the Fondo de Garantía Salarial. The document discussing labor contracts and FOGASA is general and not specifically linked to the statutory regime of the police corps.",
+    "context_doc_ids": [
+      "pdf:estatuto81.pdf p.21 c.2",
+      "pdf:estatuto81.pdf p.4 c.1",
+      "pdf:Ap1y2Estatuto.pdf p.83 c.3",
+      "pdf:estatuto81.pdf p.22 c.1"
+    ]
+  },
+  "answer_quality": {
+    "label": "ok",
+    "reasons": [],
+    "explanation": "No obvious answer-quality issue detected."
+  },
+  "failure_mode": "none",
+  "event_count": 4
+}

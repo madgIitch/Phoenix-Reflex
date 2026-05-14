@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 127.0.0.1",
+    "dev": "concurrently -n backend,frontend -c cyan,magenta \"set PYTHONPATH=..&& python -m uvicorn phoenix_reflex.main:app --host 0.0.0.0 --port 8080 --reload --reload-dir ../phoenix_reflex\" \"vite --host 127.0.0.1\"",
     "build": "tsc && vite build",
     "preview": "vite preview --host 127.0.0.1"
   },
@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3"
+    "@types/react-dom": "^19.2.3",
+    "concurrently": "^9.2.1"
   }
 }

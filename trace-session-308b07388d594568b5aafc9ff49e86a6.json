@@ -1,0 +1,139 @@
+{
+  "session_id": "session-308b07388d594568b5aafc9ff49e86a6",
+  "timestamp": "2026-05-14T09:23:05.797280+00:00",
+  "question": "¿De qué forma se articula la potestad del Estado para legislar sobre relaciones laborales con la competencia de la Comunidad Autónoma de Andalucía para ejecutar dicha legislación? ",
+  "answer": "La potestad del Estado para legislar sobre relaciones laborales se articula con la competencia de la Comunidad Autónoma de Andalucía para ejecutar dicha legislación de la siguiente manera:\n\nLa Constitución reserva al Estado la facultad de dictar la legislación laboral, con el fin de evitar que los límites territoriales de las autonomías rompan la solidaridad de los trabajadores a nivel estatal [pdf:Ap1y2Estatuto.pdf p.30 c.2].\n\nLa Comunidad Autónoma de Andalucía, en el marco de la legislación del Estado y mediante una Ley del Parlamento Andaluz, articulará la gestión ordinaria de sus competencias. Esto implica que las relaciones laborales en la comunidad autónoma se adaptarán a las peculiaridades y características existentes en Andalucía, siempre dentro de la legislación estatal [pdf:estatuto81.pdf p.10 c.2] [pdf:Ap1y2Estatuto.pdf p.30 c.2]. La Comunidad Autónoma podrá organizar y administrar los servicios relacionados con estas materias dentro de su territorio para la ejecución de la legislación estatal [pdf:estatuto81.pdf p.28 c.2].",
+  "input": {
+    "question": "¿De qué forma se articula la potestad del Estado para legislar sobre relaciones laborales con la competencia de la Comunidad Autónoma de Andalucía para ejecutar dicha legislación? "
+  },
+  "output": {
+    "answer": "La potestad del Estado para legislar sobre relaciones laborales se articula con la competencia de la Comunidad Autónoma de Andalucía para ejecutar dicha legislación de la siguiente manera:\n\nLa Constitución reserva al Estado la facultad de dictar la legislación laboral, con el fin de evitar que los límites territoriales de las autonomías rompan la solidaridad de los trabajadores a nivel estatal [pdf:Ap1y2Estatuto.pdf p.30 c.2].\n\nLa Comunidad Autónoma de Andalucía, en el marco de la legislación del Estado y mediante una Ley del Parlamento Andaluz, articulará la gestión ordinaria de sus competencias. Esto implica que las relaciones laborales en la comunidad autónoma se adaptarán a las peculiaridades y características existentes en Andalucía, siempre dentro de la legislación estatal [pdf:estatuto81.pdf p.10 c.2] [pdf:Ap1y2Estatuto.pdf p.30 c.2]. La Comunidad Autónoma podrá organizar y administrar los servicios relacionados con estas materias dentro de su territorio para la ejecución de la legislación estatal [pdf:estatuto81.pdf p.28 c.2].",
+    "faithfulness": {
+      "label": "unfaithful",
+      "score": 0,
+      "explanation": "The answer claims that the Community Autónoma can organize and administer services for the execution of state legislation related to 'estas materias' (referring to labor relations). However, the cited context [pdf:estatuto81.pdf p.28 c.2] explicitly states this power in relation to 'ejecución de la legislación del Estado sobre productos farmacéuticos', not labor relations. This is an important unsupported claim.",
+      "context_doc_ids": [
+        "pdf:estatuto81.pdf p.10 c.2",
+        "pdf:Ap1y2Estatuto.pdf p.30 c.2",
+        "pdf:estatuto81.pdf p.28 c.2",
+        "pdf:estatuto81.pdf p.43 c.2"
+      ]
+    },
+    "document_relevance": {
+      "label": "relevant",
+      "score": 1,
+      "explanation": "The retrieved context directly addresses both parts of the question. It states that the Constitution reserves to the State the power to legislate on labor relations ('la Constitución, al reservar al Estado la facultad de dictar la legislación laboral'). It then explains how this articulates with regional competencies: a regional framework for labor relations ('un marco autónomo de relaciones laborales en alguna nacionalidad o región') is a 'compromiso' that involves 'adaptar la legislación estatal a las peculiaridades y características existentes en la comunidad'. This 'adaptation' is the described form of articulation and the practical exercise of the regional entity's role in implementing/executing the state legislation.",
+      "context_doc_ids": [
+        "pdf:estatuto81.pdf p.10 c.2",
+        "pdf:Ap1y2Estatuto.pdf p.30 c.2",
+        "pdf:estatuto81.pdf p.28 c.2",
+        "pdf:estatuto81.pdf p.43 c.2"
+      ]
+    },
+    "answer_quality": {
+      "label": "ok",
+      "reasons": [],
+      "explanation": "No obvious answer-quality issue detected."
+    },
+    "failure_mode": "generation"
+  },
+  "retrieved_documents": [
+    {
+      "id": "pdf:estatuto81.pdf p.10 c.2",
+      "chunk_id": "pdf-d4da2e6ac5be-p010-c002-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.10 c.2",
+      "text": "e vengan atribuidas por la legislación básica\ndel Estado y por la legislación que dicte la Comunidad\nAutónoma en desarrollo de la misma.\nb) Las que pueda delegarle para su ejercicio la\nComunidad Autónoma, siempre bajo la dirección y el\ncontrol de ésta.\n4. En los términos de una Ley del Parlamento Anda-\nluz y en el marco de la legislación del Estado, la Comu-\nnidad Autónoma articulará la gestión ordinaria de sus\nEstatuto de Autonomía para Andalucía\n7",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 10,
+      "chunk_index": 2,
+      "enabled": true,
+      "score": 0.0302
+    },
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.30 c.2",
+      "chunk_id": "pdf-75f6fad7cb71-p030-c002-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.30 c.2",
+      "text": "nda incorporada, el diputado Sr. Redondo Urbie-\nta, a la sazón también Secretario General de la UGT, tras destacar que la\nConstitución, al reservar al Estado la facultad de dictar la legislación la-\nboral, se opone a que «los límites territoriales de las autonomías puedan\nromper la solidaridad de los trabajadores a nivel de todo el Estado», a que\nexistan «unas relaciones laborales desvinculadas e independientes de las\nque existen en todo el país», manifestará que «hablar de un marco autónomo\nde relaciones laborales en alguna nacionalidad o región» equivale a hablar\ndel «resultado de un compromiso entre las fuerzas sociales, que sólo puede\nir en la dirección de adaptar la legislación estatal a las peculiaridades y\ncaracterísticas existentes en la comunidad». Y concluirá haciendo notar que\n«nada en absoluto en los artículos» criticados «impide la plena autonomía\nde las partes representativ",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 30,
+      "chunk_index": 2,
+      "enabled": true,
+      "score": 0.03
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.28 c.2",
+      "chunk_id": "pdf-d4da2e6ac5be-p028-c002-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.28 c.2",
+      "text": "ejecución de la legislación del Estado\nsobre productos farmacéuticos.\n4. La Comunidad Autónoma de Andalucía podrá\norganizar y administrar a tales fines, y dentro de su\nterritorio, todos los servicios relacionados con las\nmaterias antes expresadas y ejercerá la tutela de las\nEstatuto de Autonomía para Andalucía\n25",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 28,
+      "chunk_index": 2,
+      "enabled": true,
+      "score": 0.0294
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.43 c.2",
+      "chunk_id": "pdf-d4da2e6ac5be-p043-c002-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.43 c.2",
+      "text": "io-\nnes de la Comunidad Autónoma dependen de ésta y\nse integran en su Administración.\nArtículo 42\n1. El Consejo de Gobierno, por conducto de su\nPresidente, podrá plantear conflictos de jurisdicción a\nlos jueces y tribunales conforme a las leyes regulado-\nras de aquéllos.\n2. Igualmente podrá el Consejo de Gobierno ejercer\nla potestad expropiatoria conforme a la legislación\nestatal y autonómica vigente en la materia.\nEstatuto de Autonomía para Andalucía\n40",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 43,
+      "chunk_index": 2,
+      "enabled": true,
+      "score": 0.0284
+    }
+  ],
+  "faithfulness": {
+    "label": "unfaithful",
+    "score": 0,
+    "explanation": "The answer claims that the Community Autónoma can organize and administer services for the execution of state legislation related to 'estas materias' (referring to labor relations). However, the cited context [pdf:estatuto81.pdf p.28 c.2] explicitly states this power in relation to 'ejecución de la legislación del Estado sobre productos farmacéuticos', not labor relations. This is an important unsupported claim.",
+    "context_doc_ids": [
+      "pdf:estatuto81.pdf p.10 c.2",
+      "pdf:Ap1y2Estatuto.pdf p.30 c.2",
+      "pdf:estatuto81.pdf p.28 c.2",
+      "pdf:estatuto81.pdf p.43 c.2"
+    ]
+  },
+  "document_relevance": {
+    "label": "relevant",
+    "score": 1,
+    "explanation": "The retrieved context directly addresses both parts of the question. It states that the Constitution reserves to the State the power to legislate on labor relations ('la Constitución, al reservar al Estado la facultad de dictar la legislación laboral'). It then explains how this articulates with regional competencies: a regional framework for labor relations ('un marco autónomo de relaciones laborales en alguna nacionalidad o región') is a 'compromiso' that involves 'adaptar la legislación estatal a las peculiaridades y características existentes en la comunidad'. This 'adaptation' is the described form of articulation and the practical exercise of the regional entity's role in implementing/executing the state legislation.",
+    "context_doc_ids": [
+      "pdf:estatuto81.pdf p.10 c.2",
+      "pdf:Ap1y2Estatuto.pdf p.30 c.2",
+      "pdf:estatuto81.pdf p.28 c.2",
+      "pdf:estatuto81.pdf p.43 c.2"
+    ]
+  },
+  "answer_quality": {
+    "label": "ok",
+    "reasons": [],
+    "explanation": "No obvious answer-quality issue detected."
+  },
+  "failure_mode": "generation",
+  "event_count": 3
+}

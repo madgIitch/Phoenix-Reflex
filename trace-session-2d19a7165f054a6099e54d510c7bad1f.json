@@ -1,0 +1,139 @@
+{
+  "session_id": "session-2d19a7165f054a6099e54d510c7bad1f",
+  "timestamp": "2026-05-14T09:31:52.129849+00:00",
+  "question": "¿Establece el Estatuto de los Trabajadores que las franjas verde y blanca de la bandera de Andalucía deben aprobarse mediante la jurisdicción de un despido colectivo?",
+  "answer": "El Estatuto de los Trabajadores no establece que las franjas verde y blanca de la bandera de Andalucía deban aprobarse mediante la jurisdicción de un despido colectivo.\n\nLos documentos indican que la bandera de Andalucía es la tradicional formada por tres franjas horizontales –verde, blanca y verde– de igual anchura, aprobada en la Asamblea de Ronda en 1918 [pdf:estatuto81.pdf p.11 c.2] [pdf:estatuto81.pdf p.12 c.1]. Por otro lado, el Estatuto de los Trabajadores se menciona en el contexto de la improcedencia del despido y la indemnización [pdf:Ap1y2Estatuto.pdf p.79 c.1]. No existe ninguna relación entre ambos temas en la información proporcionada.",
+  "input": {
+    "question": "¿Establece el Estatuto de los Trabajadores que las franjas verde y blanca de la bandera de Andalucía deben aprobarse mediante la jurisdicción de un despido colectivo?"
+  },
+  "output": {
+    "answer": "El Estatuto de los Trabajadores no establece que las franjas verde y blanca de la bandera de Andalucía deban aprobarse mediante la jurisdicción de un despido colectivo.\n\nLos documentos indican que la bandera de Andalucía es la tradicional formada por tres franjas horizontales –verde, blanca y verde– de igual anchura, aprobada en la Asamblea de Ronda en 1918 [pdf:estatuto81.pdf p.11 c.2] [pdf:estatuto81.pdf p.12 c.1]. Por otro lado, el Estatuto de los Trabajadores se menciona en el contexto de la improcedencia del despido y la indemnización [pdf:Ap1y2Estatuto.pdf p.79 c.1]. No existe ninguna relación entre ambos temas en la información proporcionada.",
+    "faithfulness": {
+      "label": "faithful",
+      "score": 1,
+      "explanation": "Every factual claim in the answer is fully supported by the retrieved context. The answer correctly states that the 'Estatuto de los Trabajadores' does not establish the approval method for the Andalusian flag, as this document (pdf:Ap1y2Estatuto.pdf) discusses dismissals and indemnities, not regional symbols. The context clearly indicates that the flag was approved in the Assembly of Ronda in 1918, as per the 'Estatuto de Autonomía para Andalucía' (pdf:estatuto81.pdf). The answer accurately identifies the lack of a relationship between the two topics in the provided information.",
+      "context_doc_ids": [
+        "pdf:estatuto81.pdf p.12 c.1",
+        "pdf:estatuto81.pdf p.11 c.2",
+        "pdf:Ap1y2Estatuto.pdf p.79 c.1",
+        "pdf:estatuto81.pdf p.4 c.1"
+      ]
+    },
+    "document_relevance": {
+      "label": "relevant",
+      "score": 1,
+      "explanation": "The question asks if the 'Estatuto de los Trabajadores' establishes a specific approval method for the Andalusian flag. The retrieved context includes a section from the 'Estatuto de los Trabajadores' which discusses dismissals but makes no mention of the Andalusian flag or its approval. Other retrieved documents, identified as 'Estatuto de Autonomía para Andalucía', describe the Andalusian flag and its approval process (Asamblea de Ronda in 1918, or by Law of the Andalusian Parliament for anthem/coat of arms), explicitly stating a different method and statute. Therefore, the retrieved context directly contains the information needed to definitively answer 'No' to the question, as the 'Estatuto de los Trabajadores' does not establish this, and the flag's approval is handled by a different legal framework and process.",
+      "context_doc_ids": [
+        "pdf:estatuto81.pdf p.12 c.1",
+        "pdf:estatuto81.pdf p.11 c.2",
+        "pdf:Ap1y2Estatuto.pdf p.79 c.1",
+        "pdf:estatuto81.pdf p.4 c.1"
+      ]
+    },
+    "answer_quality": {
+      "label": "ok",
+      "reasons": [],
+      "explanation": "No obvious answer-quality issue detected."
+    },
+    "failure_mode": "none"
+  },
+  "retrieved_documents": [
+    {
+      "id": "pdf:estatuto81.pdf p.12 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p012-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.12 c.1",
+      "text": "verde– de igual anchura, tal como fue aprobada en la\nAsamblea de Ronda en 1918.\n2. Andalucía tiene himno y escudo propios, que\nserán aprobados definitivamente por Ley del Parlamen-\nto Andaluz, teniendo en cuenta los acuerdos dictados\nsobre tales extremos por la Asamblea de Ronda de\n1918.\nArtículo 7\nLa capital de Andalucía, sede del Gobierno y del Par-\nlamento, será la ciudad que decida éste, por mayoría\nde dos tercios, en su primera sesión ordinaria. En\ndicha sesión se decidirá también la sede del Tribunal\nSuperior de Justicia.\nArtículo 8\n1. A los efectos del presente Estatuto, gozan de la\ncondición política de andaluces los ciudadanos espa-\nñoles que, de acuerdo con las leyes generales del\nEstado, tengan vecindad administrativa en cualquiera\nde los municipios de Andalucía.\n2. Como andaluces, gozan de los derechos políticos\ndefinidos en este Estatuto los ciudadanos españoles\nresidentes e",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 12,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0325
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.11 c.2",
+      "chunk_id": "pdf-d4da2e6ac5be-p011-c002-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.11 c.2",
+      "text": "a crea-\nción de comarcas integradas por municipios limítrofes\ndentro de la misma provincia, atendiendo a sus caracte-\nrísticas geográficas, económicas, sociales e históricas. Se\nrequerirá en todo caso el acuerdo de los Ayuntamientos\nafectados y la aprobación del Consejo de Gobierno.\nArtículo 6\n1. La bandera de Andalucía es la tradicional forma-\nda por tres franjas horizontales –verde, blanca y\nEstatuto de Autonomía para Andalucía\n8",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 11,
+      "chunk_index": 2,
+      "enabled": true,
+      "score": 0.0323
+    },
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.79 c.1",
+      "chunk_id": "pdf-75f6fad7cb71-p079-c001-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.79 c.1",
+      "text": "78\nESTATUTO DE LOS TRABAJADORES\nla improcedencia del despido en el acto de conciliación y ofreciese la in-\ndemnización de cuarenta y cinco días, depositándola en el juzgado de lo\nsocial a disposición del trabajador de las 48 horas siguientes a la celebración\ndel dicho acto. En la versión posterior, en la de la Ley, se amplían los\nsupuestos en los que los tan citados salarios son debidos. Pero no sólo se\npermite la limitación de su pago en la modalidad de despido más frecuente,\nla de improcedente con derecho del empresario al ejercicio de la opción;\ntambién se consiente la exención del abono mismo\n227.\nNo fue esta, desde luego, una medida meramente técnica o de tono\nmenos. Muy antes al contrario, la reforma opera un cambio normativo de\nenvergadura, al servicio de unos fines y objetivos bien definitivos. Con\nindependencia de sus efectos sobre los regímenes jurídicos de protección del\ndesem",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 79,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0294
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.4 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p004-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.4 c.1",
+      "text": "ESTATUTO DE AUTONOMÍA\nPARA ANDALUCÍA",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 4,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0161
+    }
+  ],
+  "faithfulness": {
+    "label": "faithful",
+    "score": 1,
+    "explanation": "Every factual claim in the answer is fully supported by the retrieved context. The answer correctly states that the 'Estatuto de los Trabajadores' does not establish the approval method for the Andalusian flag, as this document (pdf:Ap1y2Estatuto.pdf) discusses dismissals and indemnities, not regional symbols. The context clearly indicates that the flag was approved in the Assembly of Ronda in 1918, as per the 'Estatuto de Autonomía para Andalucía' (pdf:estatuto81.pdf). The answer accurately identifies the lack of a relationship between the two topics in the provided information.",
+    "context_doc_ids": [
+      "pdf:estatuto81.pdf p.12 c.1",
+      "pdf:estatuto81.pdf p.11 c.2",
+      "pdf:Ap1y2Estatuto.pdf p.79 c.1",
+      "pdf:estatuto81.pdf p.4 c.1"
+    ]
+  },
+  "document_relevance": {
+    "label": "relevant",
+    "score": 1,
+    "explanation": "The question asks if the 'Estatuto de los Trabajadores' establishes a specific approval method for the Andalusian flag. The retrieved context includes a section from the 'Estatuto de los Trabajadores' which discusses dismissals but makes no mention of the Andalusian flag or its approval. Other retrieved documents, identified as 'Estatuto de Autonomía para Andalucía', describe the Andalusian flag and its approval process (Asamblea de Ronda in 1918, or by Law of the Andalusian Parliament for anthem/coat of arms), explicitly stating a different method and statute. Therefore, the retrieved context directly contains the information needed to definitively answer 'No' to the question, as the 'Estatuto de los Trabajadores' does not establish this, and the flag's approval is handled by a different legal framework and process.",
+    "context_doc_ids": [
+      "pdf:estatuto81.pdf p.12 c.1",
+      "pdf:estatuto81.pdf p.11 c.2",
+      "pdf:Ap1y2Estatuto.pdf p.79 c.1",
+      "pdf:estatuto81.pdf p.4 c.1"
+    ]
+  },
+  "answer_quality": {
+    "label": "ok",
+    "reasons": [],
+    "explanation": "No obvious answer-quality issue detected."
+  },
+  "failure_mode": "none",
+  "event_count": 3
+}

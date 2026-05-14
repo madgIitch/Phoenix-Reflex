@@ -1,0 +1,139 @@
+{
+  "session_id": "session-7d3dd31b563140218cff5172cbffbadb",
+  "timestamp": "2026-05-14T09:29:24.251490+00:00",
+  "question": "¿Tienen los jóvenes andaluces de 18 años los mismos derechos para elegir al presidente de su territorio que para firmar la indemnización de fomento de empleo según los acuerdos alcanzados?",
+  "answer": "Los documentos proporcionados no especifican la edad legal para votar en Andalucía o España, ni la edad legal para firmar acuerdos de indemnización de fomento de empleo. Por lo tanto, no es posible determinar si los jóvenes andaluces de 18 años tienen los mismos derechos para ambas acciones según los acuerdos alcanzados.",
+  "input": {
+    "question": "¿Tienen los jóvenes andaluces de 18 años los mismos derechos para elegir al presidente de su territorio que para firmar la indemnización de fomento de empleo según los acuerdos alcanzados?"
+  },
+  "output": {
+    "answer": "Los documentos proporcionados no especifican la edad legal para votar en Andalucía o España, ni la edad legal para firmar acuerdos de indemnización de fomento de empleo. Por lo tanto, no es posible determinar si los jóvenes andaluces de 18 años tienen los mismos derechos para ambas acciones según los acuerdos alcanzados.",
+    "faithfulness": {
+      "label": "faithful",
+      "score": 1,
+      "explanation": "The answer correctly states that the provided documents do not contain information regarding the legal age for voting in Andalusia or Spain, nor the legal age for signing employment promotion compensation agreements. Therefore, it correctly concludes that it's not possible to determine if 18-year-olds have the same rights for both actions based on the given context. All claims are fully supported by the absence of relevant information in the context.",
+      "context_doc_ids": [
+        "pdf:estatuto81.pdf p.8 c.1",
+        "pdf:Ap1y2Estatuto.pdf p.38 c.2",
+        "pdf:Ap1y2Estatuto.pdf p.46 c.2",
+        "pdf:Ap1y2Estatuto.pdf p.15 c.1"
+      ]
+    },
+    "document_relevance": {
+      "label": "irrelevant",
+      "score": 0,
+      "explanation": "The retrieved documents discuss the Statute of Autonomy for Andalusia and the Workers' Statute, as well as employment policies. However, none of them provide information regarding the voting rights of 18-year-old Andalusians to elect their president, nor their rights to sign employment promotion indemnities, nor a comparison between these two rights. The context is too general and lacks the specific details required to answer the question.",
+      "context_doc_ids": [
+        "pdf:estatuto81.pdf p.8 c.1",
+        "pdf:Ap1y2Estatuto.pdf p.38 c.2",
+        "pdf:Ap1y2Estatuto.pdf p.46 c.2",
+        "pdf:Ap1y2Estatuto.pdf p.15 c.1"
+      ]
+    },
+    "answer_quality": {
+      "label": "ok",
+      "reasons": [],
+      "explanation": "No obvious answer-quality issue detected."
+    },
+    "failure_mode": "none"
+  },
+  "retrieved_documents": [
+    {
+      "id": "pdf:estatuto81.pdf p.8 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p008-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.8 c.1",
+      "text": "ESTATUTO DE AUTONOMÍA\nPARA ANDALUCÍA\nDON JUAN CARLOS I, REY DE ESPAÑA\nA TODOS LOS QUE LA PRESENTE VIEREN Y\nENTENDIEREN, SABED: QUE LAS CORTES\nGENERALES HAN APROBADO Y YO VENGO A\nSANCIONAR LA SIGUIENTE LEY ORGÁNICA:\nTÍTULO PRELIMINAR\nDisposiciones Generales\nArtículo 1\n1. Andalucía, como expresión de su identidad his-\ntórica y en el ejercicio del derecho al autogobierno\nque la Constitución reconoce a toda nacionalidad, se\nconstituye en Comunidad Autónoma, en el marco de\nla unidad indisoluble de la nación española, patria\ncomún indivisi ble de todos los españoles.\n5",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 8,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0305
+    },
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.38 c.2",
+      "chunk_id": "pdf-75f6fad7cb71-p038-c002-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.38 c.2",
+      "text": "ía de la finalización de la vigencia del AI, el 31 de di-\nciembre de 1983, el B.O.C.G. publica el proyecto de ley «por el que\nse modifican determinados artículos de la Ley 8/1980, de 10 de marzo,\ndel Estatuto de los Trabajadores». La Exposición de Motivos identifica,\ncomo objetivo fundamental de la reforma proyectada, «la adaptación del\nmarco institucional que regula el mercado de trabajo a las nuevas circuns-\ntancias de la economía española, tras la crisis económica del último dece-\nnio», de manera que las modificaciones propuestas persiguen dotar a ese\nmarco «de una mayor claridad y estabilidad para reducir la incertidumbre\nempresarial de la actuaciones que conducen a la creación de nuevos puestos\nde trabajo».\nEn desarrollo de este objetivo básico, el proyecto propone cambios\nnormativos en la mayor parte de las modalidades contractuales: contratos en\nprácticas y para la formación, cont",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 38,
+      "chunk_index": 2,
+      "enabled": true,
+      "score": 0.0301
+    },
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.46 c.2",
+      "chunk_id": "pdf-75f6fad7cb71-p046-c002-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.46 c.2",
+      "text": "stas\n15. La ralentización que experimenta la economía española a partir de\n1990 va a evidenciar los límites, al tiempo que los negativos efectos, de las\nmedidas de política de empleo que habían venido funcionando desde la\nsegunda década de los años ochenta a fin de dotar de una mayor flexibilidad\na la disciplina jurídica del mercado de trabajo.\nEl primer dato que se constata es la «elevada sensibilidad del empleo\na la evolución del ciclo económico»\n122. En la fase recesiva que se inicia en\n1991, se observa, por una parte, que las empresas españolas adaptan sus\nplantillas a las nuevas condiciones del mercado con mayor rapidez que en\nel pasado, utilizando las posibilidades que proporciona el ajuste vegetativo\ndel empleo, y, por otra, la elevada presencia en el mercado de trabajo de\ntrabajadores con alguna modalidad de contrato temporal. Una segunda cir-\ncunstancia a destacar, «en cierta me",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 46,
+      "chunk_index": 2,
+      "enabled": true,
+      "score": 0.0283
+    },
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.15 c.1",
+      "chunk_id": "pdf-75f6fad7cb71-p015-c001-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.15 c.1",
+      "text": "SUMARIO\n1. LAS BASES CONSTITUCIONALES: LA DELIBERADA AMBIGÜEDAD DE LA SE-\nMÁNTICA. 2. EN LOS ORÍGENES DE LA LEY. A. La ambigüedad aclarada. B. Diálogo\nsocial y consenso político. C. Confrontación política y disenso sindical. 3. LA APROBA-\nCIÓN, POR AMPLIO CONSENSO, DE LA LEY. 4. LA CENTRALIDAD POLÍTICA Y\nJURÍDICA DEL ESTATUTO DE LOS TRABAJADORES, VEINTICINCO AÑOS DES-\nPUÉS. 5. EL TIEMPO DE LAS NOVELLAS. 6. EL BIENIO DE LAS REFORMAS INTEN-\nSAS Y EXTENSAS. A. La preparación: convergencia en los diagnósticos y divergencia en\nlas propuestas. B. Los prolegómenos: el Real Decreto-Ley 18/1993. C. El desenlace: las\nleyes 10 y 11/1994. D. El epílogo: los mandatos de refundición y las reformas intermedias.\n7. LOS CAMBIOS LEGALES DE LOS GOBIERNOS POPULARES. A. Concertación y\nconfrontación sociales en las reformas hijas de «un dios mayor»: la disciplina jurídica del\nmercado de trabajo. B. Las otras",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 15,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0164
+    }
+  ],
+  "faithfulness": {
+    "label": "faithful",
+    "score": 1,
+    "explanation": "The answer correctly states that the provided documents do not contain information regarding the legal age for voting in Andalusia or Spain, nor the legal age for signing employment promotion compensation agreements. Therefore, it correctly concludes that it's not possible to determine if 18-year-olds have the same rights for both actions based on the given context. All claims are fully supported by the absence of relevant information in the context.",
+    "context_doc_ids": [
+      "pdf:estatuto81.pdf p.8 c.1",
+      "pdf:Ap1y2Estatuto.pdf p.38 c.2",
+      "pdf:Ap1y2Estatuto.pdf p.46 c.2",
+      "pdf:Ap1y2Estatuto.pdf p.15 c.1"
+    ]
+  },
+  "document_relevance": {
+    "label": "irrelevant",
+    "score": 0,
+    "explanation": "The retrieved documents discuss the Statute of Autonomy for Andalusia and the Workers' Statute, as well as employment policies. However, none of them provide information regarding the voting rights of 18-year-old Andalusians to elect their president, nor their rights to sign employment promotion indemnities, nor a comparison between these two rights. The context is too general and lacks the specific details required to answer the question.",
+    "context_doc_ids": [
+      "pdf:estatuto81.pdf p.8 c.1",
+      "pdf:Ap1y2Estatuto.pdf p.38 c.2",
+      "pdf:Ap1y2Estatuto.pdf p.46 c.2",
+      "pdf:Ap1y2Estatuto.pdf p.15 c.1"
+    ]
+  },
+  "answer_quality": {
+    "label": "ok",
+    "reasons": [],
+    "explanation": "No obvious answer-quality issue detected."
+  },
+  "failure_mode": "none",
+  "event_count": 9
+}

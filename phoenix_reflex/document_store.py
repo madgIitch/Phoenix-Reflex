@@ -47,6 +47,19 @@ def list_chunks(document_id: str | None = None, enabled_only: bool = False) -> l
     return chunks
 
 
+def set_anchor_questions(document_id: str, questions: list[str]) -> dict[str, Any] | None:
+    ensure_store()
+    with LOCK:
+        documents = _read_json(DOCUMENTS_PATH)
+        target = next((d for d in documents if d["id"] == document_id), None)
+        if target is None:
+            return None
+        target["anchor_questions"] = questions
+        target["updated_at"] = datetime.now(UTC).isoformat()
+        _write_json(DOCUMENTS_PATH, documents)
+        return target
+
+
 def save_document_with_chunks(
     document: dict[str, Any],
     chunks: list[dict[str, Any]],

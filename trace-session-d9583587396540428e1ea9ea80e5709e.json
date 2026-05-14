@@ -1,0 +1,139 @@
+{
+  "session_id": "session-d9583587396540428e1ea9ea80e5709e",
+  "timestamp": "2026-05-14T09:27:06.078281+00:00",
+  "question": "¿Qué estatuto aprobado en la década de los ochenta sufrió más cambios por culpa de la crisis para intentar solucionar los problemas de los trabajadores y los territorios?",
+  "answer": "El Estatuto de los Trabajadores, en su versión de 1980, fue la principal fuente de cambios en el período 1983-1992, siendo la Ley 32/1984 la que introdujo la mayor parte de estas modificaciones. Esta ley no solo reformó el sistema coyuntural de contratación temporal, sino que también añadió una nueva modalidad de contrato, la de lanzamiento de nueva actividad, a los tipos ya existentes [pdf:Ap1y2Estatuto.pdf p.43 c.1]. Los artículos modificados del Estatuto de los Trabajadores fueron el 11, 12, 15, 17, 33, 49, 62, 63, 67, 69, 71, 72, 74, 75 y 87 [pdf:Ap1y2Estatuto.pdf p.39 c.4].",
+  "input": {
+    "question": "¿Qué estatuto aprobado en la década de los ochenta sufrió más cambios por culpa de la crisis para intentar solucionar los problemas de los trabajadores y los territorios?"
+  },
+  "output": {
+    "answer": "El Estatuto de los Trabajadores, en su versión de 1980, fue la principal fuente de cambios en el período 1983-1992, siendo la Ley 32/1984 la que introdujo la mayor parte de estas modificaciones. Esta ley no solo reformó el sistema coyuntural de contratación temporal, sino que también añadió una nueva modalidad de contrato, la de lanzamiento de nueva actividad, a los tipos ya existentes [pdf:Ap1y2Estatuto.pdf p.43 c.1]. Los artículos modificados del Estatuto de los Trabajadores fueron el 11, 12, 15, 17, 33, 49, 62, 63, 67, 69, 71, 72, 74, 75 y 87 [pdf:Ap1y2Estatuto.pdf p.39 c.4].",
+    "faithfulness": {
+      "label": "faithful",
+      "score": 1,
+      "explanation": "Every factual claim made in the answer is directly supported by the retrieved context. The answer correctly identifies the Estatuto de los Trabajadores (version 1980) and Ley 32/1984 as the principal source of changes in the specified period, details the nature of some changes, and lists the modified articles. The answer does not make any claims about the *reason* for the changes (i.e., 'por culpa de la crisis para intentar solucionar los problemas de los trabajadores y los territorios') which is part of the question, but the context itself does not explicitly link the 1980s changes to a 'crisis' in that decade, rather to 'política de empleo' and 'mayor flexibilidad'. Since the answer does not make any unsupported claims regarding the reason, and all its stated facts are supported, it is fully faithful.",
+      "context_doc_ids": [
+        "pdf:Ap1y2Estatuto.pdf p.39 c.4",
+        "pdf:Ap1y2Estatuto.pdf p.46 c.2",
+        "pdf:Ap1y2Estatuto.pdf p.43 c.1",
+        "pdf:Ap1y2Estatuto.pdf p.73 c.1"
+      ]
+    },
+    "document_relevance": {
+      "label": "partially_relevant",
+      "score": 0.5,
+      "explanation": "The context identifies the 'Estatuto de los Trabajadores, versión 1980' as the statute that underwent the most changes in the 1980s, primarily through 'Ley 32/1984', and links these changes to solving problems for workers (e.g., 'política de empleo', 'flexibilidad a la disciplina jurídica del mercado de trabajo'). However, it does not explicitly state that these changes were 'por culpa de la crisis' (due to the crisis) for the 80s period, nor does it mention addressing problems for 'los territorios'.",
+      "context_doc_ids": [
+        "pdf:Ap1y2Estatuto.pdf p.39 c.4",
+        "pdf:Ap1y2Estatuto.pdf p.46 c.2",
+        "pdf:Ap1y2Estatuto.pdf p.43 c.1",
+        "pdf:Ap1y2Estatuto.pdf p.73 c.1"
+      ]
+    },
+    "answer_quality": {
+      "label": "ok",
+      "reasons": [],
+      "explanation": "No obvious answer-quality issue detected."
+    },
+    "failure_mode": "none"
+  },
+  "retrieved_documents": [
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.39 c.4",
+      "chunk_id": "pdf-75f6fad7cb71-p039-c004-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.39 c.4",
+      "text": "política de\nempleo adoptadas por dichos poderes en el curso de la década de los años 80.\n82 Vid. MONTOYA MELGAR, A., «La reforma del Fondo de Garantía Salarial (la Ley 32/1984 y el\nReal Decreto 505/1985, de 6 de marzo)», DL, 1985, núm. 17, pp. 7-30.\n83 Los artículos modificados fueron: 11, 12, 15, 17, 33, 49, 62, 63, 67, 69, 71, 72, 74, 75 y 87.\n84 La Disposición Final Sexta.\n85 BOE 4-8. Para un análisis pormenorizado de los cambios legislativos, vid. AA.AA., Comen-\ntarios a la nueva legislación laboral , Madrid (Tecnos) 1985.\n86 Cfr. Estatuto de los Trabajadores, cit., T. I., pp. 504-505.",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 39,
+      "chunk_index": 4,
+      "enabled": true,
+      "score": 0.0313
+    },
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.46 c.2",
+      "chunk_id": "pdf-75f6fad7cb71-p046-c002-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.46 c.2",
+      "text": "stas\n15. La ralentización que experimenta la economía española a partir de\n1990 va a evidenciar los límites, al tiempo que los negativos efectos, de las\nmedidas de política de empleo que habían venido funcionando desde la\nsegunda década de los años ochenta a fin de dotar de una mayor flexibilidad\na la disciplina jurídica del mercado de trabajo.\nEl primer dato que se constata es la «elevada sensibilidad del empleo\na la evolución del ciclo económico»\n122. En la fase recesiva que se inicia en\n1991, se observa, por una parte, que las empresas españolas adaptan sus\nplantillas a las nuevas condiciones del mercado con mayor rapidez que en\nel pasado, utilizando las posibilidades que proporciona el ajuste vegetativo\ndel empleo, y, por otra, la elevada presencia en el mercado de trabajo de\ntrabajadores con alguna modalidad de contrato temporal. Una segunda cir-\ncunstancia a destacar, «en cierta me",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 46,
+      "chunk_index": 2,
+      "enabled": true,
+      "score": 0.0287
+    },
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.43 c.1",
+      "chunk_id": "pdf-75f6fad7cb71-p043-c001-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.43 c.1",
+      "text": "42\nESTATUTO DE LOS TRABAJADORES\nLey 32/1984 no sólo opera, en el sentido ya comentado, en el frente del\nsistema coyuntural de contratación temporal; también reforma el régimen\nestructural, adicionando una nueva modalidad de contrato, la de lanzamiento\nde nueva actividad\n102, a los tres tipos clásicos ya existentes (obra y servicio,\neventualidad e interinidad) 103.\n14. En el período 1983-1992, la Ley 32/1984 constituye, de seguro, la\nprincipal fuente de cambios en el ET, versión 1980. Pero no es la única; a\nella se añaden aún otras disposiciones con rango de ley, ninguna de las\ncuales puede equipársela, sin embargo, ni en extensión ni en intensidad\nreformadoras.\nLa primera de ellas inaugura un tipo de disposición que, a partir de la\ndécada de los 90, será de uso frecuente, hasta incurrir en una práctica abu-\nsiva por parte de los sucesivos gobiernos: la legislación de emergencia. El\nReal",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 43,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.028
+    },
+    {
+      "id": "pdf:Ap1y2Estatuto.pdf p.73 c.1",
+      "chunk_id": "pdf-75f6fad7cb71-p073-c001-Ap1y2Estatuto.pdf",
+      "document_id": "pdf-75f6fad7cb71",
+      "title": "pdf:Ap1y2Estatuto.pdf p.73 c.1",
+      "text": "72\nESTATUTO DE LOS TRABAJADORES\n27. La nueva fase de diálogo social que se abre en el último trimestre\nde 2000 se encuentra una vez más motivada por las disfunciones que al\nmercado español de trabajo producen el exceso de contrataciones temporales\ny la elevada tasa de rotación laboral. Los problemas fundamentales que\npretenden abordarse en esa fase del diálogo social serán, así pues y básica-\nmente, la reducción de la temporalidad de los empleos y la corrección del\ninequitativo reparto de las oportunidades de empleo. Apenas iniciada aque-\nlla fase, se detectan de inmediato las divergencias entre los interlocutores\nsociales: mientras que objetivo esencial de la reforma es, para la represen-\ntación empresarial, la revisión de la regulación del despido, las representa-\nciones sindicales insisten sobre todo en medidas restrictivas y limitativas de\nla contratación temporal. En un contexto sem",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "Ap1y2Estatuto.pdf",
+      "page": 73,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0262
+    }
+  ],
+  "faithfulness": {
+    "label": "faithful",
+    "score": 1,
+    "explanation": "Every factual claim made in the answer is directly supported by the retrieved context. The answer correctly identifies the Estatuto de los Trabajadores (version 1980) and Ley 32/1984 as the principal source of changes in the specified period, details the nature of some changes, and lists the modified articles. The answer does not make any claims about the *reason* for the changes (i.e., 'por culpa de la crisis para intentar solucionar los problemas de los trabajadores y los territorios') which is part of the question, but the context itself does not explicitly link the 1980s changes to a 'crisis' in that decade, rather to 'política de empleo' and 'mayor flexibilidad'. Since the answer does not make any unsupported claims regarding the reason, and all its stated facts are supported, it is fully faithful.",
+    "context_doc_ids": [
+      "pdf:Ap1y2Estatuto.pdf p.39 c.4",
+      "pdf:Ap1y2Estatuto.pdf p.46 c.2",
+      "pdf:Ap1y2Estatuto.pdf p.43 c.1",
+      "pdf:Ap1y2Estatuto.pdf p.73 c.1"
+    ]
+  },
+  "document_relevance": {
+    "label": "partially_relevant",
+    "score": 0.5,
+    "explanation": "The context identifies the 'Estatuto de los Trabajadores, versión 1980' as the statute that underwent the most changes in the 1980s, primarily through 'Ley 32/1984', and links these changes to solving problems for workers (e.g., 'política de empleo', 'flexibilidad a la disciplina jurídica del mercado de trabajo'). However, it does not explicitly state that these changes were 'por culpa de la crisis' (due to the crisis) for the 80s period, nor does it mention addressing problems for 'los territorios'.",
+    "context_doc_ids": [
+      "pdf:Ap1y2Estatuto.pdf p.39 c.4",
+      "pdf:Ap1y2Estatuto.pdf p.46 c.2",
+      "pdf:Ap1y2Estatuto.pdf p.43 c.1",
+      "pdf:Ap1y2Estatuto.pdf p.73 c.1"
+    ]
+  },
+  "answer_quality": {
+    "label": "ok",
+    "reasons": [],
+    "explanation": "No obvious answer-quality issue detected."
+  },
+  "failure_mode": "none",
+  "event_count": 3
+}

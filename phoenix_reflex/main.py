@@ -13,6 +13,7 @@ from phoenix_reflex.document_store import (
     get_document,
     list_chunks,
     list_documents,
+    set_anchor_questions,
     update_chunk_enabled,
 )
 from phoenix_reflex.evaluator import evaluate_document_relevance, evaluate_faithfulness
@@ -42,6 +43,10 @@ class FaithfulnessDemoRequest(BaseModel):
 
 class ChunkUpdateRequest(BaseModel):
     enabled: bool
+
+
+class AnchorQuestionsRequest(BaseModel):
+    questions: list[str] = Field(..., min_length=1, max_length=10)
 
 
 @asynccontextmanager
@@ -149,6 +154,17 @@ def patch_chunk(chunk_id: str, request: ChunkUpdateRequest) -> dict[str, object]
     if updated is None:
         raise HTTPException(status_code=404, detail="Chunk not found")
     return {"chunk": updated}
+
+
+@app.put("/documents/{document_id}/anchor-questions")
+def put_anchor_questions(document_id: str, request: AnchorQuestionsRequest) -> dict[str, object]:
+    questions = [q.strip() for q in request.questions if q.strip()]
+    if not questions:
+        raise HTTPException(status_code=400, detail="At least one non-empty question is required")
+    updated = set_anchor_questions(document_id, questions)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Document not found")
+    return {"document_id": document_id, "anchor_questions": questions}
 
 
 @app.delete("/documents/{document_id}")

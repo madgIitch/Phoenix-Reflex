@@ -378,23 +378,35 @@ def _find_phantom_citations(answer: str, valid_ids: set[str]) -> set[str]:
 
 
 def _find_answer_style_issues(answer: str) -> list[str]:
+    # Only match multi-word phrases where the LLM is clearly describing its own
+    # retrieval mechanics, not citing technical content from the uploaded document.
+    # Single words like "context", "tool", "system" are standard tech vocabulary
+    # and produce false positives with technical PDFs.
     normalized = _normalize_for_language_hint(answer)
     issues: list[str] = []
-    internal_markers = (
-        " retrieved ",
-        " retrieved documents ",
-        " retrieved context ",
-        " context ",
-        " tool ",
-        " system ",
-        " recuperado ",
-        " recuperados ",
-        " documentos recuperados ",
-        " contexto ",
-        " herramienta ",
-        " sistema ",
+    meta_mechanic_phrases = (
+        # English meta-phrases
+        " based on the retrieved ",
+        " according to the retrieved ",
+        " the retrieved documents ",
+        " from the retrieved context ",
+        " in the retrieved context ",
+        " i retrieved ",
+        " i used the tool ",
+        " the tool returned ",
+        " the system provided me ",
+        " my retrieval ",
+        # Spanish meta-phrases
+        " según el contexto recuperado ",
+        " de los documentos recuperados ",
+        " los documentos recuperados ",
+        " el contexto recuperado ",
+        " recuperé ",
+        " usé la herramienta ",
+        " la herramienta me devolvió ",
+        " el sistema me proporcionó ",
     )
-    if any(marker in normalized for marker in internal_markers):
+    if any(phrase in normalized for phrase in meta_mechanic_phrases):
         issues.append("mentions_internal_mechanics")
     return issues
 
@@ -430,6 +442,9 @@ def _looks_spanish(text: str) -> bool:
 
 def _looks_english(text: str) -> bool:
     """Demo-grade language hint; replace with a real detector before production."""
+    # Only use stopwords that are unambiguous English words; avoid single-word
+    # tech terms (" context ", " question ", " answer ") that are routinely used
+    # in Spanish technical prose without implying an English response.
     markers = (
         " the ",
         " and ",
@@ -441,12 +456,13 @@ def _looks_english(text: str) -> bool:
         " according to ",
         " i cannot ",
         " i can ",
-        " documents ",
-        " context ",
-        " question ",
-        " answer ",
+        " is ",
+        " this ",
+        " it ",
+        " are ",
+        " with ",
     )
-    return _marker_hits(text, markers) >= 2
+    return _marker_hits(text, markers) >= 5
 
 
 def _normalize_for_language_hint(text: str) -> str:

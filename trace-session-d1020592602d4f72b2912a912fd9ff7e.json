@@ -1,0 +1,139 @@
+{
+  "session_id": "session-d1020592602d4f72b2912a912fd9ff7e",
+  "timestamp": "2026-05-14T09:25:43.686733+00:00",
+  "question": "Considerando que las reformas del Estatuto de los Trabajadores utilizaron la flexibilización y la contratación temporal como herramientas estatales para combatir el paro cíclico, ¿qué facultades específicas asume el Estatuto de Autonomía para lograr su objetivo de pleno empleo?",
+  "answer": "El Estatuto de Autonomía asume las siguientes facultades específicas para lograr su objetivo de pleno empleo:\n\n*   Competencia en materia laboral, con las facultades y servicios propios de la Administración respecto de las relaciones laborales, sin perjuicio de la alta inspección del Estado [pdf:estatuto81.pdf p.24 c.2].\n*   La reforma agraria, entendida como la transformación, modernización y desarrollo de las estructuras agrarias, y como instrumento de una política de crecimiento, pleno empleo y corrección de los desequilibrios territoriales [pdf:estatuto81.pdf p.17 c.1].\n*   Propiciar la efectiva igualdad del hombre y de la mujer andaluces, promoviendo la plena incorporación de esta última en la vida social y superando cualquier discriminación laboral [pdf:estatuto81.pdf p.15 c.1].\n*   La planificación económica de la Comunidad Autónoma [pdf:estatuto81.pdf p.60 c.1].\n*   La capacidad de constituir empresas públicas para la ejecución de funciones de su competencia y de fomentar, mediante legislación adecuada, las sociedades cooperativas [pdf:estatuto81.pdf p.60 c.1].",
+  "input": {
+    "question": "Considerando que las reformas del Estatuto de los Trabajadores utilizaron la flexibilización y la contratación temporal como herramientas estatales para combatir el paro cíclico, ¿qué facultades específicas asume el Estatuto de Autonomía para lograr su objetivo de pleno empleo?"
+  },
+  "output": {
+    "answer": "El Estatuto de Autonomía asume las siguientes facultades específicas para lograr su objetivo de pleno empleo:\n\n*   Competencia en materia laboral, con las facultades y servicios propios de la Administración respecto de las relaciones laborales, sin perjuicio de la alta inspección del Estado [pdf:estatuto81.pdf p.24 c.2].\n*   La reforma agraria, entendida como la transformación, modernización y desarrollo de las estructuras agrarias, y como instrumento de una política de crecimiento, pleno empleo y corrección de los desequilibrios territoriales [pdf:estatuto81.pdf p.17 c.1].\n*   Propiciar la efectiva igualdad del hombre y de la mujer andaluces, promoviendo la plena incorporación de esta última en la vida social y superando cualquier discriminación laboral [pdf:estatuto81.pdf p.15 c.1].\n*   La planificación económica de la Comunidad Autónoma [pdf:estatuto81.pdf p.60 c.1].\n*   La capacidad de constituir empresas públicas para la ejecución de funciones de su competencia y de fomentar, mediante legislación adecuada, las sociedades cooperativas [pdf:estatuto81.pdf p.60 c.1].",
+    "faithfulness": {
+      "label": "unfaithful",
+      "score": 0,
+      "explanation": "The answer contains several unsupported claims and one direct contradiction. 1. The claim about 'Competencia en materia laboral' (labor competence) is directly contradicted by the context (p.24 c.2), which states this is a competence of the *Estado* (State), not the Autonomous Community. 2. The claims regarding 'La planificación económica de la Comunidad Autónoma' and 'La capacidad de constituir empresas públicas... y de fomentar... las sociedades cooperativas' are not explicitly linked to the objective of 'pleno empleo' in the provided context snippets (p.60 c.1). The question specifically asks for faculties *to achieve its goal of full employment*, and this direct link is missing for these points. While the context mentions these faculties, it does not state they are for full employment. Only the claims about 'reforma agraria' and 'propiciar la efectiva igualdad' are fully supported as being linked to the objective of full employment.",
+      "context_doc_ids": [
+        "pdf:estatuto81.pdf p.24 c.2",
+        "pdf:estatuto81.pdf p.17 c.1",
+        "pdf:estatuto81.pdf p.60 c.1",
+        "pdf:estatuto81.pdf p.15 c.1"
+      ]
+    },
+    "document_relevance": {
+      "label": "relevant",
+      "score": 1,
+      "explanation": "The retrieved context directly identifies several specific faculties assumed by the Estatuto de Autonomía to achieve its objective of full employment. These include using agrarian reform as an instrument for full employment (p.17 c.1), constituting public enterprises (p.60 c.1), fostering cooperatives through legislation (p.60 c.1), and engaging in economic planning (p.60 c.1). The context also explicitly states that 'pleno empleo' is a basic objective (p.15 c.1).",
+      "context_doc_ids": [
+        "pdf:estatuto81.pdf p.24 c.2",
+        "pdf:estatuto81.pdf p.17 c.1",
+        "pdf:estatuto81.pdf p.60 c.1",
+        "pdf:estatuto81.pdf p.15 c.1"
+      ]
+    },
+    "answer_quality": {
+      "label": "ok",
+      "reasons": [],
+      "explanation": "No obvious answer-quality issue detected."
+    },
+    "failure_mode": "generation"
+  },
+  "retrieved_documents": [
+    {
+      "id": "pdf:estatuto81.pdf p.24 c.2",
+      "chunk_id": "pdf-d4da2e6ac5be-p024-c002-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.24 c.2",
+      "text": "ción del Estado en las siguientes\nmaterias:\n1. Penitenciarias.\n2. Laboral, con las facultades y servicios propios de\nla Administración respecto de las relaciones laborales,\nsin perjuicio de la alta inspección del Estado y de lo\nestablecido en el artículo 149. 1. 2 de la Constitución.\n3. Propiedad intelectual e industrial.\nEstatuto de Autonomía para Andalucía\n21",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 24,
+      "chunk_index": 2,
+      "enabled": true,
+      "score": 0.0313
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.17 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p017-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.17 c.1",
+      "text": "11.o La reforma agraria entendida como la transfor-\nmación, modernización y desarrollo de las estructuras\nagrarias y como instrumento de una política de creci-\nmiento, pleno empleo y corrección de los desequili-\nbrios territoriales.\nTÍTULO PRIMERO\nCompetencias de la Comunidad Autónoma\nArtículo 13\nLa Comunidad Autónoma de Andalucía tiene com-\npetencia exclusiva sobre las siguientes materias:\n1. Organización y estructura de sus instituciones de\nautogobierno.\n2. Organización y estructura de sus organismos\nautónomos.\n3. Régimen local, sin perjuicio de lo que dispone el\nnúmero 18 del apartado 1 del artículo 149 de la Consti-\ntución.\n4. Procedimiento administrativo derivado de las espe-\ncialidades de la organización propia de la Comunidad\nAutónoma.\n5. Normas y procedimientos electorales para la\nconstitución de sus instituciones de autogobierno.\nEstatuto de Autonomía para Andalucía\n14",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 17,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0308
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.60 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p060-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.60 c.1",
+      "text": "Artículo 68\nLa Comunidad Autónoma podrá constituir empresas\npúblicas para la ejecución de funciones de su compe-\ntencia.\nArtículo 69\n1. La Comunidad Autónoma, como poder público,\npodrá hacer uso de las facultades previstas en el ar-\ntículo 130.1 de la Constitución y podrá fomentar\nmediante una legislación adecuada las sociedades\ncooperativas.\n2. Asimismo, de acuerdo con la legislación del\nEstado en la materia, podrá hacer uso de las demás\nfacultades previstas en el artículo 129.2 de la\nConstitución.\nArtículo 70\nEl control económico y presupuestario de la Comu-\nnidad Autónoma se ejercerá por el Tribunal de Cuentas,\nen los términos de la ley.\nArtículo 71\nLa planificación económica de la Comunidad\nAutónoma de Andalucía a que se refiere el artículo 18\nEstatuto de Autonomía para Andalucía\n57",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 60,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0301
+    },
+    {
+      "id": "pdf:estatuto81.pdf p.15 c.1",
+      "chunk_id": "pdf-d4da2e6ac5be-p015-c001-estatuto81.pdf",
+      "document_id": "pdf-d4da2e6ac5be",
+      "title": "pdf:estatuto81.pdf p.15 c.1",
+      "text": "2. La Comunidad Autónoma propiciará la efectiva\nigualdad del hombre y de la mujer andaluces, promo-\nviendo la plena incorporación de ésta en la vida social\ny superando cualquier discriminación laboral, cultural,\neconómica o política.\n3. Para todo ello, la Comunidad Autónoma ejercerá\nsus poderes con los siguientes objetivos básicos:\n1.\no La consecución del pleno empleo en todos los sec-\ntores de la producción y la especial garantía de puestos\nde trabajo para las jóvenes generaciones de andaluces.\n2.\no El acceso de todos los andaluces a los niveles edu-\ncativos y culturales que les permitan su realización per-\nsonal y social. Afianzar la conciencia de identidad\nandaluza, a través de la investigación, difusión y cono-\ncimiento de los valores históricos, culturales y lingüísti-\ncos del pueblo andaluz en toda su riqueza y variedad.\n3.\no El aprovechamiento y la potenciación de los\nrecursos eco",
+      "tags": [
+        "pdf",
+        "uploaded"
+      ],
+      "source_type": "pdf",
+      "source": "estatuto81.pdf",
+      "page": 15,
+      "chunk_index": 1,
+      "enabled": true,
+      "score": 0.0284
+    }
+  ],
+  "faithfulness": {
+    "label": "unfaithful",
+    "score": 0,
+    "explanation": "The answer contains several unsupported claims and one direct contradiction. 1. The claim about 'Competencia en materia laboral' (labor competence) is directly contradicted by the context (p.24 c.2), which states this is a competence of the *Estado* (State), not the Autonomous Community. 2. The claims regarding 'La planificación económica de la Comunidad Autónoma' and 'La capacidad de constituir empresas públicas... y de fomentar... las sociedades cooperativas' are not explicitly linked to the objective of 'pleno empleo' in the provided context snippets (p.60 c.1). The question specifically asks for faculties *to achieve its goal of full employment*, and this direct link is missing for these points. While the context mentions these faculties, it does not state they are for full employment. Only the claims about 'reforma agraria' and 'propiciar la efectiva igualdad' are fully supported as being linked to the objective of full employment.",
+    "context_doc_ids": [
+      "pdf:estatuto81.pdf p.24 c.2",
+      "pdf:estatuto81.pdf p.17 c.1",
+      "pdf:estatuto81.pdf p.60 c.1",
+      "pdf:estatuto81.pdf p.15 c.1"
+    ]
+  },
+  "document_relevance": {
+    "label": "relevant",
+    "score": 1,
+    "explanation": "The retrieved context directly identifies several specific faculties assumed by the Estatuto de Autonomía to achieve its objective of full employment. These include using agrarian reform as an instrument for full employment (p.17 c.1), constituting public enterprises (p.60 c.1), fostering cooperatives through legislation (p.60 c.1), and engaging in economic planning (p.60 c.1). The context also explicitly states that 'pleno empleo' is a basic objective (p.15 c.1).",
+    "context_doc_ids": [
+      "pdf:estatuto81.pdf p.24 c.2",
+      "pdf:estatuto81.pdf p.17 c.1",
+      "pdf:estatuto81.pdf p.60 c.1",
+      "pdf:estatuto81.pdf p.15 c.1"
+    ]
+  },
+  "answer_quality": {
+    "label": "ok",
+    "reasons": [],
+    "explanation": "No obvious answer-quality issue detected."
+  },
+  "failure_mode": "generation",
+  "event_count": 3
+}
