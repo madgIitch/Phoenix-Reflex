@@ -130,6 +130,29 @@ Local data is stored under `data/`, which is ignored by git:
 
 PDF chunks are retrieved only when `enabled=true`.
 
+## Human Validation of the Judge
+
+The faithfulness judge is Gemini evaluating Gemini output. The table below documents cases reviewed by a human reviewer to surface systematic biases, false positives, and blind spots before any judge score triggers a promotion.
+
+**Key principle:** the judge never promotes automatically. It only assigns a priority score; a human must run `promote_tag.py` to advance any prompt to staging.
+
+| # | Session (short) | Question (abbreviated) | Judge verdict | Judge score | Human verdict | Agreement | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | `ee77466` | ¿Qué facultades asume el Estatuto de Autonomía para el pleno empleo? | unfaithful | 0.0 | **Agree** | ✓ | Answer included "Materia laboral" as a full-employment faculty. Source text (p.24 c.2) only describes scope of competence; the link to full employment is an inference, not stated. Judge correctly flagged it. |
+| 2 | `ec334dbc` | What failed in the latest traces, and what improvement should we make next? | unfaithful | 0.0 | **Disagree** | ✗ → bug fixed | Answer was correct and grounded in Phoenix MCP evidence. Judge short-circuited to "unfaithful" because `retrieved_documents=[]` caused the context string to start with "No documents retrieved." — the LLM judge anchored on that and ignored the runtime traces that followed. Fixed by passing `extra_context` through `evaluate_document_relevance` and rewriting `_format_context` to not prepend that string when runtime context exists. |
+| 3 | `94b797a2` | ¿Establece el Estatuto de los Trabajadores que las franjas verde y blanca de la bandera de Andalucía deben aprobarse mediante la jurisdicción de un despido colectivo? | faithful | 1.0 | **Agree** | ✓ | Absurd/trap question combining two unrelated legal texts. Answer correctly abstained and explained both texts separately. `document_relevance=0` is also correct: retrieved chunks are each only partially on-topic and none link the flag to dismissal jurisdiction. The system handled a hostile question cleanly. |
+| 4 | `cbdbdf36` | What failed in the latest traces, and what improvement should we make next? | faithful | 1.0 | **Agree** | ✓ | Same question as case 2, after the evaluator fix. Agent called `phoenix_list-traces` twice, cited a specific `case_id` and `source_session_id`, described the exact failure, and proposed a concrete fix. Answer is fully grounded. `document_relevance=1` now correct because runtime context is passed to the evaluator. |
+
+**Agreement rate (seed set): 3 / 4 (75%).** Case 2 was a judge pipeline bug (not a design choice), which was fixed. Excluding it, the seed agreement is 3 / 3.
+
+### What this does not cover yet
+
+- Questions where the judge scores 0.5 (partially faithful) — need cases where the human can assess borderline support
+- High-recall questions with long answers where one unsupported claim in ten is easy to miss
+- Non-Spanish / mixed-language questions
+
+Add rows to this table as the system accumulates traces. Minimum recommended before a demo: 8–10 cases with at least one confirmed false positive and one confirmed false negative.
+
 ## Demo Discipline
 
 Use any text-based PDF whose contents you can verify. Precompute embeddings before a live demo:

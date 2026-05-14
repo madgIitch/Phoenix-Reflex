@@ -4,7 +4,7 @@ Objetivo: subir Phoenix Reflex de una submission tecnicamente fuerte a una submi
 
 ## P0 - Cerrar Rubrica Antes Del Submit
 
-- [ ] Encender Phoenix MCP en la demo.
+- [x] Encender Phoenix MCP en la demo.
   - Riesgo actual: `ENABLE_PHOENIX_MCP=0` puede hacer que un juez marque el requisito MCP como no cumplido.
   - Resultado esperado: el agente puede consultar datos operativos via Phoenix MCP durante runtime.
   - Demo minima: preguntar algo como "que fallo en las ultimas trazas?" y mostrar una tool MCP consultando trazas o spans.
@@ -15,7 +15,7 @@ Objetivo: subir Phoenix Reflex de una submission tecnicamente fuerte a una submi
   - Resultado esperado: `.env.example`, documentacion y codigo usan el modelo Gemini 3 disponible para la region/proyecto.
   - Verificacion: correr una pregunta `/ask`, generar un candidate prompt y ejecutar un experimento corto.
 
-- [ ] Preparar validacion humana del judge.
+- [x] Preparar validacion humana del judge.
   - Riesgo actual: la narrativa depende de "Gemini judging Gemini", que es el agujero tecnico mas facil de atacar.
   - Resultado esperado: una slide o seccion del README con una muestra de trazas revisadas manualmente.
   - Formato recomendado: 5-10 casos, score del judge, veredicto humano, acuerdo/desacuerdo y notas.
@@ -80,6 +80,19 @@ Objetivo: subir Phoenix Reflex de una submission tecnicamente fuerte a una submi
   - Improvement cases.
   - Prompt experiment production vs candidate.
   - Phoenix MCP introspection.
+
+## P1 - Despliegue Para El Juez
+
+- [ ] Desplegar a Cloud Run (Opcion A).
+  - Riesgo actual: el juez clona el repo pero `.env` esta en `.gitignore`; sin claves el agente no arranca y la demo MCP no funciona.
+  - Resultado esperado: una URL publica funcional donde el juez puede mandar preguntas sin instalar nada.
+  - Pasos:
+    - [ ] Hacer build y push de la imagen Docker a Google Artifact Registry.
+    - [ ] Crear servicio Cloud Run con las variables de entorno configuradas en el panel (no en el repo): `GEMINI_API_KEY`, `GOOGLE_API_KEY`, `GEMINI_MODEL`, `ENABLE_PHOENIX_MCP`, `PHOENIX_HOST`, `PHOENIX_API_KEY`, `ARIZE_API_KEY`, `ARIZE_SPACE_ID`, `ARIZE_PROJECT_NAME`, `ARIZE_OTEL_ENDPOINT`.
+    - [ ] Verificar que `GET /health` devuelve 200 desde la URL publica.
+    - [ ] Verificar que `GET /observability/mcp` devuelve `demo_ready: true`.
+    - [ ] Anadir la URL publica al README como primera linea de "Local Run" o en una seccion "Live Demo".
+  - Mensaje clave: el juez no debe necesitar Python, npm ni ningun fichero local para evaluar la funcionalidad principal.
 
 ## P2 - Robustez Tecnica Para La Demo
 
