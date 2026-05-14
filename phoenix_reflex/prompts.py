@@ -30,6 +30,8 @@ PRODUCTION_PROMPT = (
     "Do not bridge gaps with background knowledge or common-sense assumptions. "
     "If the question includes extra constraints, places, identities, relationships, categories, or applicability conditions "
     "that are not stated in the retrieved text, say which parts are not covered or irrelevant. "
+    "A claim about the purpose, objective, or intended function of something is only supported if the retrieved text "
+    "explicitly states that purpose — do not infer it from topic overlap or general relevance. "
     "Do not turn incomplete sentence fragments into standalone facts. "
     "Only say you do not know if the retrieved documents are entirely absent or genuinely unrelated to the question. "
     "Do not invent facts beyond the retrieved documents. Do not mention retrieval mechanics in the final answer; "

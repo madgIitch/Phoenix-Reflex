@@ -87,9 +87,7 @@ def evaluate_faithfulness(
             docs = retrieved_documents
         else:
             docs = retrieve_documents(question, top_k=5)["documents"]
-        context = _format_context(docs)
-        if extra_context:
-            context = f"{context}\n\n{extra_context}"
+        context = _format_context(docs, extra_context=extra_context)
         context_doc_ids = [doc["id"] for doc in docs]
         if extra_context_ids:
             context_doc_ids.extend(extra_context_ids)
@@ -127,6 +125,7 @@ def evaluate_faithfulness(
 def evaluate_document_relevance(
     question: str,
     retrieved_documents: list[dict[str, Any]] | None = None,
+    extra_context: str | None = None,
 ) -> dict[str, Any]:
     """Evaluate whether retrieval found enough context for the question."""
     tracer = get_tracer()
@@ -135,14 +134,14 @@ def evaluate_document_relevance(
             docs = retrieved_documents
         else:
             docs = retrieve_documents(question, top_k=5)["documents"]
-        context = _format_context(docs)
+        context = _format_context(docs, extra_context=extra_context)
         context_doc_ids = [doc["id"] for doc in docs]
         span.set_attribute("input.value", question)
         span.set_attribute("eval.name", "document_relevance")
         span.set_attribute("eval.context_doc_ids", ", ".join(context_doc_ids))
         span.set_attribute("critic.implementation", "llm_judge")
 
-        if not docs:
+        if not docs and not extra_context:
             result = {
                 "label": "irrelevant",
                 "score": 0.0,
@@ -248,12 +247,15 @@ def _parse_relevance_response(response_text: str) -> dict[str, Any]:
     }
 
 
-def _format_context(documents: list[dict[str, Any]]) -> str:
-    if not documents:
-        return "No documents retrieved."
-    return "\n\n".join(
-        f"[{doc['id']}] {doc['title']}\n{doc['text']}" for doc in documents
-    )
+def _format_context(documents: list[dict[str, Any]], extra_context: str | None = None) -> str:
+    parts: list[str] = []
+    if documents:
+        parts.append("\n\n".join(
+            f"[{doc['id']}] {doc['title']}\n{doc['text']}" for doc in documents
+        ))
+    if extra_context:
+        parts.append(extra_context)
+    return "\n\n".join(parts) if parts else "No documents retrieved."
 
 
 def _set_eval_attributes(span: Any, result: dict[str, Any]) -> None:

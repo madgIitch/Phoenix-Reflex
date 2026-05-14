@@ -163,6 +163,7 @@ async def ask_agent(question: str) -> dict[str, object]:
         document_relevance = evaluate_document_relevance(
             question,
             retrieved_documents=retrieved_documents,
+            extra_context=extra_context,
         )
         faithfulness = evaluate_faithfulness(
             question,
