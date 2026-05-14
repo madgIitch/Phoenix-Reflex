@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:8080';
+const API_BASE = import.meta.env.VITE_API_BASE ?? '';
 
-type View = 'documents' | 'chunks' | 'ask' | 'traces' | 'evaluations';
+type View = 'documents' | 'chunks' | 'ask' | 'traces' | 'evaluations' | 'mcp';
 
 type DocumentRecord = {
   id: string;
@@ -52,6 +52,28 @@ type AskResponse = {
   phantom_citations?: string[];
   style_correction_applied?: boolean;
   event_count?: number;
+  phoenix_mcp_called?: boolean;
+  phoenix_mcp_call_count?: number;
+  phoenix_mcp_tools?: string[];
+  phoenix_mcp_evidence?: PhoenixMcpEvidence[];
+};
+
+type PhoenixMcpEvidence = {
+  tool: string;
+  summary: string;
+};
+
+type McpStatus = {
+  enabled: boolean;
+  configured: boolean;
+  importable: boolean;
+  demo_ready: boolean;
+  phoenix_host: string;
+  tool_filter: string[];
+  missing: string[];
+  model: string;
+  tracing_backend: string;
+  note: string;
 };
 
 type ImprovementCase = {
@@ -88,6 +110,10 @@ type TraceSummary = {
   phantom_citations_corrected_count?: number;
   phantom_citations?: string[];
   style_correction_applied?: boolean;
+  phoenix_mcp_called?: boolean;
+  phoenix_mcp_call_count?: number;
+  phoenix_mcp_tools?: string[];
+  phoenix_mcp_evidence?: PhoenixMcpEvidence[];
 };
 
 function App() {
@@ -104,6 +130,7 @@ function App() {
   const [cases, setCases] = useState<ImprovementCase[]>([]);
   const [traces, setTraces] = useState<TraceSummary[]>([]);
   const [selectedTrace, setSelectedTrace] = useState<TraceSummary | null>(null);
+  const [mcpStatus, setMcpStatus] = useState<McpStatus | null>(null);
 
   const selectedDocument = useMemo(
     () => documents.find((document) => document.id === selectedDocumentId),
@@ -114,6 +141,7 @@ function App() {
     refreshDocuments();
     refreshCases();
     refreshTraces();
+    refreshMcpStatus();
   }, []);
 
   useEffect(() => {
@@ -145,6 +173,11 @@ function App() {
     const payload = await fetchJson<{ traces: TraceSummary[] }>('/introspection/traces?limit=20');
     setTraces(payload.traces);
     setSelectedTrace((current) => current ?? payload.traces[0] ?? null);
+  }
+
+  async function refreshMcpStatus() {
+    const payload = await fetchJson<McpStatus>('/observability/mcp');
+    setMcpStatus(payload);
   }
 
   async function uploadPdf(file: File) {
@@ -217,7 +250,7 @@ function App() {
           <span>Phoenix Reflex</span>
           <small>PDF Intake</small>
         </div>
-        {(['documents', 'chunks', 'ask', 'traces', 'evaluations'] as View[]).map((item) => (
+        {(['documents', 'chunks', 'ask', 'traces', 'evaluations', 'mcp'] as View[]).map((item) => (
           <button key={item} className={view === item ? 'active' : ''} onClick={() => setView(item)}>
             {labelFor(item)}
           </button>
@@ -261,6 +294,21 @@ function App() {
           />
         )}
         {view === 'evaluations' && <EvaluationsView cases={cases} onRefresh={refreshCases} />}
+        {view === 'mcp' && (
+          <McpView
+            status={mcpStatus}
+            lastResponse={askResponse}
+            traces={traces}
+            onRefresh={async () => {
+              await refreshMcpStatus();
+              await refreshTraces();
+            }}
+            onUseDemoQuestion={() => {
+              setQuestion('What failed in the latest traces, and what improvement should we make next?');
+              setView('ask');
+            }}
+          />
+        )}
       </section>
     </main>
   );
@@ -432,7 +480,102 @@ function AskView({ question, response, onQuestion, onAsk }: {
               styleFixed={response.style_correction_applied ?? false}
               eventCount={response.event_count ?? 0}
             />
+            <McpEvidencePanel
+              called={response.phoenix_mcp_called ?? false}
+              callCount={response.phoenix_mcp_call_count ?? 0}
+              tools={response.phoenix_mcp_tools ?? []}
+              evidence={response.phoenix_mcp_evidence ?? []}
+            />
           </>
+        ) : <p>No answer yet.</p>}
+      </aside>
+    </div>
+  );
+}
+
+function McpView({
+  status,
+  lastResponse,
+  traces,
+  onRefresh,
+  onUseDemoQuestion,
+}: {
+  status: McpStatus | null;
+  lastResponse: AskResponse | null;
+  traces: TraceSummary[];
+  onRefresh: () => void;
+  onUseDemoQuestion: () => void;
+}) {
+  const mcpTraces = traces.filter((trace) => trace.phoenix_mcp_called);
+
+  return (
+    <div className="twoPane">
+      <section>
+        <header className="sectionHeader">
+          <div>
+            <h1>Observability MCP</h1>
+            <p>Phoenix MCP readiness and runtime evidence for the Arize demo.</p>
+          </div>
+          <div className="actions">
+            <button onClick={onUseDemoQuestion}>Use demo question</button>
+            <button onClick={onRefresh}>Refresh</button>
+          </div>
+        </header>
+        {status ? (
+          <div className="statusGrid">
+            <StatusTile label="Demo ready" value={status.demo_ready ? 'yes' : 'no'} good={status.demo_ready} />
+            <StatusTile label="Enabled" value={status.enabled ? 'yes' : 'no'} good={status.enabled} />
+            <StatusTile label="Configured" value={status.configured ? 'yes' : 'no'} good={status.configured} />
+            <StatusTile label="Importable" value={status.importable ? 'yes' : 'no'} good={status.importable} />
+          </div>
+        ) : <p>MCP status has not loaded yet.</p>}
+        {status && (
+          <section className="traceBlock">
+            <h3>Runtime configuration</h3>
+            <Metric label="Phoenix host" value={status.phoenix_host || '-'} />
+            <Metric label="Tracing backend" value={status.tracing_backend} />
+            <Metric label="Model" value={status.model} />
+            <Metric label="Missing" value={status.missing.length ? status.missing.join(', ') : '-'} />
+            <p>{status.note}</p>
+          </section>
+        )}
+        {status && (
+          <section className="traceBlock">
+            <h3>Phoenix MCP tools</h3>
+            <div className="toolList">
+              {status.tool_filter.map((tool) => <code key={tool}>{tool}</code>)}
+            </div>
+          </section>
+        )}
+        <section className="traceBlock">
+          <h3>Recent MCP traces</h3>
+          <table>
+            <thead>
+              <tr><th>Time</th><th>Session</th><th>Question</th><th>Tools</th></tr>
+            </thead>
+            <tbody>
+              {mcpTraces.map((trace) => (
+                <tr key={trace.session_id}>
+                  <td>{formatTime(trace.timestamp)}</td>
+                  <td>{trace.session_id.slice(0, 18)}...</td>
+                  <td>{trace.question}</td>
+                  <td>{(trace.phoenix_mcp_tools ?? []).join(', ') || '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {mcpTraces.length === 0 && <p>No Phoenix MCP calls captured yet. Use the demo question from this tab, then ask it.</p>}
+        </section>
+      </section>
+      <aside className="inspector">
+        <h2>Last /ask MCP evidence</h2>
+        {lastResponse ? (
+          <McpEvidencePanel
+            called={lastResponse.phoenix_mcp_called ?? false}
+            callCount={lastResponse.phoenix_mcp_call_count ?? 0}
+            tools={lastResponse.phoenix_mcp_tools ?? []}
+            evidence={lastResponse.phoenix_mcp_evidence ?? []}
+          />
         ) : <p>No answer yet.</p>}
       </aside>
     </div>
@@ -506,7 +649,7 @@ function TracesView({
         </header>
         <table>
           <thead>
-            <tr><th>Time</th><th>Session</th><th>Input</th><th>Faithfulness</th><th>Quality</th><th>Failure</th><th>Corrections</th></tr>
+            <tr><th>Time</th><th>Session</th><th>Input</th><th>Faithfulness</th><th>Quality</th><th>Failure</th><th>MCP</th><th>Corrections</th></tr>
           </thead>
           <tbody>
             {traces.map((trace) => (
@@ -517,6 +660,7 @@ function TracesView({
                 <td>{trace.faithfulness?.label ?? '-'} {trace.faithfulness?.score ?? ''}</td>
                 <td>{trace.answer_quality?.label ?? '-'}</td>
                 <td>{trace.failure_mode ?? '-'}</td>
+                <td>{trace.phoenix_mcp_called ? <span className="correctionTag fixed">used</span> : <span className="correctionTag clean">-</span>}</td>
                 <td><CorrectionBadge detected={trace.phantom_citations_detected_count ?? 0} corrected={trace.phantom_citations_corrected_count ?? 0} styleFixed={trace.style_correction_applied ?? false} /></td>
               </tr>
             ))}
@@ -565,6 +709,15 @@ function TracesView({
                 eventCount={selectedTrace.event_count ?? 0}
               />
             </section>
+            <section className="traceBlock">
+              <h3>Phoenix MCP</h3>
+              <McpEvidencePanel
+                called={selectedTrace.phoenix_mcp_called ?? false}
+                callCount={selectedTrace.phoenix_mcp_call_count ?? 0}
+                tools={selectedTrace.phoenix_mcp_tools ?? []}
+                evidence={selectedTrace.phoenix_mcp_evidence ?? []}
+              />
+            </section>
             <div className="actions">
               <button onClick={copySelectedTrace}>Copy JSON</button>
               <button onClick={() => downloadJson(`trace-${selectedTrace.session_id}.json`, selectedTrace)}>Export selected</button>
@@ -610,8 +763,46 @@ function CorrectionLoopPanel({ detected, corrected, remaining, styleFixed, event
   );
 }
 
+function McpEvidencePanel({ called, callCount, tools, evidence }: {
+  called: boolean;
+  callCount: number;
+  tools: string[];
+  evidence: PhoenixMcpEvidence[];
+}) {
+  return (
+    <div className="correctionPanel">
+      <div className="correctionHeader">
+        <span>Phoenix MCP</span>
+        {called ? <span className="correctionTag fixed">used</span> : <span className="correctionTag clean">not used</span>}
+      </div>
+      <Metric label="Called" value={called ? 'yes' : 'no'} />
+      <Metric label="Call count" value={String(callCount)} />
+      <Metric label="Tools" value={tools.length ? tools.join(', ') : '-'} />
+      {evidence.length > 0 && (
+        <div className="evidenceList">
+          {evidence.map((item, index) => (
+            <div key={`${item.tool}-${index}`} className="evidenceItem">
+              <strong>{item.tool}</strong>
+              <span>{item.summary}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StatusTile({ label, value, good }: { label: string; value: string; good: boolean }) {
+  return (
+    <div className={good ? 'statusTile good' : 'statusTile bad'}>
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
+}
+
 function CorrectionBadge({ detected, corrected, styleFixed }: { detected: number; corrected: number; styleFixed: boolean }) {
-  if (detected === 0 && !styleFixed) return <span className="correctionTag clean">—</span>;
+  if (detected === 0 && !styleFixed) return <span className="correctionTag clean">-</span>;
   if (detected > 0 && corrected === detected) return <span className="correctionTag fixed">{corrected} fixed</span>;
   if (detected > 0) return <span className="correctionTag failed">{detected - corrected} left</span>;
   if (styleFixed) return <span className="correctionTag fixed">style</span>;
@@ -623,7 +814,7 @@ function Metric({ label, value }: { label: string; value: string }) {
 }
 
 function labelFor(view: View) {
-  return { documents: 'Documents', chunks: 'Chunks', ask: 'Ask', traces: 'Traces', evaluations: 'Evaluations' }[view];
+  return { documents: 'Documents', chunks: 'Chunks', ask: 'Ask', traces: 'Traces', evaluations: 'Evaluations', mcp: 'MCP' }[view];
 }
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {

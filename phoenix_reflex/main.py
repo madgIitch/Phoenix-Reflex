@@ -19,6 +19,7 @@ from phoenix_reflex.document_store import (
 from phoenix_reflex.evaluator import evaluate_document_relevance, evaluate_faithfulness
 from phoenix_reflex.experiments import generate_prompt_candidate, run_prompt_experiment
 from phoenix_reflex.ingestion import ingest_pdf
+from phoenix_reflex.mcp import phoenix_mcp_status
 from phoenix_reflex.observability import configure_tracing, get_tracer
 from phoenix_reflex.prompts import list_prompts, promote_prompt_tag
 from phoenix_reflex.qa import ask_agent
@@ -108,6 +109,28 @@ def hello() -> dict[str, str]:
             "project": project,
             "timestamp": datetime.now(UTC).isoformat(),
         }
+
+
+@app.get("/observability/mcp")
+def observability_mcp() -> dict[str, object]:
+    status = phoenix_mcp_status()
+    tracing_backend = (
+        "arize-ax"
+        if os.getenv("ARIZE_API_KEY")
+        else "phoenix"
+        if os.getenv("PHOENIX_API_KEY")
+        else "disabled"
+    )
+    return {
+        **status,
+        "model": os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+        "tracing_backend": tracing_backend,
+        "note": (
+            "Phoenix MCP is ready for the demo."
+            if status["demo_ready"]
+            else "Phoenix MCP demo is not ready; check missing fields before recording."
+        ),
+    }
 
 
 @app.get("/retrieve")

@@ -9,6 +9,7 @@ from google.adk.sessions import InMemorySessionService
 from google.genai import types
 
 from phoenix_reflex.evaluator import evaluate_document_relevance, evaluate_faithfulness
+from phoenix_reflex.mcp import PHOENIX_MCP_TOOL_FILTER, phoenix_mcp_status
 from phoenix_reflex.observability import get_tracer
 from phoenix_reflex.reflex import (
     format_reflex_context,
@@ -47,9 +48,27 @@ async def ask_agent(question: str) -> dict[str, object]:
             session_id=session_id,
         )
 
+        # Inject runtime context into the message BEFORE the agent runs so it
+        # can actually use it. (Previously this was computed post-run and only
+        # reached the faithfulness evaluator, not the agent itself.)
+        is_introspection = _is_introspection_question(question)
+        extra_context = None
+        extra_context_ids = None
+        if is_introspection:
+            extra_context, extra_context_ids = format_reflex_context()
+
+        if extra_context:
+            message_text = (
+                f"[Runtime Context — use this to answer the question]\n"
+                f"{extra_context}\n\n"
+                f"[Question]\n{question}"
+            )
+        else:
+            message_text = question
+
         message = types.Content(
             role="user",
-            parts=[types.Part.from_text(text=question)],
+            parts=[types.Part.from_text(text=message_text)],
         )
         answer = ""
         event_count = 0
@@ -70,15 +89,30 @@ async def ask_agent(question: str) -> dict[str, object]:
         span.set_attribute("qa.event_count", event_count)
         span.set_attribute("qa.final_author", final_author or "")
         span.set_attribute("output.value", answer)
-        extra_context = None
-        extra_context_ids = None
-        if _is_introspection_question(question):
-            extra_context, extra_context_ids = format_reflex_context()
+        phoenix_mcp_calls = await _extract_phoenix_mcp_calls(session_id)
+        if is_introspection and not phoenix_mcp_calls and phoenix_mcp_status()["demo_ready"]:
+            forced_answer, forced_event_count = await _force_phoenix_mcp_introspection(
+                session_id=session_id,
+                question=question,
+            )
+            event_count += forced_event_count
+            if forced_answer:
+                answer = forced_answer
+                span.set_attribute("output.value", answer)
+            phoenix_mcp_calls = await _extract_phoenix_mcp_calls(session_id)
+            span.set_attribute("qa.event_count", event_count)
+        phoenix_mcp_tools = sorted({str(call["tool"]) for call in phoenix_mcp_calls})
+        span.set_attribute("phoenix_mcp.called", bool(phoenix_mcp_calls))
+        span.set_attribute("phoenix_mcp.call_count", len(phoenix_mcp_calls))
+        span.set_attribute("phoenix_mcp.tools", ", ".join(phoenix_mcp_tools))
 
         agent_retrieved = await _extract_agent_retrieval(session_id)
         if agent_retrieved:
             retrieved_documents = agent_retrieved["documents"]
             valid_ids = set(agent_retrieved["valid_citation_ids"])
+        elif is_introspection:
+            retrieved_documents = []
+            valid_ids = set()
         else:
             fallback = retrieve_documents(question, top_k=5)
             retrieved_documents = fallback.get("documents", [])
@@ -162,6 +196,10 @@ async def ask_agent(question: str) -> dict[str, object]:
             phantom_citations_corrected_count=len(corrected_phantom_citations),
             phantom_citations=sorted(phantom_citations),
             style_correction_applied=style_correction_applied,
+            phoenix_mcp_called=bool(phoenix_mcp_calls),
+            phoenix_mcp_call_count=len(phoenix_mcp_calls),
+            phoenix_mcp_tools=phoenix_mcp_tools,
+            phoenix_mcp_evidence=phoenix_mcp_calls,
         )
         improvement_case = maybe_create_improvement_case(summary)
         if improvement_case:
@@ -182,6 +220,10 @@ async def ask_agent(question: str) -> dict[str, object]:
             "session_id": session_id,
             "event_count": event_count,
             "retrieved_documents": retrieved_documents,
+            "phoenix_mcp_called": bool(phoenix_mcp_calls),
+            "phoenix_mcp_call_count": len(phoenix_mcp_calls),
+            "phoenix_mcp_tools": phoenix_mcp_tools,
+            "phoenix_mcp_evidence": phoenix_mcp_calls,
         }
 
 
@@ -305,6 +347,92 @@ async def _extract_agent_retrieval(session_id: str) -> dict[str, object] | None:
         return {"valid_citation_ids": valid_ids, "documents": documents}
     except Exception:
         return None
+
+
+async def _extract_phoenix_mcp_calls(session_id: str) -> list[dict[str, object]]:
+    """Read Phoenix MCP tool responses from the agent session for demo evidence."""
+    try:
+        session = await _session_service().get_session(
+            app_name=APP_NAME,
+            user_id=USER_ID,
+            session_id=session_id,
+        )
+        if not session:
+            return []
+        calls: list[dict[str, object]] = []
+        for event in session.events or []:
+            if not event.content:
+                continue
+            for part in event.content.parts or []:
+                fr = getattr(part, "function_response", None)
+                name = str(getattr(fr, "name", "") or "")
+                if not fr or not _is_phoenix_mcp_tool_name(name):
+                    continue
+                calls.append(
+                    {
+                        "tool": name,
+                        "summary": _summarize_tool_response(fr.response),
+                    }
+                )
+        return calls
+    except Exception:
+        return []
+
+
+def _is_phoenix_mcp_tool_name(name: str) -> bool:
+    normalized = name.lower().replace("_", "-")
+    if normalized.startswith("phoenix"):
+        return True
+    return normalized in {tool.lower() for tool in PHOENIX_MCP_TOOL_FILTER}
+
+
+def _summarize_tool_response(response: object) -> str:
+    if response is None:
+        return "No response payload."
+    if isinstance(response, dict):
+        keys = list(response.keys())[:8]
+        count_bits: list[str] = []
+        for key, value in response.items():
+            if isinstance(value, list):
+                count_bits.append(f"{key}={len(value)}")
+            elif isinstance(value, dict):
+                count_bits.append(f"{key}.keys={len(value)}")
+        prefix = f"keys={', '.join(keys)}" if keys else "empty object"
+        suffix = f"; {', '.join(count_bits[:4])}" if count_bits else ""
+        return (prefix + suffix)[:500]
+    if isinstance(response, list):
+        return f"list items={len(response)}"
+    return str(response)[:500]
+
+
+async def _force_phoenix_mcp_introspection(session_id: str, question: str) -> tuple[str, int]:
+    """Second pass for demo-critical introspection questions when the first turn skipped MCP."""
+    mcp_tools = ", ".join(f"phoenix_{tool}" for tool in PHOENIX_MCP_TOOL_FILTER)
+    correction = (
+        "This is an observability introspection request, not a PDF retrieval request. "
+        "Use Phoenix MCP now before answering. Available Phoenix MCP tools include: "
+        f"{mcp_tools}. "
+        "Inspect the latest traces or spans, then answer the original question with what failed "
+        "and the next concrete improvement. Original question: "
+        f"{question}"
+    )
+    correction_message = types.Content(
+        role="user",
+        parts=[types.Part.from_text(text=correction)],
+    )
+    corrected_answer = ""
+    event_count = 0
+    async for event in _runner().run_async(
+        user_id=USER_ID,
+        session_id=session_id,
+        new_message=correction_message,
+    ):
+        event_count += 1
+        if event.is_final_response() and event.content:
+            text = _content_text(event.content)
+            if text:
+                corrected_answer = text
+    return corrected_answer, event_count
 
 
 async def _correct_phantom_citations(

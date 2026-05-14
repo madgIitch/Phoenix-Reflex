@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from google.adk.agents import Agent
 from google.genai import types
 
+from phoenix_reflex.mcp import optional_phoenix_mcp_tools
 from phoenix_reflex.prompts import PRODUCTION_PROMPT
 from phoenix_reflex.reflex import list_improvement_cases
 from phoenix_reflex.retriever import retrieve_documents
@@ -26,5 +27,6 @@ root_agent = Agent(
     tools=[
         retrieve_documents,
         list_improvement_cases,
+        *optional_phoenix_mcp_tools(),
     ],
 )

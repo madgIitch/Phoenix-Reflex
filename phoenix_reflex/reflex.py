@@ -27,6 +27,10 @@ def record_trace_summary(
     phantom_citations_corrected_count: int = 0,
     phantom_citations: list[str] | None = None,
     style_correction_applied: bool = False,
+    phoenix_mcp_called: bool = False,
+    phoenix_mcp_call_count: int = 0,
+    phoenix_mcp_tools: list[str] | None = None,
+    phoenix_mcp_evidence: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Store a compact runtime summary for agent self-introspection."""
     retrieved_documents = retrieved_documents or []
@@ -55,6 +59,10 @@ def record_trace_summary(
         "phantom_citations_corrected_count": phantom_citations_corrected_count,
         "phantom_citations": phantom_citations or [],
         "style_correction_applied": style_correction_applied,
+        "phoenix_mcp_called": phoenix_mcp_called,
+        "phoenix_mcp_call_count": phoenix_mcp_call_count,
+        "phoenix_mcp_tools": phoenix_mcp_tools or [],
+        "phoenix_mcp_evidence": phoenix_mcp_evidence or [],
     }
     with LOCK:
         TRACE_SUMMARIES.appendleft(summary)

@@ -34,6 +34,54 @@ This is the most distinctive part of the system and should not be skipped.
 
 **OTel evidence:** In the Phoenix/Arize trace, look for spans with `eval.citation_correction_applied = true` and `eval.phantom_citation_count`. Each correction turn increments `qa.event_count`, making the multi-turn nature visible in the trace timeline.
 
+## Phoenix MCP Demo Beat
+
+This is the rubric checkbox that proves the agent can inspect operational data at runtime through Phoenix MCP.
+
+Prewarm the MCP server package before recording so the demo does not pause on the first `npx` download:
+
+```powershell
+npx -y @arizeai/phoenix-mcp@latest --help
+```
+
+Configure Phoenix Cloud credentials:
+
+```env
+ENABLE_PHOENIX_MCP=1
+PHOENIX_HOST=https://app.phoenix.arize.com/s/your-space
+PHOENIX_API_KEY=px_live_...
+```
+
+Verify readiness:
+
+```powershell
+Invoke-RestMethod "http://localhost:8080/observability/mcp"
+```
+
+Expected demo-ready response fields:
+
+```json
+{
+  "enabled": true,
+  "configured": true,
+  "importable": true,
+  "demo_ready": true
+}
+```
+
+Ask the observability question:
+
+```text
+What failed in the latest traces, and what improvement should we make next?
+```
+
+What to show:
+
+- The MCP tab says `Demo ready: yes`.
+- The `/ask` response includes `phoenix_mcp_called: true`, a non-zero `phoenix_mcp_call_count`, and at least one `phoenix_mcp_tools` entry.
+- The trace span includes `phoenix_mcp.called = true`.
+- The answer connects observed trace failures to a concrete improvement, for example tightening prompt behavior, adding a regression case, or improving retrieval coverage.
+
 ## Before The Demo
 
 Precompute embeddings:

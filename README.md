@@ -13,6 +13,7 @@ Phoenix Reflex is a regression-driven PDF RAG system: weak answers become regres
 7. Low-scoring or suspicious answers become `improvement_case` records in `regression_v1`.
 8. A candidate prompt can be generated from regression cases and compared against production.
 9. Promotion to `staging` is manual.
+10. For observability/debug questions, the agent can inspect Phoenix Cloud traces at runtime through Phoenix MCP and returns MCP evidence in `/ask`.
 
 ## Local Run
 
@@ -48,6 +49,20 @@ ARIZE_API_KEY=...
 ARIZE_SPACE_ID=...
 ARIZE_PROJECT_NAME=phoenix-reflex
 ARIZE_OTEL_ENDPOINT=https://otlp.eu-west-1a.arize.com/v1
+```
+
+Phoenix MCP is used for the hackathon demo runtime introspection checkbox:
+
+```env
+ENABLE_PHOENIX_MCP=1
+PHOENIX_HOST=https://app.phoenix.arize.com/s/your-space
+PHOENIX_API_KEY=px_live_...
+```
+
+Check readiness:
+
+```powershell
+Invoke-RestMethod "http://localhost:8080/observability/mcp"
 ```
 
 ## API Checks
