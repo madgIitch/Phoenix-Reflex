@@ -158,6 +158,10 @@ async def ask_agent(question: str) -> dict[str, object]:
             session_id=session_id,
             event_count=event_count,
             retrieved_documents=retrieved_documents,
+            phantom_citations_detected_count=len(detected_phantom_citations),
+            phantom_citations_corrected_count=len(corrected_phantom_citations),
+            phantom_citations=sorted(phantom_citations),
+            style_correction_applied=style_correction_applied,
         )
         improvement_case = maybe_create_improvement_case(summary)
         if improvement_case:

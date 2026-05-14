@@ -47,6 +47,11 @@ type AskResponse = {
   document_relevance?: { label: string; score: number; explanation: string; context_doc_ids: string[] };
   answer_quality?: { label: string; reasons: string[]; explanation: string };
   failure_mode?: string;
+  phantom_citations_detected_count?: number;
+  phantom_citations_corrected_count?: number;
+  phantom_citations?: string[];
+  style_correction_applied?: boolean;
+  event_count?: number;
 };
 
 type ImprovementCase = {
@@ -79,6 +84,10 @@ type TraceSummary = {
   answer_quality?: AskResponse['answer_quality'];
   failure_mode?: string;
   event_count: number;
+  phantom_citations_detected_count?: number;
+  phantom_citations_corrected_count?: number;
+  phantom_citations?: string[];
+  style_correction_applied?: boolean;
 };
 
 function App() {
@@ -416,6 +425,13 @@ function AskView({ question, response, onQuestion, onAsk }: {
             <Metric label="Failure mode" value={response.failure_mode ?? '-'} />
             <p>{response.faithfulness?.explanation}</p>
             {response.answer_quality?.label === 'suspicious' && <p>{response.answer_quality.explanation}</p>}
+            <CorrectionLoopPanel
+              detected={response.phantom_citations_detected_count ?? 0}
+              corrected={response.phantom_citations_corrected_count ?? 0}
+              remaining={response.phantom_citations ?? []}
+              styleFixed={response.style_correction_applied ?? false}
+              eventCount={response.event_count ?? 0}
+            />
           </>
         ) : <p>No answer yet.</p>}
       </aside>
@@ -490,7 +506,7 @@ function TracesView({
         </header>
         <table>
           <thead>
-            <tr><th>Time</th><th>Session</th><th>Input</th><th>Faithfulness</th><th>Quality</th><th>Failure</th></tr>
+            <tr><th>Time</th><th>Session</th><th>Input</th><th>Faithfulness</th><th>Quality</th><th>Failure</th><th>Corrections</th></tr>
           </thead>
           <tbody>
             {traces.map((trace) => (
@@ -501,6 +517,7 @@ function TracesView({
                 <td>{trace.faithfulness?.label ?? '-'} {trace.faithfulness?.score ?? ''}</td>
                 <td>{trace.answer_quality?.label ?? '-'}</td>
                 <td>{trace.failure_mode ?? '-'}</td>
+                <td><CorrectionBadge detected={trace.phantom_citations_detected_count ?? 0} corrected={trace.phantom_citations_corrected_count ?? 0} styleFixed={trace.style_correction_applied ?? false} /></td>
               </tr>
             ))}
           </tbody>
@@ -533,12 +550,20 @@ function TracesView({
             </section>
             <section className="traceBlock">
               <h3>Evaluations</h3>
-              <pre>{JSON.stringify({
-                faithfulness: selectedTrace.faithfulness,
-                document_relevance: selectedTrace.document_relevance,
-                answer_quality: selectedTrace.answer_quality,
-                failure_mode: selectedTrace.failure_mode,
-              }, null, 2)}</pre>
+              <Metric label="Faithfulness" value={`${selectedTrace.faithfulness?.label ?? '-'} ${selectedTrace.faithfulness?.score ?? ''}`} />
+              <Metric label="Document relevance" value={`${selectedTrace.document_relevance?.label ?? '-'} ${selectedTrace.document_relevance?.score ?? ''}`} />
+              <Metric label="Answer quality" value={selectedTrace.answer_quality?.label ?? '-'} />
+              <Metric label="Failure mode" value={selectedTrace.failure_mode ?? '-'} />
+            </section>
+            <section className="traceBlock">
+              <h3>Correction loop</h3>
+              <CorrectionLoopPanel
+                detected={selectedTrace.phantom_citations_detected_count ?? 0}
+                corrected={selectedTrace.phantom_citations_corrected_count ?? 0}
+                remaining={selectedTrace.phantom_citations ?? []}
+                styleFixed={selectedTrace.style_correction_applied ?? false}
+                eventCount={selectedTrace.event_count ?? 0}
+              />
             </section>
             <div className="actions">
               <button onClick={copySelectedTrace}>Copy JSON</button>
@@ -550,6 +575,47 @@ function TracesView({
       </aside>
     </div>
   );
+}
+
+function CorrectionLoopPanel({ detected, corrected, remaining, styleFixed, eventCount }: {
+  detected: number;
+  corrected: number;
+  remaining: string[];
+  styleFixed: boolean;
+  eventCount: number;
+}) {
+  const allFixed = detected > 0 && corrected === detected && remaining.length === 0;
+  const partialFail = detected > 0 && remaining.length > 0;
+
+  return (
+    <div className="correctionPanel">
+      <div className="correctionHeader">
+        <span>Correction loop</span>
+        {detected === 0 && !styleFixed && <span className="correctionTag clean">clean</span>}
+        {allFixed && <span className="correctionTag fixed">self-corrected</span>}
+        {partialFail && <span className="correctionTag failed">correction failed</span>}
+        {styleFixed && <span className="correctionTag fixed">style fixed</span>}
+      </div>
+      <Metric label="Phantom citations detected" value={String(detected)} />
+      <Metric label="Phantom citations corrected" value={String(corrected)} />
+      {remaining.length > 0 && (
+        <div className="correctionRemaining">
+          <span>Remaining</span>
+          <code>{remaining.join(', ')}</code>
+        </div>
+      )}
+      <Metric label="Style correction applied" value={styleFixed ? 'yes' : 'no'} />
+      <Metric label="Agent turn count" value={String(eventCount)} />
+    </div>
+  );
+}
+
+function CorrectionBadge({ detected, corrected, styleFixed }: { detected: number; corrected: number; styleFixed: boolean }) {
+  if (detected === 0 && !styleFixed) return <span className="correctionTag clean">—</span>;
+  if (detected > 0 && corrected === detected) return <span className="correctionTag fixed">{corrected} fixed</span>;
+  if (detected > 0) return <span className="correctionTag failed">{detected - corrected} left</span>;
+  if (styleFixed) return <span className="correctionTag fixed">style</span>;
+  return null;
 }
 
 function Metric({ label, value }: { label: string; value: string }) {

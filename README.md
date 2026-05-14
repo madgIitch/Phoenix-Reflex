@@ -8,10 +8,11 @@ Phoenix Reflex is a regression-driven PDF RAG system: weak answers become regres
 2. The backend extracts pages, chunks text, and stores local JSON records under `data/`.
 3. Retrieval ranks enabled chunks with BM25 or hybrid BM25 + embeddings when Gemini credentials are available.
 4. The QA agent answers from returned chunks only and cites returned PDF chunk IDs.
-5. Evaluators score faithfulness, document relevance, and lightweight answer quality.
-6. Low-scoring or suspicious answers become `improvement_case` records in `regression_v1`.
-7. A candidate prompt can be generated from regression cases and compared against production.
-8. Promotion to `staging` is manual.
+5. **In-session correction loop**: the agent's answer is inspected before it reaches the user. Phantom citations (IDs the model invented that do not correspond to any retrieved chunk) trigger up to two correction rounds inside the same ADK session. If the corrected answer then leaks internal retrieval mechanics, a second style-correction pass runs. All correction events are recorded as OTel span attributes.
+6. Evaluators score faithfulness, document relevance, and lightweight answer quality on the final corrected answer.
+7. Low-scoring or suspicious answers become `improvement_case` records in `regression_v1`.
+8. A candidate prompt can be generated from regression cases and compared against production.
+9. Promotion to `staging` is manual.
 
 ## Local Run
 
@@ -69,6 +70,19 @@ Expected citations use the returned chunk IDs:
 ```text
 [pdf:filename.pdf p.3 c.2]
 ```
+
+The response also includes correction telemetry:
+
+```json
+{
+  "answer": "...",
+  "phantom_citations_detected_count": 1,
+  "phantom_citations": [],
+  "failure_mode": "none"
+}
+```
+
+`phantom_citations_detected_count > 0` with an empty `phantom_citations` array means the loop caught and fixed an invented citation. A non-empty array means correction failed after two attempts.
 
 ## Prompt Loop
 

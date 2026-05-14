@@ -199,6 +199,46 @@ textarea {
   font-size: 14px;
 }
 
+.correctionPanel {
+  margin-top: 16px;
+  border: 1px solid #1d2632;
+  border-radius: 6px;
+  padding: 12px 14px;
+  background: #0c1016;
+}
+.correctionHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #8492a6;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.correctionTag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.correctionTag.clean { background: #111d14; color: #57a864; border: 1px solid #1e3d22; }
+.correctionTag.fixed { background: #0f2233; color: #2aa198; border: 1px solid #1a3d4a; }
+.correctionTag.failed { background: #2a0f0f; color: #ff7070; border: 1px solid #4d1a1a; }
+.correctionRemaining {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+  border-bottom: 1px solid #1d2632;
+}
+.correctionRemaining span { color: #8492a6; font-size: 13px; }
+.correctionRemaining code { color: #ff7070; font-size: 12px; word-break: break-all; }
+
 @media (max-width: 900px) {
   body { min-width: 0; }
   .shell { grid-template-columns: 1fr; }

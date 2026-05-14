@@ -23,6 +23,10 @@ def record_trace_summary(
     session_id: str,
     event_count: int,
     retrieved_documents: list[dict[str, Any]] | None = None,
+    phantom_citations_detected_count: int = 0,
+    phantom_citations_corrected_count: int = 0,
+    phantom_citations: list[str] | None = None,
+    style_correction_applied: bool = False,
 ) -> dict[str, Any]:
     """Store a compact runtime summary for agent self-introspection."""
     retrieved_documents = retrieved_documents or []
@@ -47,6 +51,10 @@ def record_trace_summary(
         "answer_quality": answer_quality,
         "failure_mode": failure_mode,
         "event_count": event_count,
+        "phantom_citations_detected_count": phantom_citations_detected_count,
+        "phantom_citations_corrected_count": phantom_citations_corrected_count,
+        "phantom_citations": phantom_citations or [],
+        "style_correction_applied": style_correction_applied,
     }
     with LOCK:
         TRACE_SUMMARIES.appendleft(summary)

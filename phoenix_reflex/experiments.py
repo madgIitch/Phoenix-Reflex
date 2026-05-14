@@ -111,6 +111,7 @@ def run_prompt_experiment(n_runs: int = 1) -> dict[str, Any]:
         result = {
             "candidate_version": candidate["version"],
             "n_runs": n_runs,
+            "generator_temperature": EXPERIMENT_GENERATOR_TEMPERATURE,
             "production_regression_avg": production_regression_avg,
             "production_regression_std": production_regression_stats["std"],
             "candidate_regression_avg": candidate_regression_avg,
@@ -125,6 +126,7 @@ def run_prompt_experiment(n_runs: int = 1) -> dict[str, Any]:
         }
         span.set_attribute("experiment.candidate_version", candidate["version"])
         span.set_attribute("experiment.n_runs", n_runs)
+        span.set_attribute("experiment.generator_temperature", EXPERIMENT_GENERATOR_TEMPERATURE)
         span.set_attribute("experiment.should_promote_to_staging", should_promote)
         span.set_attribute("experiment.production_regression_avg", production_regression_avg)
         span.set_attribute("experiment.candidate_regression_avg", candidate_regression_avg)
@@ -200,7 +202,12 @@ def _evaluate_generated_answer(question: str, prompt: str) -> dict[str, Any]:
     }
 
 
+EXPERIMENT_GENERATOR_TEMPERATURE = 0.4
+
+
 def _answer_with_prompt(question: str, prompt: str) -> str:
+    # Uses non-zero temperature so that n_runs > 1 produces real variance.
+    # Judge calls always use temperature=0.0 for reproducibility.
     retrieved = retrieve_documents(question, top_k=5)
     context = "\n\n".join(
         f"[{doc['id']}] {doc['title']}\n{doc['text']}" for doc in retrieved["documents"]
@@ -210,7 +217,8 @@ def _answer_with_prompt(question: str, prompt: str) -> str:
             prompt=prompt,
             question=question,
             context=context,
-        )
+        ),
+        temperature=EXPERIMENT_GENERATOR_TEMPERATURE,
     ).strip()
 
 
@@ -274,7 +282,7 @@ def _generate_adversarial_questions(limit: int = 4) -> list[str]:
     return [line for line in lines if line.endswith("?")][:limit]
 
 
-def _generate_text(prompt: str) -> str:
+def _generate_text(prompt: str, temperature: float = 0.0) -> str:
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY or GOOGLE_API_KEY is required")
@@ -283,7 +291,7 @@ def _generate_text(prompt: str) -> str:
     response = client.models.generate_content(
         model=model,
         contents=prompt,
-        config=types.GenerateContentConfig(temperature=0.0),
+        config=types.GenerateContentConfig(temperature=temperature),
     )
     return response.text or ""
 
