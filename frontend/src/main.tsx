@@ -40,17 +40,53 @@ type RetrievalResult = {
   chunk_index?: number;
 };
 
+type EvalScore = { label: string; score: number; explanation: string; context_doc_ids: string[] };
+
+type AnswerQuality = { label: string; reasons: string[]; explanation: string };
+
+type ImprovementCase = {
+  case_id: string;
+  question: string;
+  bad_answer: string;
+  faithfulness_label: string;
+  faithfulness_score: number;
+  failure_mode?: string;
+  failure_report: string;
+  suggested_fix: string;
+};
+
+type LoopSummary = {
+  steps: string[];
+  correction: {
+    attempted: boolean;
+    rounds: number;
+    phantom_citations_detected_count: number;
+    phantom_citations_corrected_count: number;
+    style_correction_applied: boolean;
+  };
+  eval: {
+    faithfulness?: EvalScore;
+    document_relevance?: EvalScore;
+    answer_quality?: AnswerQuality;
+    failure_mode?: string;
+  };
+  improvement_case: ImprovementCase | null;
+};
+
 type AskResponse = {
   question: string;
   answer: string;
-  faithfulness?: { label: string; score: number; explanation: string; context_doc_ids: string[] };
-  document_relevance?: { label: string; score: number; explanation: string; context_doc_ids: string[] };
-  answer_quality?: { label: string; reasons: string[]; explanation: string };
+  faithfulness?: EvalScore;
+  document_relevance?: EvalScore;
+  answer_quality?: AnswerQuality;
   failure_mode?: string;
   phantom_citations_detected_count?: number;
   phantom_citations_corrected_count?: number;
   phantom_citations?: string[];
   style_correction_applied?: boolean;
+  improvement_case?: ImprovementCase | null;
+  loop?: LoopSummary;
+  session_id?: string;
   event_count?: number;
   phoenix_mcp_called?: boolean;
   phoenix_mcp_call_count?: number;
@@ -76,15 +112,29 @@ type McpStatus = {
   note: string;
 };
 
-type ImprovementCase = {
-  case_id: string;
-  question: string;
-  bad_answer: string;
-  faithfulness_label: string;
-  faithfulness_score: number;
-  failure_mode?: string;
-  failure_report: string;
-  suggested_fix: string;
+type PromptRecord = {
+  tag: string;
+  version: string;
+  prompt: string;
+  source: string;
+  created_at?: string;
+};
+
+type CandidateResponse = {
+  candidate: PromptRecord;
+  regression_case_count: number;
+};
+
+type PromptExperimentResponse = {
+  candidate_version: string;
+  n_runs: number;
+  production_regression_avg: number;
+  candidate_regression_avg: number;
+  production_good_avg: number;
+  candidate_good_avg: number;
+  should_promote_to_staging: boolean;
+  regression_results: Array<{ case_id?: string; question: string; production_score: number; candidate_score: number }>;
+  good_results: Array<{ question: string; production_score: number; candidate_score: number }>;
 };
 
 type TraceSummary = {
@@ -445,6 +495,33 @@ function AskView({ question, response, onQuestion, onAsk }: {
   onQuestion: (question: string) => void;
   onAsk: () => void;
 }) {
+  const [candidate, setCandidate] = useState<CandidateResponse | null>(null);
+  const [experiment, setExperiment] = useState<PromptExperimentResponse | null>(null);
+  const [loopStatus, setLoopStatus] = useState('');
+
+  useEffect(() => {
+    setCandidate(null);
+    setExperiment(null);
+    setLoopStatus('');
+  }, [response?.session_id]);
+
+  async function generateCandidate() {
+    setLoopStatus('Generating candidate');
+    const payload = await fetchJson<CandidateResponse>('/prompts/candidate', { method: 'POST' });
+    setCandidate(payload);
+    setExperiment(null);
+    setLoopStatus('Candidate ready');
+  }
+
+  async function runExperiment() {
+    setLoopStatus('Running experiment');
+    const payload = await fetchJson<PromptExperimentResponse>('/experiments/prompt?n_runs=1', { method: 'POST' });
+    setExperiment(payload);
+    setLoopStatus('Experiment ready');
+  }
+
+  const improvementCase = response?.loop?.improvement_case ?? response?.improvement_case ?? null;
+
   return (
     <div className="askLayout">
       <section>
@@ -461,6 +538,17 @@ function AskView({ question, response, onQuestion, onAsk }: {
             <h2>Answer</h2>
             <p>{response.answer}</p>
           </article>
+        )}
+        {response && (
+          <LoopMissionPanel
+            response={response}
+            improvementCase={improvementCase}
+            candidate={candidate}
+            experiment={experiment}
+            status={loopStatus}
+            onGenerateCandidate={generateCandidate}
+            onRunExperiment={runExperiment}
+          />
         )}
       </section>
       <aside className="inspector">
@@ -480,6 +568,9 @@ function AskView({ question, response, onQuestion, onAsk }: {
               styleFixed={response.style_correction_applied ?? false}
               eventCount={response.event_count ?? 0}
             />
+            {improvementCase && (
+              <ImprovementCasePanel caseItem={improvementCase} compact />
+            )}
             <McpEvidencePanel
               called={response.phoenix_mcp_called ?? false}
               callCount={response.phoenix_mcp_call_count ?? 0}
@@ -489,6 +580,138 @@ function AskView({ question, response, onQuestion, onAsk }: {
           </>
         ) : <p>No answer yet.</p>}
       </aside>
+    </div>
+  );
+}
+
+function LoopMissionPanel({
+  response,
+  improvementCase,
+  candidate,
+  experiment,
+  status,
+  onGenerateCandidate,
+  onRunExperiment,
+}: {
+  response: AskResponse;
+  improvementCase: ImprovementCase | null;
+  candidate: CandidateResponse | null;
+  experiment: PromptExperimentResponse | null;
+  status: string;
+  onGenerateCandidate: () => void;
+  onRunExperiment: () => void;
+}) {
+  const loop = response.loop;
+
+  return (
+    <section className="loopMission">
+      <div className="loopMissionHeader">
+        <div>
+          <h2>Regression loop</h2>
+          <p>Correction, evaluation, regression case, prompt candidate, and experiment stay in one operator flow.</p>
+        </div>
+        {status && <span className="actionStatus">{status}</span>}
+      </div>
+      <div className="loopTimeline">
+        <LoopStep
+          index="1"
+          title="Correction"
+          state={loop?.correction.attempted ? 'applied' : 'clean'}
+          detail={`${loop?.correction.rounds ?? 0} citation rounds, ${loop?.correction.style_correction_applied ? 'style fixed' : 'style clean'}`}
+        />
+        <LoopStep
+          index="2"
+          title="Eval"
+          state={response.failure_mode ?? 'unknown'}
+          detail={`Faithfulness ${response.faithfulness?.score ?? '-'} · relevance ${response.document_relevance?.score ?? '-'}`}
+        />
+        <LoopStep
+          index="3"
+          title="Case"
+          state={improvementCase ? 'captured' : 'not needed'}
+          detail={improvementCase?.case_id ?? 'No regression case from this answer'}
+        />
+        <LoopStep
+          index="4"
+          title="Candidate"
+          state={candidate ? 'ready' : 'manual action'}
+          detail={candidate ? `${candidate.regression_case_count} regression cases used` : 'Generate after a captured case'}
+        />
+        <LoopStep
+          index="5"
+          title="Experiment"
+          state={experiment ? 'complete' : 'waiting'}
+          detail={experiment ? `promote recommendation: ${experiment.should_promote_to_staging ? 'yes' : 'no'}` : 'Run after candidate'}
+        />
+      </div>
+
+      {improvementCase ? (
+        <ImprovementCasePanel caseItem={improvementCase} />
+      ) : (
+        <div className="loopEmpty">
+          <strong>No improvement case captured</strong>
+          <span>The answer passed the current failure thresholds, so candidate generation is disabled for this run.</span>
+        </div>
+      )}
+
+      <div className="loopActions">
+        <button className="primary" onClick={onGenerateCandidate} disabled={!improvementCase}>
+          Generate Candidate
+        </button>
+        <button onClick={onRunExperiment} disabled={!candidate}>
+          Run Experiment
+        </button>
+      </div>
+
+      {candidate && (
+        <section className="traceBlock">
+          <h3>Candidate prompt</h3>
+          <Metric label="Version" value={candidate.candidate.version} />
+          <Metric label="Regression cases" value={String(candidate.regression_case_count)} />
+          <pre>{candidate.candidate.prompt}</pre>
+        </section>
+      )}
+
+      {experiment && (
+        <section className="traceBlock">
+          <h3>Experiment decision</h3>
+          <Metric label="Candidate version" value={experiment.candidate_version} />
+          <Metric label="Should promote to staging" value={experiment.should_promote_to_staging ? 'yes' : 'no'} />
+          <Metric label="Regression delta" value={`${experiment.production_regression_avg} -> ${experiment.candidate_regression_avg}`} />
+          <Metric label="Good-question guard" value={`${experiment.production_good_avg} -> ${experiment.candidate_good_avg}`} />
+          <p>Promotion remains manual; this flow does not call the promote endpoint.</p>
+        </section>
+      )}
+    </section>
+  );
+}
+
+function LoopStep({ index, title, state, detail }: { index: string; title: string; state: string; detail: string }) {
+  return (
+    <div className="loopStep">
+      <span>{index}</span>
+      <strong>{title}</strong>
+      <em>{state}</em>
+      <small>{detail}</small>
+    </div>
+  );
+}
+
+function ImprovementCasePanel({ caseItem, compact = false }: { caseItem: ImprovementCase; compact?: boolean }) {
+  return (
+    <div className={compact ? 'casePanel compact' : 'casePanel'}>
+      <div className="correctionHeader">
+        <span>Improvement case</span>
+        <span className="correctionTag failed">{caseItem.failure_mode ?? 'failure'}</span>
+      </div>
+      <Metric label="Case" value={caseItem.case_id} />
+      <Metric label="Faithfulness" value={`${caseItem.faithfulness_label} ${caseItem.faithfulness_score}`} />
+      {!compact && (
+        <>
+          <p>{caseItem.failure_report}</p>
+          <pre>{caseItem.suggested_fix}</pre>
+        </>
+      )}
     </div>
   );
 }

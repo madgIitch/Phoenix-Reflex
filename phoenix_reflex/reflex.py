@@ -11,6 +11,54 @@ TRACE_SUMMARIES: deque[dict[str, Any]] = deque(maxlen=50)
 IMPROVEMENT_CASES: deque[dict[str, Any]] = deque(maxlen=50)
 LOCK = Lock()
 
+MOJIBAKE_MARKERS = ("Ã", "Â", "â€", "â€”", "â€“", "�")
+
+
+def repair_mojibake(value: Any) -> Any:
+    """Repair common UTF-8 text that was decoded as Windows-1252/Latin-1."""
+    if isinstance(value, str):
+        return _repair_mojibake_text(value)
+    if isinstance(value, list):
+        return [repair_mojibake(item) for item in value]
+    if isinstance(value, dict):
+        return {key: repair_mojibake(item) for key, item in value.items()}
+    return value
+
+
+def _repair_mojibake_text(text: str) -> str:
+    repaired = text
+    for _ in range(3):
+        if not _looks_mojibake(repaired):
+            break
+        candidate = _decode_mojibake_once(repaired)
+        if candidate == repaired or _mojibake_score(candidate) > _mojibake_score(repaired):
+            break
+        repaired = candidate
+    return repaired
+
+
+def _decode_mojibake_once(text: str) -> str:
+    best = text
+    best_score = _mojibake_score(text)
+    for encoding in ("latin-1", "cp1252"):
+        try:
+            candidate = text.encode(encoding).decode("utf-8")
+        except UnicodeError:
+            continue
+        score = _mojibake_score(candidate)
+        if score < best_score:
+            best = candidate
+            best_score = score
+    return best
+
+
+def _looks_mojibake(text: str) -> bool:
+    return any(marker in text for marker in MOJIBAKE_MARKERS)
+
+
+def _mojibake_score(text: str) -> int:
+    return sum(text.count(marker) for marker in MOJIBAKE_MARKERS)
+
 
 def record_trace_summary(
     *,
@@ -34,6 +82,13 @@ def record_trace_summary(
 ) -> dict[str, Any]:
     """Store a compact runtime summary for agent self-introspection."""
     retrieved_documents = retrieved_documents or []
+    question = _repair_mojibake_text(question)
+    answer = _repair_mojibake_text(answer)
+    faithfulness = repair_mojibake(faithfulness)
+    document_relevance = repair_mojibake(document_relevance)
+    answer_quality = repair_mojibake(answer_quality)
+    retrieved_documents = repair_mojibake(retrieved_documents)
+    phoenix_mcp_evidence = repair_mojibake(phoenix_mcp_evidence)
     summary = {
         "session_id": session_id,
         "timestamp": datetime.now(UTC).isoformat(),
@@ -89,7 +144,11 @@ def maybe_create_improvement_case(summary: dict[str, Any]) -> dict[str, Any] | N
             else str(faithfulness.get("explanation", ""))
         ),
         source_session_id=summary["session_id"],
-        failure_mode="answer_quality" if quality_only_failure else str(summary.get("failure_mode", "unknown")),
+        failure_mode=(
+            "answer_quality"
+            if quality_only_failure
+            else str(summary.get("failure_mode", "unknown"))
+        ),
     )
 
 
@@ -135,6 +194,9 @@ def add_improvement_case(
     failure_mode: str = "unknown",
 ) -> dict[str, Any]:
     """Add a regression case candidate for future evaluation datasets."""
+    question = _repair_mojibake_text(question)
+    answer = _repair_mojibake_text(answer)
+    explanation = _repair_mojibake_text(explanation)
     tracer = get_tracer()
     with tracer.start_as_current_span("add_improvement_case") as span:
         case = {
@@ -196,7 +258,7 @@ def format_reflex_context(limit: int = 5) -> tuple[str, list[str]]:
                     f"score={trace['faithfulness'].get('score')} "
                     f"document_relevance={_relevance_label(trace)} "
                     f"failure_mode={trace.get('failure_mode')} "
-                    f"question={trace['question']!r}"
+                    f"question={_repair_mojibake_text(trace['question'])!r}"
                 )
                 for trace in traces
             )
@@ -211,12 +273,12 @@ def format_reflex_context(limit: int = 5) -> tuple[str, list[str]]:
             + "\n".join(
                 (
                     f"- case_id={case['case_id']} "
-                    f"question={case['question']!r} "
-                    f"bad_answer={case['bad_answer']!r} "
+                    f"question={_repair_mojibake_text(case['question'])!r} "
+                    f"bad_answer={_repair_mojibake_text(case['bad_answer'])!r} "
                     f"label={case['faithfulness_label']} "
                     f"score={case['faithfulness_score']} "
                     f"failure_mode={case.get('failure_mode')} "
-                    f"report={case['failure_report']!r} "
+                    f"report={_repair_mojibake_text(case['failure_report'])!r} "
                     f"suggested_fix={case['suggested_fix']!r}"
                 )
                 for case in cases
@@ -234,8 +296,14 @@ def _suggest_fix(failure_mode: str) -> str:
     if failure_mode == "generation":
         return "Tighten the prompt so unsupported claims become explicit abstentions."
     if failure_mode == "answer_quality":
-        return "Improve answer usefulness checks: preserve the user language, avoid intent drift, and do not over-abstain when relevant context exists."
-    return "Improve retrieval coverage or tighten the prompt so unsupported claims become explicit abstentions."
+        return (
+            "Improve answer usefulness checks: preserve the user language, avoid intent drift, "
+            "and do not over-abstain when relevant context exists."
+        )
+    return (
+        "Improve retrieval coverage or tighten the prompt so unsupported claims become explicit "
+        "abstentions."
+    )
 
 
 def _relevance_label(trace: dict[str, Any]) -> str:

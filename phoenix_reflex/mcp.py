@@ -19,6 +19,54 @@ PHOENIX_MCP_TOOL_FILTER = [
 ]
 
 
+def is_observability_question(question: str) -> bool:
+    """Return whether a question asks about runtime observability or regressions."""
+    normalized = question.lower()
+    keywords = (
+        "traza",
+        "trazas",
+        "trace",
+        "traces",
+        "span",
+        "spans",
+        "fallo",
+        "fallos",
+        "failure",
+        "failures",
+        "caso de mejora",
+        "casos de mejora",
+        "improvement",
+        "regression",
+        "regresion",
+        "regresiones",
+        "introspeccion",
+        "introspection",
+        "observabilidad",
+        "observability",
+    )
+    return any(keyword in normalized for keyword in keywords)
+
+
+def build_observability_agent_message(question: str, reflex_context: str | None) -> str:
+    """Build the first-turn message for observability questions."""
+    context_block = (
+        f"[Local Reflex Context - use if Phoenix MCP is unavailable]\n{reflex_context}\n\n"
+        if reflex_context
+        else ""
+    )
+    mcp_tools = ", ".join(f"phoenix_{tool}" for tool in PHOENIX_MCP_TOOL_FILTER)
+    return (
+        "[Observability Request]\n"
+        "This question asks about traces, spans, failures, regressions, or improvement cases. "
+        "If Phoenix MCP tools are available, use them in this first turn before answering. "
+        f"Relevant Phoenix MCP tools include: {mcp_tools}. "
+        "If Phoenix MCP is unavailable or returns no useful trace data, answer from the local "
+        "Reflex context below without failing.\n\n"
+        f"{context_block}"
+        f"[Question]\n{question}"
+    )
+
+
 def _mcp_enabled() -> bool:
     return os.getenv("ENABLE_PHOENIX_MCP", "").lower() in {"1", "true", "yes"}
 
@@ -71,7 +119,10 @@ def optional_phoenix_mcp_tools() -> list[object]:
 
     status = phoenix_mcp_status()
     if not status["demo_ready"]:
-        logger.warning("Phoenix MCP enabled but not ready: missing=%s", ", ".join(status["missing"]))
+        logger.warning(
+            "Phoenix MCP enabled but not ready: missing=%s",
+            ", ".join(status["missing"]),
+        )
         return []
 
     phoenix_host = str(status["phoenix_host"])

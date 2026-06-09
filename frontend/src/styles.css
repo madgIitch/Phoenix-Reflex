@@ -34,7 +34,7 @@ button, input, textarea { font: inherit; }
 }
 .brand small { color: #8090a3; }
 
-.rail button, .sectionHeader button, table button, .primary, .danger {
+.rail button, .sectionHeader button, table button, .primary, .danger, .loopActions button {
   border: 1px solid #293241;
   background: #111821;
   color: #e7ecef;
@@ -54,6 +54,11 @@ button, input, textarea { font: inherit; }
 button:hover {
   background: #17202b;
   transform: translateY(-1px);
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
 }
 .danger { border-color: #6d2932; color: #ffb4bd; }
 .railStatus {
@@ -298,12 +303,104 @@ textarea {
   word-break: break-word;
 }
 
+.loopMission {
+  margin-top: 22px;
+  border-top: 1px solid #1d2632;
+  padding-top: 20px;
+}
+.loopMissionHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+.loopMissionHeader h2 {
+  margin-bottom: 4px;
+}
+.loopMissionHeader p {
+  margin: 0;
+}
+.loopTimeline {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border: 1px solid #1d2632;
+  background: #0b1016;
+  margin-bottom: 16px;
+}
+.loopStep {
+  min-height: 136px;
+  padding: 14px;
+  border-right: 1px solid #1d2632;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+  gap: 7px;
+}
+.loopStep:last-child {
+  border-right: 0;
+}
+.loopStep > span {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #2aa198;
+  color: #2aa198;
+  font-size: 12px;
+  font-weight: 700;
+}
+.loopStep strong {
+  color: #e7ecef;
+}
+.loopStep em {
+  color: #2aa198;
+  font-style: normal;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.loopStep small {
+  color: #a9b4c2;
+  line-height: 1.35;
+}
+.loopActions {
+  display: flex;
+  gap: 10px;
+  margin: 14px 0;
+}
+.loopEmpty, .casePanel {
+  border: 1px solid #1d2632;
+  background: #0c1016;
+  border-radius: 6px;
+  padding: 14px;
+}
+.loopEmpty {
+  display: grid;
+  gap: 4px;
+}
+.loopEmpty span {
+  color: #a9b4c2;
+}
+.casePanel {
+  margin-top: 12px;
+}
+.casePanel.compact {
+  padding: 12px 14px;
+}
+.casePanel pre {
+  margin-bottom: 0;
+}
+
 @media (max-width: 900px) {
   body { min-width: 0; }
   .shell { grid-template-columns: 1fr; }
   .rail { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid #1c232d; }
   .brand { display: none; }
   .twoPane, .askLayout { grid-template-columns: 1fr; height: auto; }
+  .loopTimeline { grid-template-columns: 1fr; }
+  .loopStep { border-right: 0; border-bottom: 1px solid #1d2632; min-height: auto; }
+  .loopStep:last-child { border-bottom: 0; }
   .statusGrid { grid-template-columns: 1fr 1fr; }
   .inspector { border-left: 0; border-top: 1px solid #1d2632; padding-left: 0; padding-top: 20px; }
 }

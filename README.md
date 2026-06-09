@@ -1,6 +1,14 @@
+Public demo URL: https://phoenix-reflex-27208039935.europe-west1.run.app
+
 # Phoenix Reflex
 
-Phoenix Reflex is a regression-driven PDF RAG system: weak answers become regression cases, improvement hypotheses, and prompt-candidate comparisons before a human promotes a change.
+Phoenix Reflex is not a PDF chatbot. It is a regression-driven agent for the real
+failure mode in RAG: agents fail silently, then repeat the same weak answers.
+
+In Phoenix Reflex, weak answers become test cases and prompt candidates. The agent
+retrieves evidence, corrects invalid citations before responding, scores the final
+answer, captures failures as regression data, and compares candidate prompts before
+a human promotes a change.
 
 ## Core Flow
 
@@ -10,7 +18,7 @@ Phoenix Reflex is a regression-driven PDF RAG system: weak answers become regres
 4. The QA agent answers from returned chunks only and cites returned PDF chunk IDs.
 5. **In-session correction loop**: the agent's answer is inspected before it reaches the user. Phantom citations (IDs the model invented that do not correspond to any retrieved chunk) trigger up to two correction rounds inside the same ADK session. If the corrected answer then leaks internal retrieval mechanics, a second style-correction pass runs. All correction events are recorded as OTel span attributes.
 6. Evaluators score faithfulness, document relevance, and lightweight answer quality on the final corrected answer.
-7. Low-scoring or suspicious answers become `improvement_case` records in `regression_v1`.
+7. Low-scoring or suspicious answers become test cases in `regression_v1`.
 8. A candidate prompt can be generated from regression cases and compared against production.
 9. Promotion to `staging` is manual.
 10. For observability/debug questions, the agent can inspect Phoenix Cloud traces at runtime through Phoenix MCP and returns MCP evidence in `/ask`.
@@ -39,7 +47,7 @@ Open `http://127.0.0.1:5173`.
 ```env
 GEMINI_API_KEY=...
 GOOGLE_API_KEY=...
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.5-flash
 ```
 
 Tracing is optional. If configured, the service can emit OpenTelemetry spans:

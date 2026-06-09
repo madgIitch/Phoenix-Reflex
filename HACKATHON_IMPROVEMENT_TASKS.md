@@ -10,8 +10,8 @@ Objetivo: subir Phoenix Reflex de una submission tecnicamente fuerte a una submi
   - Demo minima: preguntar algo como "que fallo en las ultimas trazas?" y mostrar una tool MCP consultando trazas o spans.
   - Evidencia a mostrar: llamada MCP visible, datos de traza usados por el agente y respuesta que conecte esos datos con una mejora.
 
-- [ ] Actualizar el modelo por defecto a Gemini 3.
-  - Riesgo actual: README y defaults apuntan a `gemini-2.5-flash`, mientras la rubrica menciona Gemini 3.
+- [x] Actualizar el modelo por defecto a Gemini 3.
+  - Resultado actual: README, defaults, deploy y `.env.example` apuntan a `gemini-3.5-flash`.
   - Resultado esperado: `.env.example`, documentacion y codigo usan el modelo Gemini 3 disponible para la region/proyecto.
   - Verificacion: correr una pregunta `/ask`, generar un candidate prompt y ejecutar un experimento corto.
 
@@ -21,8 +21,8 @@ Objetivo: subir Phoenix Reflex de una submission tecnicamente fuerte a una submi
   - Formato recomendado: 5-10 casos, score del judge, veredicto humano, acuerdo/desacuerdo y notas.
   - Mensaje clave: el judge no promueve automaticamente; solo prioriza casos y la promocion sigue siendo manual.
 
-- [ ] Reposicionar el producto como agente de regression cases, no como PDF chatbot.
-  - Riesgo actual: si parece "otro RAG", baja la percepcion aunque el sistema sea mas fuerte.
+- [x] Reposicionar el producto como agente de regression cases, no como PDF chatbot.
+  - Resultado actual: README y DEMO abren con Phoenix Reflex como agente regression-driven, no chatbot PDF.
   - Frase de apertura: "Phoenix Reflex is not a PDF chatbot; it is a regression-driven agent that turns its own weak answers into test cases and prompt candidates."
   - Todo el material de submit debe repetir esta idea: README, Devpost, video y demo script.
 
@@ -174,4 +174,3 @@ La submission debe permitir a un juez marcar estas casillas sin inferir nada:
 - Evalua con LLM-as-judge.
 - Usa datos de observabilidad para generar regression cases y mejorar prompts.
 - La promocion de cambios queda bajo control humano.
-

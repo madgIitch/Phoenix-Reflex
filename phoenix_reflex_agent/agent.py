@@ -20,7 +20,7 @@ if not os.getenv("GOOGLE_API_KEY") and os.getenv("GEMINI_API_KEY"):
 
 root_agent = Agent(
     name="qa_agent",
-    model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+    model=os.getenv("GEMINI_MODEL", "gemini-3.5-flash"),
     description="RAG QA agent for Phoenix Reflex.",
     instruction=PRODUCTION_PROMPT,
     generate_content_config=types.GenerateContentConfig(temperature=0.0),

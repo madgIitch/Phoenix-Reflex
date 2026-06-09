@@ -1,13 +1,18 @@
 # Phoenix Reflex Demo
 
-Use any text-based PDF with content you can inspect and verify. The demo should show the generic loop, not a case-specific script:
+Open with the product thesis: Phoenix Reflex is not a PDF chatbot. It is a
+regression-driven agent for RAG systems that fail silently and repeat mistakes.
+In the demo, weak answers become test cases and prompt candidates under human
+control.
 
-1. Upload or select a prepared PDF.
+Use any text-based PDF with content you can inspect and verify. The demo should show the improvement loop, not a case-specific script:
+
+1. Upload or select a prepared PDF as the failure surface for the agent.
 2. Ask a question that is directly supported by enabled chunks.
-3. Ask a question that is only partially supported.
+3. Ask a question that is only partially supported so the system can expose a weak answer.
 4. **Show the in-session correction loop** (see section below — this is the agentic highlight).
 5. Show faithfulness, document relevance, answer quality, and retrieved citations.
-6. Show any generated improvement cases.
+6. Show the weak answer becoming an improvement case / regression test.
 7. Generate a candidate prompt and run the prompt experiment.
 
 ## Showing the In-Session Correction Loop

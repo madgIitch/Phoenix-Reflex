@@ -1,3 +1,9 @@
+"""FastAPI routes for the Phoenix Reflex regression-driven RAG agent.
+
+The service exposes the operator workflow where weak answers become test cases
+and prompt candidates instead of silent repeated failures.
+"""
+
 from __future__ import annotations
 
 import os
@@ -123,7 +129,7 @@ def observability_mcp() -> dict[str, object]:
     )
     return {
         **status,
-        "model": os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+        "model": os.getenv("GEMINI_MODEL", "gemini-3.5-flash"),
         "tracing_backend": tracing_backend,
         "note": (
             "Phoenix MCP is ready for the demo."

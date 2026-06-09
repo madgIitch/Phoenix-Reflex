@@ -16,7 +16,7 @@
       "description": "Crear archivo LICENSE en la raíz del repo. Las bases del hackathon lo exigen explícito y detectable en el About de GitHub. 2 minutos, descalifica si falta.",
       "priority": "P0",
       "sdd": false,
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": 2,
@@ -25,7 +25,7 @@
       "description": "Cambiar gemini-2.5-flash → gemini-3.5-flash en .env.example, phoenix_reflex_agent/agent.py, phoenix_reflex/evaluator.py, phoenix_reflex/experiments.py y scripts/deploy-cloud-run.ps1. Revisar si thinking_level enum aplica.",
       "priority": "P0",
       "sdd": false,
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": 3,
@@ -34,7 +34,7 @@
       "description": "Actualizar README opener, DEMO.md y docstring de main.py. Frase ancla: 'weak answers become test cases and prompt candidates'. El problema real-world es 'los agentes RAG fallan en silencio y repiten errores'.",
       "priority": "P0",
       "sdd": false,
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": 4,
@@ -49,7 +49,7 @@
       ],
       "priority": "P0",
       "sdd": true,
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": 5,
@@ -58,7 +58,7 @@
       "description": "Ejecutar scripts/deploy-cloud-run.ps1, configurar env vars como secrets en el panel de Cloud Run (no en repo), verificar GET /health → 200 y GET /observability/mcp → demo_ready: true desde URL pública. URL en primera línea del README.",
       "priority": "P0",
       "sdd": false,
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": 6,
@@ -73,7 +73,7 @@
       ],
       "priority": "P1",
       "sdd": true,
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "id": 7,

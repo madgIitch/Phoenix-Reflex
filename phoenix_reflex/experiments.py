@@ -287,7 +287,7 @@ def _generate_text(prompt: str, temperature: float = 0.0) -> str:
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY or GOOGLE_API_KEY is required")
     client = genai.Client(api_key=api_key)
-    model = os.getenv("GEMINI_JUDGE_MODEL", os.getenv("GEMINI_MODEL", "gemini-2.5-flash"))
+    model = os.getenv("GEMINI_JUDGE_MODEL", os.getenv("GEMINI_MODEL", "gemini-3.5-flash"))
     response = client.models.generate_content(
         model=model,
         contents=prompt,
