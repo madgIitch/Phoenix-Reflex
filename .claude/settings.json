@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m pytest*)",
+      "Bash(pytest*)",
+      "Bash(python -c \"import phoenix_reflex*)",
+      "Bash(python scripts/precompute_embeddings.py*)",
+      "Bash(python scripts/promote_tag.py*)",
+      "Bash(python -m uvicorn*)",
+      "Bash(pip install -r requirements.txt)",
+      "Bash(pip install*)",
+      "Bash(adk run*)",
+      "Bash(adk web*)",
+      "Bash(uvicorn*)",
+      "Bash(bash ./init.sh*)"
+    ]
+  }
+}

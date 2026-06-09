@@ -1,0 +1,127 @@
+{
+  "project": "phoenix-reflex",
+  "description": "Agente RAG regression-driven con observabilidad via Arize/Phoenix MCP — hackathon Arize",
+  "rules": {
+    "one_feature_at_a_time": true,
+    "require_tests_to_close": true,
+    "require_approved_spec_to_implement": true,
+    "valid_status": ["pending", "spec_ready", "in_progress", "review_pending", "done", "blocked"],
+    "sdd_required_when": "feature tiene \"sdd\": true"
+  },
+  "features": [
+    {
+      "id": 1,
+      "name": "license_file",
+      "title": "Añadir LICENSE de open source (MIT)",
+      "description": "Crear archivo LICENSE en la raíz del repo. Las bases del hackathon lo exigen explícito y detectable en el About de GitHub. 2 minutos, descalifica si falta.",
+      "priority": "P0",
+      "sdd": false,
+      "status": "pending"
+    },
+    {
+      "id": 2,
+      "name": "gemini_3_migration",
+      "title": "Migrar modelo a gemini-3.5-flash",
+      "description": "Cambiar gemini-2.5-flash → gemini-3.5-flash en .env.example, phoenix_reflex_agent/agent.py, phoenix_reflex/evaluator.py, phoenix_reflex/experiments.py y scripts/deploy-cloud-run.ps1. Revisar si thinking_level enum aplica.",
+      "priority": "P0",
+      "sdd": false,
+      "status": "pending"
+    },
+    {
+      "id": 3,
+      "name": "narrative_repositioning",
+      "title": "Reposicionar narrativa: regression-driven agent, no PDF chatbot",
+      "description": "Actualizar README opener, DEMO.md y docstring de main.py. Frase ancla: 'weak answers become test cases and prompt candidates'. El problema real-world es 'los agentes RAG fallan en silencio y repiten errores'.",
+      "priority": "P0",
+      "sdd": false,
+      "status": "pending"
+    },
+    {
+      "id": 4,
+      "name": "mcp_hardening",
+      "title": "Endurecer disparo de Phoenix MCP: natural, sin fallback forzado",
+      "description": "optional_phoenix_mcp_tools arranca npx y _force_phoenix_mcp_introspection es un parche que fuerza una segunda llamada. Para la demo necesitamos que el MCP dispare de forma fiable y natural ante preguntas de observabilidad, no por el fallback.",
+      "acceptance": [
+        "Ante pregunta sobre trazas/fallos, el agente llama al MCP tool en el primer turno sin forzar _force_phoenix_mcp_introspection",
+        "Si MCP no está disponible (ENABLE_PHOENIX_MCP=0), el agente responde con contexto local de reflex.py de forma limpia",
+        "phoenix_mcp_called: true aparece en la respuesta JSON de /ask cuando MCP se usa",
+        "Test cubre el path de disparo natural y el path de graceful fallback"
+      ],
+      "priority": "P0",
+      "sdd": true,
+      "status": "pending"
+    },
+    {
+      "id": 5,
+      "name": "cloud_run_deploy",
+      "title": "Deploy público en Cloud Run con URL verificada",
+      "description": "Ejecutar scripts/deploy-cloud-run.ps1, configurar env vars como secrets en el panel de Cloud Run (no en repo), verificar GET /health → 200 y GET /observability/mcp → demo_ready: true desde URL pública. URL en primera línea del README.",
+      "priority": "P0",
+      "sdd": false,
+      "status": "pending"
+    },
+    {
+      "id": 6,
+      "name": "loop_visible_mission",
+      "title": "Loop multi-step visible en una corrida: correction → eval → case → candidate → experiment",
+      "description": "En una sola demo el agente detecta un fallo, genera el regression case, propone el candidate prompt, corre el experiment y presenta la decisión de promoción (human-in-the-loop). El brief premia 'planifica pasos, usa tools, manteniéndote en control'.",
+      "acceptance": [
+        "/ask devuelve improvement_case no nulo cuando faithfulness < 0.75",
+        "Un prompt de pregunta con fallo conocido muestra en la respuesta JSON el encadenamiento completo: correction → eval → improvement_case",
+        "La UI renderiza el loop completo (correction panel + improvement case + botón 'Generate Candidate') sin recargar",
+        "La decisión final es human-in-the-loop: should_promote aparece pero no se actúa sin confirmación"
+      ],
+      "priority": "P1",
+      "sdd": true,
+      "status": "pending"
+    },
+    {
+      "id": 7,
+      "name": "mcp_observation_action",
+      "title": "MCP: observación de trazas → acción concreta (improvement case o candidate)",
+      "description": "Conectar el beat de introspección (qué falló en trazas via Phoenix MCP) con la creación automática de un improvement case o candidate prompt. El agente no solo describe el fallo: ejecuta la mejora.",
+      "acceptance": [
+        "Pregunta de introspección genera un improvement_case concreto cuando el MCP encuentra spans con failure_mode != 'none'",
+        "La respuesta de /ask incluye mcp_action con descripción de la acción ejecutada (p.ej. 'improvement case #N captured from trace X')",
+        "El agente consulta list_improvement_cases antes de actuar para evitar duplicados",
+        "Test cubre el path MCP → action y el path sin trazas de fallo (no action)"
+      ],
+      "priority": "P1",
+      "sdd": true,
+      "status": "pending"
+    },
+    {
+      "id": 8,
+      "name": "judge_validation_table",
+      "title": "Ampliar tabla de validación humana a 8-10 casos con FP/FN",
+      "description": "Añadir al README 8-10 casos con revisión humana. Incluir al menos 1 falso positivo y 1 falso negativo del juez LLM confirmados. Formato: case #, question, judge verdict, human verdict, agreement, notes.",
+      "priority": "P2",
+      "sdd": false,
+      "status": "pending"
+    },
+    {
+      "id": 9,
+      "name": "phantom_citation_tests",
+      "title": "Tests unitarios: _find_phantom_citations y failure mode classifier",
+      "description": "Cubrir con pytest las dos funciones más críticas: detección de phantom citations (regex + lógica de IDs) y clasificador de failure mode. Dan robustez barata si hay demo en vivo.",
+      "acceptance": [
+        "pytest cubre _find_phantom_citations: 0 phantoms, 1 phantom, múltiples, IDs malformados, brackets anidados",
+        "pytest cubre classify_failure_mode (o equivalente) con los 4 valores: none, retrieval, generation, answer_quality",
+        "pytest termina con exit 0"
+      ],
+      "priority": "P2",
+      "sdd": true,
+      "status": "pending"
+    },
+    {
+      "id": 10,
+      "name": "multi_agent_adk",
+      "title": "Multi-agente ADK 2.0: coordinador + judge subagente + improvement subagente",
+      "description": "Arquitectura multi-agente con coordinador QA que delega en subagente judge y subagente de mejora, usando el engine basado en grafo de ADK 2.0. Solo si no pone en riesgo la estabilidad de la demo.",
+      "priority": "P3",
+      "sdd": true,
+      "status": "blocked",
+      "blocked_reason": "No tocar hasta que P0 y P1 estén completos y la demo sea estable. Evaluar si ADK 2.0 graph engine está en GA antes de iniciar."
+    }
+  ]
+}
