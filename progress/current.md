@@ -1,6 +1,6 @@
 # Sesion actual
 
-Feature en review_pending: **ID 10** - `multi_agent_adk` (P3, SDD).
+Feature completada: **ID 10** - `multi_agent_adk` (P3, SDD).
 
 Cambios de esta fase:
 

@@ -120,7 +120,7 @@
       "description": "Arquitectura multi-agente con coordinador QA que delega en subagente judge y subagente de mejora, usando el engine basado en grafo de ADK 2.0. Solo si no pone en riesgo la estabilidad de la demo.",
       "priority": "P3",
       "sdd": true,
-      "status": "review_pending"
+      "status": "done"
     },
     {
       "id": 11,
