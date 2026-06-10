@@ -44,19 +44,30 @@ def retrieve_documents(query: str, top_k: int = 4) -> dict[str, Any]:
         span.set_attribute("input.value", query)
         span.set_attribute("retrieval.top_k", top_k)
 
-        use_semantic = _semantic_available()
-        results = _hybrid_rank(query, top_k) if use_semantic else _rank(query, top_k)
+        method = "bm25"
+        semantic_error = ""
+        if _semantic_available():
+            try:
+                results = _hybrid_rank(query, top_k)
+                method = "hybrid"
+            except Exception as exc:
+                semantic_error = f"{type(exc).__name__}: {exc}"
+                results = _rank(query, top_k)
+                method = "bm25_fallback"
+                span.set_attribute("retrieval.semantic_error", semantic_error[:500])
+        else:
+            results = _rank(query, top_k)
         max_score = results[0]["score"] if results else 0.0
         valid_citation_ids = [item["id"] for item in results]
         span.set_attribute("retrieval.result_count", len(results))
         span.set_attribute("retrieval.max_score", max_score)
-        span.set_attribute("retrieval.method", "hybrid" if use_semantic else "bm25")
+        span.set_attribute("retrieval.method", method)
         span.set_attribute("output.value", ", ".join(valid_citation_ids))
-        return {
+        response = {
             "query": query,
             "top_k": top_k,
             "max_score": max_score,
-            "retrieval_method": "hybrid" if use_semantic else "bm25",
+            "retrieval_method": method,
             "valid_citation_ids": valid_citation_ids,
             "citation_rule": (
                 "You MUST only cite IDs from valid_citation_ids. "
@@ -64,6 +75,9 @@ def retrieve_documents(query: str, top_k: int = 4) -> dict[str, Any]:
             ),
             "documents": results,
         }
+        if semantic_error:
+            response["semantic_error"] = semantic_error[:500]
+        return response
 
 
 _RRF_K = 60

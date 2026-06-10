@@ -15,6 +15,65 @@ Use any text-based PDF with content you can inspect and verify. The demo should 
 6. Show the weak answer becoming an improvement case / regression test.
 7. Generate a candidate prompt and run the prompt experiment.
 
+## Demo Corpus & Script Questions
+
+Upload both PDFs before starting:
+
+| PDF                                  | Contenido                                          |
+|--------------------------------------|----------------------------------------------------|
+| `BOE-A-2015-11430-consolidado.pdf`   | Estatuto de los Trabajadores (RDL 2/2015)          |
+| `lo_2-2007.pdf`                      | Estatuto de Autonomía para Andalucía (LO 2/2007)   |
+
+### Paso 2 — Pregunta con respuesta bien soportada (faithfulness 1.0, relevance 1.0)
+
+Demuestra que el sistema funciona correctamente cuando los chunks son correctos.
+
+```text
+¿Cuántas horas semanales fija el Estatuto de los Trabajadores como jornada ordinaria máxima?
+```
+
+Respuesta esperada: 40 horas semanales (Art. 34). Retriever encuentra el chunk exacto.
+
+```text
+Según el Estatuto de Autonomía para Andalucía, ¿cómo define el artículo 1 a Andalucía y de dónde emanan sus poderes?
+```
+
+Respuesta esperada: nacionalidad histórica, poderes emanan de la Constitución y del pueblo andaluz (Art. 1 LO 2/2007).
+
+### Paso 3 — Pregunta fuera del corpus (abstención correcta)
+
+Demuestra que el sistema no inventa cuando la información no está.
+
+```text
+¿Cuál es el plazo exacto para renovar el DNI electrónico?
+```
+
+Respuesta esperada: el sistema indica que los documentos no contienen esa información. `failure_mode: none`, `document_relevance: 0`.
+
+### Paso 4 — Pregunta que dispara el loop de corrección ⭐
+
+Esta es la pregunta de la demo principal. Produce `faithfulness: 0.5`, `failure_mode: "retrieval"` y genera `improvement_case`.
+
+```text
+Lista todos los permisos retribuidos a los que tiene derecho un trabajador según el Estatuto de los Trabajadores, indicando la duración exacta de cada uno.
+```
+
+Por qué falla: el retriever recupera chunks de conciliación y vacaciones (Art. 37-38) pero no el Art. 37.3 con la lista completa de permisos y sus días exactos. El agente referencia artículos no presentes en el contexto → juez: `partially_faithful`. Señales visibles en la respuesta:
+
+```json
+{
+  "faithfulness": { "score": 0.5, "label": "partially_faithful" },
+  "failure_mode": "retrieval",
+  "phantom_citations_detected_count": 11,
+  "phantom_citations_corrected_count": 11,
+  "event_count": 38
+}
+```
+
+El alto `event_count` y los 11 phantom citations corregidos hacen esta sesión especialmente rica para mostrar en el trace de Phoenix/Arize.
+
+---
+
 ## Showing the In-Session Correction Loop
 
 This is the most distinctive part of the system and should not be skipped.

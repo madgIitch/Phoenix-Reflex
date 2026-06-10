@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from collections import deque
 from datetime import UTC, datetime
 from threading import Lock
@@ -10,6 +11,7 @@ from phoenix_reflex.observability import get_tracer
 TRACE_SUMMARIES: deque[dict[str, Any]] = deque(maxlen=50)
 IMPROVEMENT_CASES: deque[dict[str, Any]] = deque(maxlen=50)
 LOCK = Lock()
+ACTIONABLE_FAILURE_MODES = {"retrieval", "generation", "answer_quality", "unknown"}
 
 MOJIBAKE_MARKERS = ("Ã", "Â", "â€", "â€”", "â€“", "�")
 
@@ -79,6 +81,7 @@ def record_trace_summary(
     phoenix_mcp_call_count: int = 0,
     phoenix_mcp_tools: list[str] | None = None,
     phoenix_mcp_evidence: list[dict[str, Any]] | None = None,
+    mcp_action: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Store a compact runtime summary for agent self-introspection."""
     retrieved_documents = retrieved_documents or []
@@ -118,6 +121,7 @@ def record_trace_summary(
         "phoenix_mcp_call_count": phoenix_mcp_call_count,
         "phoenix_mcp_tools": phoenix_mcp_tools or [],
         "phoenix_mcp_evidence": phoenix_mcp_evidence or [],
+        "mcp_action": mcp_action,
     }
     with LOCK:
         TRACE_SUMMARIES.appendleft(summary)
@@ -149,6 +153,128 @@ def maybe_create_improvement_case(summary: dict[str, Any]) -> dict[str, Any] | N
             if quality_only_failure
             else str(summary.get("failure_mode", "unknown"))
         ),
+    )
+
+
+def build_mcp_action(
+    *,
+    question: str,
+    phoenix_mcp_evidence: list[dict[str, object]],
+) -> dict[str, object]:
+    """Create a concrete action from Phoenix MCP failure evidence."""
+    candidate = extract_mcp_failure_candidate(phoenix_mcp_evidence)
+    if candidate is None:
+        return _mcp_action(
+            status="no_action",
+            description="Phoenix MCP returned no traces or spans with actionable failure_mode.",
+        )
+
+    source_trace_id = str(candidate["source_trace_id"])
+    failure_mode = str(candidate["failure_mode"])
+    action_question = str(candidate.get("question") or question)
+    existing_cases = list_improvement_cases(limit=50)["cases"]
+    duplicate = find_duplicate_improvement_case(
+        source_session_id=source_trace_id,
+        question=action_question,
+        failure_mode=failure_mode,
+        existing_cases=existing_cases,
+    )
+    if duplicate:
+        return _mcp_action(
+            status="duplicate",
+            description=(
+                f"Existing improvement case {duplicate['case_id']} already covers trace "
+                f"{source_trace_id}."
+            ),
+            source_trace_id=source_trace_id,
+            failure_mode=failure_mode,
+            improvement_case=duplicate,
+        )
+
+    improvement_case = add_mcp_improvement_case(
+        question=question,
+        candidate=candidate,
+    )
+    return _mcp_action(
+        status="created",
+        description=(
+            f"Improvement case {improvement_case['case_id']} captured from trace "
+            f"{source_trace_id}."
+        ),
+        source_trace_id=source_trace_id,
+        failure_mode=failure_mode,
+        improvement_case=improvement_case,
+    )
+
+
+def extract_mcp_failure_candidate(
+    phoenix_mcp_evidence: list[dict[str, object]],
+) -> dict[str, object] | None:
+    """Return the first actionable failure candidate found in Phoenix MCP evidence."""
+    for item in _iter_dicts(phoenix_mcp_evidence):
+        failure_mode = _failure_mode_from_item(item)
+        if failure_mode is None:
+            continue
+        source_trace_id = _first_string(
+            item,
+            ("trace_id", "session_id", "source_session_id", "id"),
+        )
+        if source_trace_id is None:
+            source_trace_id = f"mcp-{_stable_signature(str(item), failure_mode)}"
+        question = _first_string(item, ("question", "input", "input.value"))
+        answer = _first_string(item, ("answer", "output", "output.value", "bad_answer"))
+        explanation = _first_string(
+            item,
+            ("explanation", "failure_report", "error", "message", "summary"),
+        )
+        return {
+            "source_trace_id": source_trace_id,
+            "failure_mode": failure_mode,
+            "question": question,
+            "answer": answer,
+            "explanation": explanation or f"Phoenix MCP reported failure_mode={failure_mode}.",
+        }
+    return None
+
+
+def find_duplicate_improvement_case(
+    *,
+    source_session_id: str,
+    question: str,
+    failure_mode: str,
+    existing_cases: list[dict[str, object]],
+) -> dict[str, object] | None:
+    """Find an existing case for the same source trace or question/failure signature."""
+    signature = _stable_signature(question, failure_mode)
+    for case in existing_cases:
+        if str(case.get("source_session_id", "")) == source_session_id:
+            return case
+        case_signature = _stable_signature(
+            str(case.get("question", "")),
+            str(case.get("failure_mode", "")),
+        )
+        if case_signature == signature:
+            return case
+    return None
+
+
+def add_mcp_improvement_case(
+    *,
+    question: str,
+    candidate: dict[str, object],
+) -> dict[str, object]:
+    """Create an improvement case from normalized Phoenix MCP failure evidence."""
+    action_question = str(candidate.get("question") or question)
+    failure_mode = str(candidate.get("failure_mode", "unknown"))
+    source_trace_id = str(candidate.get("source_trace_id", "mcp-unknown"))
+    return add_improvement_case(
+        question=action_question,
+        answer=str(candidate.get("answer") or "Phoenix MCP trace reported a failed answer."),
+        faithfulness_label="mcp_failure",
+        faithfulness_score=0.0,
+        explanation=str(candidate.get("explanation") or "Phoenix MCP reported a failed trace."),
+        source_session_id=source_trace_id,
+        failure_mode=failure_mode,
     )
 
 
@@ -304,6 +430,79 @@ def _suggest_fix(failure_mode: str) -> str:
         "Improve retrieval coverage or tighten the prompt so unsupported claims become explicit "
         "abstentions."
     )
+
+
+def _mcp_action(
+    *,
+    status: str,
+    description: str,
+    source_trace_id: str | None = None,
+    failure_mode: str | None = None,
+    improvement_case: dict[str, Any] | None = None,
+) -> dict[str, object]:
+    return {
+        "status": status,
+        "description": description,
+        "source_trace_id": source_trace_id,
+        "failure_mode": failure_mode,
+        "improvement_case": improvement_case,
+    }
+
+
+def _iter_dicts(value: object) -> list[dict[str, object]]:
+    if isinstance(value, dict):
+        children = []
+        for child in value.values():
+            children.extend(_iter_dicts(child))
+        return [value, *children]
+    if isinstance(value, list):
+        children = []
+        for item in value:
+            children.extend(_iter_dicts(item))
+        return children
+    return []
+
+
+def _failure_mode_from_item(item: dict[str, object]) -> str | None:
+    raw_failure_mode = item.get("failure_mode")
+    if raw_failure_mode is None:
+        attributes = item.get("attributes")
+        if isinstance(attributes, dict):
+            raw_failure_mode = attributes.get("failure_mode") or attributes.get("eval.failure_mode")
+    if raw_failure_mode is None:
+        return None
+
+    failure_mode = str(raw_failure_mode).strip().lower()
+    if failure_mode == "none":
+        return None
+    if failure_mode in ACTIONABLE_FAILURE_MODES:
+        return failure_mode
+    return "unknown"
+
+
+def _first_string(item: dict[str, object], keys: tuple[str, ...]) -> str | None:
+    for key in keys:
+        value = _lookup_nested(item, key)
+        if isinstance(value, str) and value.strip():
+            return _repair_mojibake_text(value.strip())
+    return None
+
+
+def _lookup_nested(item: dict[str, object], key: str) -> object:
+    if key in item:
+        return item[key]
+    value: object = item
+    for part in key.split("."):
+        if not isinstance(value, dict) or part not in value:
+            return None
+        value = value[part]
+    return value
+
+
+def _stable_signature(question: str, failure_mode: str) -> str:
+    normalized_question = re.sub(r"\s+", " ", question.strip().lower())
+    normalized_failure = failure_mode.strip().lower()
+    return f"{normalized_failure}:{normalized_question}"
 
 
 def _relevance_label(trace: dict[str, Any]) -> str:

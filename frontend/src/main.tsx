@@ -275,15 +275,19 @@ function App() {
 
   async function ask() {
     setStatus('Asking');
-    const payload = await fetchJson<AskResponse>('/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question }),
-    });
-    setAskResponse(payload);
-    setStatus('Answer ready');
-    await refreshCases();
-    await refreshTraces();
+    try {
+      const payload = await fetchJson<AskResponse>('/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question }),
+      });
+      setAskResponse(payload);
+      setStatus('Answer ready');
+      await refreshCases();
+      await refreshTraces();
+    } catch (error) {
+      setStatus(`Ask failed: ${errorMessage(error)}`);
+    }
   }
 
   async function exportTraces() {
@@ -507,17 +511,25 @@ function AskView({ question, response, onQuestion, onAsk }: {
 
   async function generateCandidate() {
     setLoopStatus('Generating candidate');
-    const payload = await fetchJson<CandidateResponse>('/prompts/candidate', { method: 'POST' });
-    setCandidate(payload);
-    setExperiment(null);
-    setLoopStatus('Candidate ready');
+    try {
+      const payload = await fetchJson<CandidateResponse>('/prompts/candidate', { method: 'POST' });
+      setCandidate(payload);
+      setExperiment(null);
+      setLoopStatus('Candidate ready');
+    } catch (error) {
+      setLoopStatus(`Candidate failed: ${errorMessage(error)}`);
+    }
   }
 
   async function runExperiment() {
     setLoopStatus('Running experiment');
-    const payload = await fetchJson<PromptExperimentResponse>('/experiments/prompt?n_runs=1', { method: 'POST' });
-    setExperiment(payload);
-    setLoopStatus('Experiment ready');
+    try {
+      const payload = await fetchJson<PromptExperimentResponse>('/experiments/prompt?n_runs=1', { method: 'POST' });
+      setExperiment(payload);
+      setLoopStatus('Experiment ready');
+    } catch (error) {
+      setLoopStatus(`Experiment failed: ${errorMessage(error)}`);
+    }
   }
 
   const improvementCase = response?.loop?.improvement_case ?? response?.improvement_case ?? null;
@@ -1042,8 +1054,15 @@ function labelFor(view: View) {
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, init);
-  if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+  if (!response.ok) {
+    const detail = await response.text().catch(() => response.statusText);
+    throw new Error(`${response.status} ${response.statusText}${detail ? `: ${detail.slice(0, 240)}` : ''}`);
+  }
   return response.json();
+}
+
+function errorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
 }
 
 function downloadJson(filename: string, data: unknown) {

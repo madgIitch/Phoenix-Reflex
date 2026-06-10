@@ -16,6 +16,7 @@ from phoenix_reflex.mcp import (
 )
 from phoenix_reflex.observability import get_tracer
 from phoenix_reflex.reflex import (
+    build_mcp_action,
     format_reflex_context,
     maybe_create_improvement_case,
     record_trace_summary,
@@ -99,9 +100,16 @@ async def ask_agent(question: str) -> dict[str, object]:
         span.set_attribute("output.value", answer)
         phoenix_mcp_calls = await _extract_phoenix_mcp_calls(session_id)
         phoenix_mcp_tools = sorted({str(call["tool"]) for call in phoenix_mcp_calls})
+        mcp_action = (
+            build_mcp_action(question=question, phoenix_mcp_evidence=phoenix_mcp_calls)
+            if phoenix_mcp_calls
+            else None
+        )
         span.set_attribute("phoenix_mcp.called", bool(phoenix_mcp_calls))
         span.set_attribute("phoenix_mcp.call_count", len(phoenix_mcp_calls))
         span.set_attribute("phoenix_mcp.tools", ", ".join(phoenix_mcp_tools))
+        if mcp_action:
+            span.set_attribute("phoenix_mcp.action_status", str(mcp_action["status"]))
 
         agent_retrieved = await _extract_agent_retrieval(session_id)
         if agent_retrieved:
@@ -198,6 +206,7 @@ async def ask_agent(question: str) -> dict[str, object]:
             phoenix_mcp_call_count=len(phoenix_mcp_calls),
             phoenix_mcp_tools=phoenix_mcp_tools,
             phoenix_mcp_evidence=phoenix_mcp_calls,
+            mcp_action=mcp_action,
         )
         improvement_case = maybe_create_improvement_case(summary)
         if improvement_case:
@@ -234,6 +243,7 @@ async def ask_agent(question: str) -> dict[str, object]:
             "phoenix_mcp_call_count": len(phoenix_mcp_calls),
             "phoenix_mcp_tools": phoenix_mcp_tools,
             "phoenix_mcp_evidence": phoenix_mcp_calls,
+            "mcp_action": mcp_action,
         }
 
 
@@ -398,6 +408,7 @@ async def _extract_phoenix_mcp_calls(session_id: str) -> list[dict[str, object]]
                     {
                         "tool": name,
                         "summary": _summarize_tool_response(fr.response),
+                        "response": repair_mojibake(fr.response),
                     }
                 )
         return calls

@@ -73,7 +73,7 @@
       ],
       "priority": "P1",
       "sdd": true,
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "id": 7,
@@ -88,7 +88,7 @@
       ],
       "priority": "P1",
       "sdd": true,
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": 8,
@@ -97,7 +97,7 @@
       "description": "Añadir al README 8-10 casos con revisión humana. Incluir al menos 1 falso positivo y 1 falso negativo del juez LLM confirmados. Formato: case #, question, judge verdict, human verdict, agreement, notes.",
       "priority": "P2",
       "sdd": false,
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": 9,
@@ -111,7 +111,7 @@
       ],
       "priority": "P2",
       "sdd": true,
-      "status": "pending"
+      "status": "spec_ready"
     },
     {
       "id": 10,

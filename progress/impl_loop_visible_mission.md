@@ -8,6 +8,7 @@ Implementacion completada.
 - `frontend/src/main.tsx`
 - `frontend/src/styles.css`
 - `tests/test_loop_visible_mission.py`
+- `tests/test_retriever_fallback.py`
 - `pytest.ini`
 - `specs/loop_visible_mission/design.md`
 - `specs/loop_visible_mission/tasks.md`
@@ -20,6 +21,8 @@ Implementacion completada.
 - `Run Experiment` llama a `POST /experiments/prompt?n_runs=1` sin recargar.
 - La UI muestra `should_promote_to_staging` como recomendacion, sin llamar a `/prompts/promote`.
 - Se agrego `pytest.ini` para que `pytest` literal encuentre el paquete local.
+- Tras smoke test, `AskView` captura errores de `/ask`, `/prompts/candidate` y `/experiments/prompt` para no dejar la UI bloqueada en estados de carga.
+- Tras smoke test, retrieval degrada de `hybrid` a `bm25_fallback` si Gemini embeddings falla por cuota u otro error, evitando 500 en `/ask`.
 
 ## Guion de demo
 1. Abrir el frontend.
@@ -38,3 +41,6 @@ Implementacion completada.
 ## Verificacion
 - `pytest` -> 12 passed.
 - `npm run build` en `frontend/` -> exit 0.
+- Re-verificacion tras fix de errores UI: `npm run build` en `frontend/` -> exit 0.
+- Re-verificacion tras fallback BM25: `pytest` -> 13 passed.
+- Re-verificacion tras fallback BM25: `npm run build` en `frontend/` -> exit 0.
