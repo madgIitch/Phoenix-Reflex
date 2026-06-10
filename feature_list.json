@@ -111,7 +111,7 @@
       ],
       "priority": "P2",
       "sdd": true,
-      "status": "spec_ready"
+      "status": "done"
     },
     {
       "id": 10,
@@ -120,8 +120,24 @@
       "description": "Arquitectura multi-agente con coordinador QA que delega en subagente judge y subagente de mejora, usando el engine basado en grafo de ADK 2.0. Solo si no pone en riesgo la estabilidad de la demo.",
       "priority": "P3",
       "sdd": true,
-      "status": "blocked",
-      "blocked_reason": "No tocar hasta que P0 y P1 estén completos y la demo sea estable. Evaluar si ADK 2.0 graph engine está en GA antes de iniciar."
+      "status": "review_pending"
+    },
+    {
+      "id": 11,
+      "name": "frontend_multi_agent_toggle",
+      "title": "Toggle frontend para activar Multi-agent ADK por request",
+      "description": "Permitir que el operador active o desactive el modo multi-agente desde la vista Ask sin reiniciar el backend. El toggle debe enviar la preferencia en cada POST /ask, el backend debe seleccionar/cachear el runner por modo y la respuesta debe indicar que modo se uso.",
+      "acceptance": [
+        "La vista Ask muestra un toggle claro para usar el modo Multi-agent ADK sin depender de cambiar variables de entorno en caliente",
+        "POST /ask acepta un campo opcional multi_agent_adk y conserva compatibilidad con clientes que solo envian question",
+        "qa.py usa runner cacheado por modo para evitar que el lru_cache actual bloquee el cambio entre single-agent y multi-agent",
+        "La respuesta JSON de /ask incluye el modo usado para que la UI pueda mostrar evidencia de la ejecucion",
+        "Tests cubren el modo por defecto single-agent, el override multi-agent y que el contrato anterior de /ask sigue funcionando",
+        "npm run build y pytest pasan antes de cerrar la feature"
+      ],
+      "priority": "P3",
+      "sdd": true,
+      "status": "pending"
     }
   ]
 }

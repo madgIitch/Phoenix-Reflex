@@ -23,7 +23,7 @@ from phoenix_reflex.reflex import (
     repair_mojibake,
 )
 from phoenix_reflex.retriever import retrieve_documents
-from phoenix_reflex_agent.agent import root_agent
+from phoenix_reflex_agent.multi_agent import build_root_agent
 
 APP_NAME = "phoenix-reflex"
 USER_ID = "api-user"
@@ -38,7 +38,7 @@ def _session_service() -> InMemorySessionService:
 def _runner() -> Runner:
     return Runner(
         app_name=APP_NAME,
-        agent=root_agent,
+        agent=build_root_agent(),
         session_service=_session_service(),
     )
 
@@ -547,6 +547,10 @@ def _find_answer_style_issues(answer: str) -> list[str]:
     )
     if any(phrase in normalized for phrase in meta_mechanic_phrases):
         issues.append("mentions_internal_mechanics")
+    # Detect coordinator returning a JSON-wrapped block instead of plain text.
+    stripped = answer.strip()
+    if stripped.startswith("```json") or stripped.startswith('{"answer"') or stripped.startswith("{\n  \"answer\""):
+        issues.append("json_wrapped_response")
     return issues
 
 

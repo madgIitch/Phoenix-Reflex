@@ -1,5 +1,57 @@
 # Sesion actual
 
+Feature en review_pending: **ID 10** - `multi_agent_adk` (P3, SDD).
+
+Cambios de esta fase:
+
+- Aprobacion humana recibida con "aprobado".
+- Ejecutado `.\init.ps1` con exit 0 antes de implementar.
+- Marcado `multi_agent_adk` como `in_progress` en `feature_list.json`.
+- T0 confirmado: `pip index versions google-adk` muestra `2.2.0`, `2.1.0` y `2.0.0`.
+- Actualizado `requirements.txt` a `google-adk>=2.0.0,<3.0.0`.
+- Verificado `pip install -r requirements.txt` con exit 0; `openinference-instrumentation-google-adk` sin conflicto.
+- Extraida `build_single_agent()` preservando `root_agent`.
+- Creado `phoenix_reflex_agent/multi_agent.py` con coordinador, judge subagent, improvement subagent y fallback a single-agent.
+- Integrado `qa.py` para usar `build_root_agent()`.
+- Aniadido `tests/test_multi_agent_adk.py`.
+- Verificado `pytest` -> 37 passed.
+- Verificado import check -> exit 0.
+- Verificado `.\init.ps1` -> `RESULTADO: OK - listo para trabajar`.
+- Escrito `progress/impl_multi_agent_adk.md`.
+- Reviewer: APPROVED en `progress/review_multi_agent_adk.md`.
+- Marcado `multi_agent_adk` como `review_pending`.
+
+Siguiente accion:
+
+- Pausa obligatoria SDD: smoke tests humanos pendientes.
+- No marcar `done` hasta que el humano confirme los smoke tests.
+- Nueva feature registrada: **ID 11** - `frontend_multi_agent_toggle` (P3, SDD, pending).
+- No iniciar la ID 11 hasta cerrar o desbloquear explicitamente la pausa actual de la ID 10.
+
+---
+
+Feature desbloqueada y preparada: **ID 10** - `multi_agent_adk` (P3, SDD).
+
+Cambios aplicados en esta fase:
+
+- Recibida instruccion humana explicita: "desbloquea".
+- Verificada documentacion oficial de ADK:
+  - `https://adk.dev/` anuncia `ADK Python 2.0 GA` con graph workflows y collaborative agents.
+  - `https://adk.dev/graphs/` indica soporte de graph-based workflows en `ADK Python v2.0.0`.
+  - `https://adk.dev/workflows/` describe graph-based, dynamic y collaborative workflows para ADK 2.0+.
+- Confirmado que P0/P1 ya estan `done` y que `.\init.ps1` pasaba antes de iniciar.
+- Detectado que el repo actual tiene `google-adk>=1.32.0,<2.0.0`; la spec incluye migracion controlada a ADK 2.x.
+- Detectado que `AGENTS.md` menciona `phoenix_reflex/agent.py`, pero el archivo real del agente es `phoenix_reflex_agent/agent.py`.
+- Creados `specs/multi_agent_adk/requirements.md`, `specs/multi_agent_adk/design.md` y `specs/multi_agent_adk/tasks.md`.
+- Marcado `multi_agent_adk` como `spec_ready` en `feature_list.json`.
+
+Siguiente accion:
+
+- Pausa obligatoria SDD: el humano debe aprobar la spec antes de implementar.
+- Si el humano confirma aprobacion, cambiar `multi_agent_adk` a `in_progress` e implementar con fallback default al agente unico.
+
+---
+
 Feature preparada: **ID 9** - `phantom_citation_tests` (P2, SDD).
 
 Cambios aplicados en esta fase:
@@ -9,11 +61,23 @@ Cambios aplicados en esta fase:
 - Revisada la logica actual de `_find_phantom_citations()` y `_classify_failure_mode()` en `phoenix_reflex/qa.py`.
 - Creados `specs/phantom_citation_tests/requirements.md`, `specs/phantom_citation_tests/design.md` y `specs/phantom_citation_tests/tasks.md`.
 - Marcado `phantom_citation_tests` como `spec_ready` en `feature_list.json`.
+- Aprobacion humana recibida con "adelante".
+- Marcado `phantom_citation_tests` como `in_progress` en `feature_list.json`.
+- Implementados tests unitarios en `tests/test_qa_detection.py`.
+- Verificado `pytest` -> 28 passed.
+- Verificado `python -c "import phoenix_reflex; import phoenix_reflex_agent"` -> exit 0.
+- Escrito `progress/impl_phantom_citation_tests.md`.
+- Reviewer: APPROVED en `progress/review_phantom_citation_tests.md`.
+- Marcado `phantom_citation_tests` como `review_pending` en `feature_list.json`.
+- Smoke test humano confirmado:
+  - `pytest tests/test_qa_detection.py -v` -> 9 passed.
+  - `.\init.ps1` -> `RESULTADO: OK - listo para trabajar`.
+- Marcado `phantom_citation_tests` como `done` en `feature_list.json`.
 
 Siguiente accion:
 
-- Pausa obligatoria SDD: el humano debe aprobar la spec antes de implementar tests.
-- Si el humano confirma aprobacion, cambiar `phantom_citation_tests` a `in_progress` e implementar `tests/test_qa_detection.py`.
+- Feature **ID 10** - `multi_agent_adk` esta `blocked`.
+- No iniciar sin instrucciones explicitas: esta bloqueada hasta que P0/P1 esten completos y la demo sea estable.
 
 ---
 
