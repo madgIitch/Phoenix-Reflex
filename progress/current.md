@@ -1,5 +1,10 @@
 # Sesion actual
 
+Implementacion en curso: **auto-seed corpus demo** en `phoenix_reflex/main.py`.
+
+---
+
+
 Feature completada: **ID 10** - `multi_agent_adk` (P3, SDD).
 
 Cambios de esta fase:

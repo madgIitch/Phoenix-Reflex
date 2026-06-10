@@ -10,6 +10,44 @@ retrieves evidence, corrects invalid citations before responding, scores the fin
 answer, captures failures as regression data, and compares candidate prompts before
 a human promotes a change.
 
+## Arize Track Checklist
+
+| Requirement | Status | Evidence |
+| --- | --- | --- |
+| Code-owned runtime | ✅ | Google ADK 2.x runner managed in `phoenix_reflex/qa.py`; no managed-service black box |
+| OpenInference instrumentation | ✅ | `openinference-instrumentation-google-adk` wraps every ADK session; spans emitted to Arize |
+| Phoenix tracing | ✅ | OTel traces to `otlp.eu-west-1a.arize.com`; `eval.*` attributes on every span |
+| Phoenix MCP runtime introspection | ✅ | `GET /observability/mcp` → `demo_ready: true`; agent calls MCP tools live during `/ask` |
+| LLM-as-judge evaluation | ✅ | Faithfulness, document relevance, and answer quality scored per request; see human validation table |
+| Observability-driven improvement | ✅ | Low-scoring answers auto-captured as regression cases; candidate prompts generated and compared before human promotes |
+
+> **On Google Cloud Agent Builder:** Phoenix Reflex uses Google ADK 2.x — the open-source, code-first layer of the same Agent Builder stack. Code-owned runtime is a deliberate choice: it is the only way to attach OpenInference instrumentation and emit the per-span `eval.*` attributes that Arize requires. The service runs on Cloud Run with Gemini 3.5 Flash, fully within the Google Cloud ecosystem.
+
+## Try it in 60 seconds
+
+The demo corpus (Estatuto de los Trabajadores + Estatuto de Autonomía para Andalucía) is pre-loaded on the public instance. No setup needed.
+
+**Question 1 — well-supported answer (faithfulness 1.0):**
+
+```text
+¿Cuántas horas semanales fija el Estatuto de los Trabajadores como jornada ordinaria máxima?
+```
+
+**Question 2 — abstention (out-of-corpus):**
+
+```text
+¿Cuál es el plazo exacto para renovar el DNI electrónico?
+```
+
+Expected: the agent refuses to answer and cites the absence of the information in the loaded documents.
+
+**Question 3 — triggers the correction loop ⭐:**
+
+```text
+Lista todos los permisos retribuidos a los que tiene derecho un trabajador según el Estatuto de los Trabajadores, indicando la duración exacta de cada uno.
+```
+Expected: `phantom_citations_detected_count > 0`, `phantom_citations: []`, `failure_mode: "retrieval"`, `improvement_case` non-null. The inline correction loop fires, fixes invented citation IDs before the answer reaches you, and captures the weak answer as a regression case.
+
 ## Core Flow
 
 1. Upload one or more text-based PDFs.

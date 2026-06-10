@@ -6,19 +6,27 @@ and prompt candidates instead of silent repeated failures.
 
 from __future__ import annotations
 
+import hashlib
 import os
+import re
+import tempfile
 from contextlib import asynccontextmanager
 from datetime import datetime, UTC
+from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from phoenix_reflex.chunking import chunk_pages
 from phoenix_reflex.document_store import (
     delete_document,
     get_document,
     list_chunks,
     list_documents,
+    save_document_with_chunks,
     set_anchor_questions,
     update_chunk_enabled,
 )
@@ -27,6 +35,7 @@ from phoenix_reflex.experiments import generate_prompt_candidate, run_prompt_exp
 from phoenix_reflex.ingestion import ingest_pdf
 from phoenix_reflex.mcp import phoenix_mcp_status
 from phoenix_reflex.observability import configure_tracing, get_tracer
+from phoenix_reflex.pdf_loader import extract_pdf_pages
 from phoenix_reflex.prompts import list_prompts, promote_prompt_tag
 from phoenix_reflex.qa import ask_agent
 from phoenix_reflex.reflex import (
@@ -56,9 +65,83 @@ class AnchorQuestionsRequest(BaseModel):
     questions: list[str] = Field(..., min_length=1, max_length=10)
 
 
+_DEMO_PDFS = [
+    "BOE-A-2015-11430-consolidado.pdf",
+    "lo_2-2007.pdf",
+]
+
+
+def _seed_demo_corpus() -> None:
+    """Ingest demo PDFs on startup if the document store is empty."""
+    docs = list_documents()
+    if docs:
+        return
+
+    for pdf_name in _DEMO_PDFS:
+        pdf_path = Path(pdf_name)
+        if not pdf_path.exists():
+            print(f"[seed] {pdf_name} not found, skipping")
+            continue
+        try:
+            data = pdf_path.read_bytes()
+            digest = hashlib.sha256(data).hexdigest()[:12]
+            document_id = f"pdf-{digest}"
+            filename = pdf_path.name
+
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                tmp.write(data)
+                tmp_path = Path(tmp.name)
+
+            try:
+                pages = extract_pdf_pages(tmp_path)
+                chunks = chunk_pages([(page.page, page.text) for page in pages])
+                if not chunks:
+                    print(f"[seed] {pdf_name} produced no chunks, skipping")
+                    continue
+
+                now = datetime.now(UTC).isoformat()
+                safe_name = re.sub(r"[^a-zA-Z0-9._-]+", "-", filename).strip("-")
+                document = {
+                    "id": document_id,
+                    "filename": filename,
+                    "source_type": "pdf",
+                    "status": "indexed",
+                    "page_count": len(pages),
+                    "chunk_count": len(chunks),
+                    "sha256": hashlib.sha256(data).hexdigest(),
+                    "created_at": now,
+                    "updated_at": now,
+                }
+                chunk_records = [
+                    {
+                        "id": f"{document_id}-p{c.page:03d}-c{c.chunk_index:03d}-{safe_name}",
+                        "document_id": document_id,
+                        "source": filename,
+                        "source_type": "pdf",
+                        "page": c.page,
+                        "chunk_index": c.chunk_index,
+                        "title": f"pdf:{filename} p.{c.page} c.{c.chunk_index}",
+                        "text": c.text,
+                        "token_estimate": max(1, len(c.text) // 4),
+                        "enabled": True,
+                        "tags": ["pdf", "seed"],
+                        "created_at": now,
+                        "updated_at": now,
+                    }
+                    for c in chunks
+                ]
+                save_document_with_chunks(document, chunk_records, tmp_path)
+                print(f"[seed] ingested {pdf_name}: {len(chunk_records)} chunks")
+            finally:
+                tmp_path.unlink(missing_ok=True)
+        except Exception as exc:  # noqa: BLE001
+            print(f"[seed] error ingesting {pdf_name}: {exc}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     tracer_provider = configure_tracing()
+    _seed_demo_corpus()
     yield
     if tracer_provider is not None:
         tracer_provider.shutdown()
@@ -73,11 +156,19 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://phoenix-reflex-27208039935.europe-west1.run.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+_FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
+if _FRONTEND_DIST.is_dir():
+    app.mount("/assets", StaticFiles(directory=_FRONTEND_DIST / "assets"), name="assets")
 
 
 @app.get("/health")
@@ -86,7 +177,10 @@ def health() -> dict[str, str]:
 
 
 @app.get("/")
-def root() -> dict[str, str]:
+def root():
+    index = _FRONTEND_DIST / "index.html"
+    if index.is_file():
+        return FileResponse(index)
     return {
         "service": "phoenix-reflex",
         "status": "ready",
@@ -280,3 +374,11 @@ def prompt_experiment(n_runs: int = 1) -> dict[str, object]:
 @app.post("/prompts/promote")
 def promote_prompt(source_tag: str = "candidate", target_tag: str = "staging") -> dict[str, object]:
     return promote_prompt_tag(source_tag=source_tag, target_tag=target_tag)
+
+
+@app.get("/{full_path:path}")
+def spa_fallback(full_path: str):
+    index = _FRONTEND_DIST / "index.html"
+    if index.is_file():
+        return FileResponse(index)
+    return {"service": "phoenix-reflex", "status": "ready"}

@@ -123,6 +123,33 @@
       "status": "done"
     },
     {
+      "id": 12,
+      "name": "demo_assets_cleanup",
+      "title": "Mover trace-session JSON de raíz a demo-assets/",
+      "description": "Los 9 ficheros trace-session-*.json sueltos en la raíz dan sensación de desorden. Moverlos a demo-assets/ con un README de una línea que explica que son evidencia del correction loop.",
+      "priority": "P0",
+      "sdd": false,
+      "status": "done"
+    },
+    {
+      "id": 13,
+      "name": "seed_corpus",
+      "title": "Incluir PDFs de demo en repo + auto-seed en startup",
+      "description": "Quitar *.pdf de .gitignore para que BOE-A-2015-11430-consolidado.pdf y lo_2-2007.pdf se suban al repo. Añadir auto-ingestion en lifespan: si el data store arranca vacío, ingestar automáticamente los dos PDFs de demo desde la raíz. Esto hace que Cloud Run sea demo-ready sin upload manual.",
+      "priority": "P0",
+      "sdd": false,
+      "status": "done"
+    },
+    {
+      "id": 14,
+      "name": "readme_arize_checklist",
+      "title": "Sección Arize Track Checklist + Agent Builder + Try it in 60s en README",
+      "description": "Añadir sección con las casillas explícitas de la rúbrica Arize marcadas, párrafo sobre ADK vs Agent Builder, y sección 'Try it in 60 seconds' con 3 preguntas copy-paste para el juez técnico.",
+      "priority": "P0",
+      "sdd": false,
+      "status": "done"
+    },
+    {
       "id": 11,
       "name": "frontend_multi_agent_toggle",
       "title": "Toggle frontend para activar Multi-agent ADK por request",
