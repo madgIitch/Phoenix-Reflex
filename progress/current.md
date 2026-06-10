@@ -21,12 +21,18 @@ Cambios de esta fase:
 - Reviewer: APPROVED en `progress/review_multi_agent_adk.md`.
 - Marcado `multi_agent_adk` como `review_pending`.
 
+Cambios adicionales de cierre:
+
+- Bug fix: COORDINATOR_INSTRUCTION corregida para devolver texto plano (no JSON).
+- Bug fix: _find_answer_style_issues detecta json_wrapped_response como issue.
+- Añadido *.pdf a .gitignore.
+- Smoke tests 1, 2 y 3 superados con faithfulness: 1.0 y failure_mode: none.
+- Marcado `multi_agent_adk` como `done` en `feature_list.json`.
+
 Siguiente accion:
 
-- Pausa obligatoria SDD: smoke tests humanos pendientes.
-- No marcar `done` hasta que el humano confirme los smoke tests.
-- Nueva feature registrada: **ID 11** - `frontend_multi_agent_toggle` (P3, SDD, pending).
-- No iniciar la ID 11 hasta cerrar o desbloquear explicitamente la pausa actual de la ID 10.
+- Feature **ID 11** - `frontend_multi_agent_toggle` (P3, SDD) esta `pending`.
+- Debe pasar por spec_author antes de implementar.
 
 ---
 
